@@ -176,12 +176,12 @@
             100% { transform: translateX(-100%); }
         }
 
-        /* ===== 轮播横幅 - 自适应高度，图片完整显示 ===== */
+        /* ===== 轮播横幅 - 尺寸适中，图片完整显示 ===== */
         .carousel-container {
             position: relative;
             width: 100%;
-            max-width: 1280px;
-            margin: 20px auto 10px;
+            max-width: 900px;
+            margin: 12px auto 8px;
             border-radius: 12px;
             overflow: hidden;
             background: #1a1a1a;
@@ -209,7 +209,7 @@
         .carousel-slide img {
             width: 100%;
             height: auto;
-            max-height: 70vh;
+            max-height: 50vh;
             object-fit: contain;
             display: block;
             background: #1a1a1a;
@@ -311,10 +311,10 @@
             }
             .carousel-container {
                 border-radius: 8px;
-                margin: 12px auto 8px;
+                margin: 8px auto 6px;
             }
             .carousel-slide img {
-                max-height: 50vh;
+                max-height: 35vh;
             }
             .carousel-slide .slide-overlay h3 {
                 font-size: 16px;
@@ -352,10 +352,10 @@
             }
             .carousel-container {
                 border-radius: 6px;
-                margin: 8px auto 6px;
+                margin: 6px auto 4px;
             }
             .carousel-slide img {
-                max-height: 40vh;
+                max-height: 30vh;
             }
             .carousel-slide .slide-overlay h3 {
                 font-size: 14px;
@@ -4741,7 +4741,7 @@
 
             console.log('✅ 人民共产网已启动');
             console.log('📌 超级管理员：杨振浩 / Yzh061110');
-            console.log('✅ 轮播横幅图片显示已修复 (object-fit:contain)');
+            console.log('✅ 轮播横幅尺寸已优化 (max-width:900px, max-height:50vh)');
             console.log('✅ 后台上传按钮重新绑定事件，选择图片后仍可再次点击');
         });
 
