@@ -155,7 +155,7 @@
             overflow: hidden;
             white-space: nowrap;
             position: sticky;
-            top: 52px; /* 导航栏高度，与 .nav-inner min-height 一致 */
+            top: 52px;
             z-index: 998;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             border-bottom: 2px solid #b8860b;
@@ -176,6 +176,127 @@
             100% { transform: translateX(-100%); }
         }
 
+        /* ===== 轮播横幅 ===== */
+        .carousel-container {
+            position: relative;
+            width: 100%;
+            max-width: 1280px;
+            margin: 20px auto 10px;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #1a1a1a;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            aspect-ratio: 3/1;
+            min-height: 150px;
+            display: none;
+        }
+        .carousel-container.active {
+            display: block;
+        }
+        .carousel-slides {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        .carousel-slide {
+            min-width: 100%;
+            height: 100%;
+            position: relative;
+            flex-shrink: 0;
+        }
+        .carousel-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .carousel-slide .slide-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 20px 30px;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+            color: white;
+        }
+        .carousel-slide .slide-overlay h3 {
+            font-size: 22px;
+            margin-bottom: 4px;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+        }
+        .carousel-slide .slide-overlay p {
+            font-size: 14px;
+            opacity: 0.9;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(4px);
+            color: white;
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .carousel-btn:hover {
+            background: rgba(255, 255, 255, 0.45);
+        }
+        .carousel-btn.prev {
+            left: 16px;
+        }
+        .carousel-btn.next {
+            right: 16px;
+        }
+        .carousel-dots {
+            position: absolute;
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            z-index: 10;
+        }
+        .carousel-dots .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.4);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .carousel-dots .dot.active {
+            background: #ffd700;
+            border-color: #ffd700;
+            transform: scale(1.2);
+        }
+        .carousel-dots .dot:hover {
+            background: rgba(255, 215, 0, 0.6);
+        }
+        .carousel-status {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 13px;
+            z-index: 10;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2px 12px;
+            border-radius: 12px;
+            backdrop-filter: blur(2px);
+        }
+
         /* 移动端适配 */
         @media (max-width: 768px) {
             .nav-inner {
@@ -184,6 +305,38 @@
             #noticeBar {
                 top: 44px;
             }
+            .carousel-container {
+                aspect-ratio: 16/9;
+                min-height: 120px;
+                border-radius: 8px;
+                margin: 12px auto 8px;
+            }
+            .carousel-slide .slide-overlay h3 {
+                font-size: 16px;
+            }
+            .carousel-slide .slide-overlay p {
+                font-size: 12px;
+            }
+            .carousel-btn {
+                width: 32px;
+                height: 32px;
+                font-size: 14px;
+            }
+            .carousel-btn.prev {
+                left: 8px;
+            }
+            .carousel-btn.next {
+                right: 8px;
+            }
+            .carousel-slide .slide-overlay {
+                padding: 12px 16px;
+            }
+            .carousel-status {
+                font-size: 11px;
+                top: 8px;
+                right: 10px;
+                padding: 1px 10px;
+            }
         }
         @media (max-width: 480px) {
             .nav-inner {
@@ -191,6 +344,27 @@
             }
             #noticeBar {
                 top: 40px;
+            }
+            .carousel-container {
+                aspect-ratio: 16/9;
+                min-height: 100px;
+                border-radius: 6px;
+                margin: 8px auto 6px;
+            }
+            .carousel-slide .slide-overlay h3 {
+                font-size: 14px;
+            }
+            .carousel-slide .slide-overlay p {
+                font-size: 11px;
+            }
+            .carousel-btn {
+                width: 28px;
+                height: 28px;
+                font-size: 12px;
+            }
+            .carousel-dots .dot {
+                width: 8px;
+                height: 8px;
             }
         }
 
@@ -1668,6 +1842,16 @@
 
         <!-- 首页 -->
         <div id="page-home" class="page active">
+            <!-- 轮播横幅 -->
+            <div class="carousel-container" id="carouselContainer">
+                <div class="carousel-slides" id="carouselSlides">
+                    <!-- 由 JavaScript 动态生成 -->
+                </div>
+                <button class="carousel-btn prev" id="carouselPrev"><i class="fas fa-chevron-left"></i></button>
+                <button class="carousel-btn next" id="carouselNext"><i class="fas fa-chevron-right"></i></button>
+                <div class="carousel-dots" id="carouselDots"></div>
+                <div class="carousel-status" id="carouselStatus">1 / 1</div>
+            </div>
             <div id="homePostList"></div>
         </div>
 
@@ -1755,6 +1939,44 @@
                     </form>
                 </div>
 
+                <!-- 轮播管理 -->
+                <div class="admin-card">
+                    <h3><i class="fas fa-images"></i> 轮播管理</h3>
+                    <form id="carouselForm">
+                        <div class="form-group">
+                            <label>轮播开关</label>
+                            <div style="display:flex; gap:12px; align-items:center; margin-top:4px;">
+                                <label style="font-weight:400; font-size:14px; display:flex; align-items:center; gap:4px;">
+                                    <input type="radio" name="carouselEnabled" value="1"> 开启
+                                </label>
+                                <label style="font-weight:400; font-size:14px; display:flex; align-items:center; gap:4px;">
+                                    <input type="radio" name="carouselEnabled" value="0"> 关闭
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>添加横幅图片</label>
+                            <div class="file-input-wrapper">
+                                <label class="file-btn" id="carouselFileBtn">
+                                    <i class="fas fa-plus"></i> 选择图片
+                                    <input type="file" id="carouselFileInput" accept="image/*">
+                                </label>
+                                <span class="file-size-info">建议尺寸：1280×420，不超过2MB</span>
+                            </div>
+                            <div style="margin-top:6px;">
+                                <button type="button" class="btn-admin btn-sm" onclick="addCarouselSlide()" style="font-size:13px; padding:6px 16px;">
+                                    <i class="fas fa-plus-circle"></i> 添加到轮播
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-group" id="carouselPreviewContainer">
+                            <label>当前轮播列表</label>
+                            <div id="carouselPreviewList" style="display:flex; flex-wrap:wrap; gap:8px; margin-top:6px;"></div>
+                        </div>
+                        <button type="submit" class="btn-admin"><i class="fas fa-save"></i> 保存轮播设置</button>
+                    </form>
+                </div>
+
                 <div class="admin-card">
                     <h3><i class="fas fa-check-double"></i> 审核投稿</h3>
                     <div class="admin-list" id="adminReviewList"></div>
@@ -1806,9 +2028,327 @@
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         // ================================================================
-        //  通知管理 - 使用独立的 site_config 表
+        //  轮播管理 - 使用 site_config 表
         // ================================================================
         const TABLE_CONFIG = 'site_config';
+
+        // 默认轮播数据
+        const DEFAULT_CAROUSEL = {
+            enabled: false,
+            slides: [
+                // { id: 1, image: 'data:image/...', title: '标题', subtitle: '描述' }
+            ]
+        };
+
+        async function loadCarouselConfig() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from(TABLE_CONFIG)
+                    .select('value')
+                    .eq('key', 'carousel')
+                    .maybeSingle();
+
+                if (error) {
+                    console.error('加载轮播配置失败:', error);
+                    return { ...DEFAULT_CAROUSEL };
+                }
+
+                if (data && data.value) {
+                    try {
+                        const parsed = JSON.parse(data.value);
+                        return { ...DEFAULT_CAROUSEL, ...parsed };
+                    } catch (e) {
+                        console.error('解析轮播数据失败:', e);
+                        return { ...DEFAULT_CAROUSEL };
+                    }
+                }
+                return { ...DEFAULT_CAROUSEL };
+            } catch (e) {
+                console.error('加载轮播配置异常:', e);
+                return { ...DEFAULT_CAROUSEL };
+            }
+        }
+
+        async function saveCarouselConfig(config) {
+            try {
+                const { data: existing, error: checkError } = await supabaseClient
+                    .from(TABLE_CONFIG)
+                    .select('*')
+                    .eq('key', 'carousel')
+                    .maybeSingle();
+
+                if (checkError) {
+                    console.error('检查轮播记录失败:', checkError);
+                    showToast('❌ 保存轮播设置失败');
+                    return false;
+                }
+
+                const value = JSON.stringify(config);
+                let result;
+                if (existing) {
+                    result = await supabaseClient
+                        .from(TABLE_CONFIG)
+                        .update({ value })
+                        .eq('key', 'carousel');
+                } else {
+                    result = await supabaseClient
+                        .from(TABLE_CONFIG)
+                        .insert([{ key: 'carousel', value }]);
+                }
+
+                if (result.error) {
+                    console.error('保存轮播配置失败:', result.error);
+                    showToast('❌ 保存轮播设置失败');
+                    return false;
+                }
+
+                showToast('✅ 轮播设置已保存');
+                return true;
+            } catch (e) {
+                console.error('保存轮播配置异常:', e);
+                showToast('❌ 保存轮播设置异常');
+                return false;
+            }
+        }
+
+        // 轮播状态
+        let carouselConfig = { ...DEFAULT_CAROUSEL };
+        let currentSlideIndex = 0;
+        let carouselTimer = null;
+
+        // 渲染轮播
+        function renderCarousel() {
+            const container = document.getElementById('carouselContainer');
+            const slidesContainer = document.getElementById('carouselSlides');
+            const dotsContainer = document.getElementById('carouselDots');
+            const statusEl = document.getElementById('carouselStatus');
+
+            if (!container || !slidesContainer) return;
+
+            const slides = carouselConfig.slides || [];
+            const enabled = carouselConfig.enabled === true;
+
+            if (!enabled || slides.length === 0) {
+                container.classList.remove('active');
+                return;
+            }
+
+            container.classList.add('active');
+
+            // 生成幻灯片
+            slidesContainer.innerHTML = slides.map((slide, index) => `
+                    <div class="carousel-slide" data-index="${index}">
+                        <img src="${slide.image}" alt="${slide.title || '轮播图'}">
+                        ${(slide.title || slide.subtitle) ? `
+                        <div class="slide-overlay">
+                            ${slide.title ? `<h3>${escapeHtml(slide.title)}</h3>` : ''}
+                            ${slide.subtitle ? `<p>${escapeHtml(slide.subtitle)}</p>` : ''}
+                        </div>
+                        ` : ''}
+                    </div>
+                `).join('');
+
+            // 生成指示点
+            dotsContainer.innerHTML = slides.map((_, index) => `
+                    <span class="dot ${index === 0 ? 'active' : ''}" onclick="goToSlide(${index})"></span>
+                `).join('');
+
+            // 更新状态
+            updateCarouselStatus();
+
+            // 重置位置
+            goToSlide(0);
+        }
+
+        function updateCarouselStatus() {
+            const slides = carouselConfig.slides || [];
+            const total = slides.length;
+            const statusEl = document.getElementById('carouselStatus');
+            if (statusEl) {
+                statusEl.textContent = `${currentSlideIndex + 1} / ${total}`;
+            }
+
+            // 更新指示点
+            const dots = document.querySelectorAll('#carouselDots .dot');
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentSlideIndex);
+            });
+        }
+
+        function goToSlide(index) {
+            const slides = carouselConfig.slides || [];
+            if (slides.length === 0) return;
+            if (index < 0) index = slides.length - 1;
+            if (index >= slides.length) index = 0;
+
+            currentSlideIndex = index;
+
+            const slidesContainer = document.getElementById('carouselSlides');
+            if (slidesContainer) {
+                slidesContainer.style.transform = `translateX(-${index * 100}%)`;
+            }
+
+            updateCarouselStatus();
+            resetCarouselTimer();
+        }
+
+        function nextSlide() {
+            const slides = carouselConfig.slides || [];
+            if (slides.length === 0) return;
+            goToSlide(currentSlideIndex + 1);
+        }
+
+        function prevSlide() {
+            const slides = carouselConfig.slides || [];
+            if (slides.length === 0) return;
+            goToSlide(currentSlideIndex - 1);
+        }
+
+        function resetCarouselTimer() {
+            if (carouselTimer) {
+                clearInterval(carouselTimer);
+                carouselTimer = null;
+            }
+            const slides = carouselConfig.slides || [];
+            if (slides.length > 1) {
+                carouselTimer = setInterval(nextSlide, 4000);
+            }
+        }
+
+        // 管理员：添加轮播图片
+        let carouselPendingImage = null;
+
+        function setupCarouselFileUpload() {
+            const input = document.getElementById('carouselFileInput');
+            if (!input) return;
+
+            const newInput = input.cloneNode(true);
+            input.parentNode.replaceChild(newInput, input);
+
+            newInput.addEventListener('change', async function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                if (file.size > 2 * 1024 * 1024) {
+                    showToast('❌ 图片超过2MB');
+                    this.value = '';
+                    return;
+                }
+
+                if (!file.type.startsWith('image/')) {
+                    showToast('❌ 请选择图片文件');
+                    this.value = '';
+                    return;
+                }
+
+                try {
+                    const dataUrl = await readFileAsDataURL(file);
+                    carouselPendingImage = dataUrl;
+                    showToast('✅ 图片已选择，点击"添加到轮播"按钮添加');
+                    document.getElementById('carouselFileBtn').textContent = '已选择: ' + file.name;
+                } catch (err) {
+                    showToast('❌ 读取图片失败');
+                    this.value = '';
+                }
+            });
+        }
+
+        function addCarouselSlide() {
+            if (!carouselPendingImage) {
+                showToast('❌ 请先选择一张图片');
+                return;
+            }
+
+            const newSlide = {
+                id: Date.now(),
+                image: carouselPendingImage,
+                title: '',
+                subtitle: ''
+            };
+
+            const title = prompt('请输入轮播图标题（可选）：', '');
+            if (title !== null) {
+                newSlide.title = title;
+            }
+
+            const subtitle = prompt('请输入轮播图描述（可选）：', '');
+            if (subtitle !== null) {
+                newSlide.subtitle = subtitle;
+            }
+
+            carouselConfig.slides.push(newSlide);
+            carouselPendingImage = null;
+            document.getElementById('carouselFileInput').value = '';
+            document.getElementById('carouselFileBtn').textContent = '选择图片';
+
+            renderCarouselPreview();
+            renderCarousel();
+            showToast('✅ 已添加到轮播');
+        }
+
+        function removeCarouselSlide(index) {
+            if (!confirm('确定要删除这张轮播图吗？')) return;
+
+            carouselConfig.slides.splice(index, 1);
+            if (currentSlideIndex >= carouselConfig.slides.length) {
+                currentSlideIndex = Math.max(0, carouselConfig.slides.length - 1);
+            }
+            renderCarouselPreview();
+            renderCarousel();
+            showToast('✅ 已删除');
+        }
+
+        function renderCarouselPreview() {
+            const container = document.getElementById('carouselPreviewList');
+            if (!container) return;
+
+            const slides = carouselConfig.slides || [];
+            if (slides.length === 0) {
+                container.innerHTML = '<div style="color:#999; font-size:13px;">暂无轮播图片</div>';
+                return;
+            }
+
+            container.innerHTML = slides.map((slide, index) => `
+                    <div style="position:relative; width:100px; height:70px; border-radius:6px; overflow:hidden; border:2px solid #e0e0e0; flex-shrink:0;">
+                        <img src="${slide.image}" alt="轮播预览" style="width:100%;height:100%;object-fit:cover;">
+                        <button onclick="removeCarouselSlide(${index})" style="position:absolute; top:-6px; right:-6px; background:#cc0000; color:white; border:none; border-radius:50%; width:20px; height:20px; font-size:12px; cursor:pointer; display:flex; align-items:center; justify-content:center;">
+                            &times;
+                        </button>
+                        ${slide.title ? `<div style="position:absolute; bottom:0; left:0; right:0; background:rgba(0,0,0,0.5); color:white; font-size:10px; padding:2px 4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escapeHtml(slide.title)}</div>` : ''}
+                    </div>
+                `).join('');
+        }
+
+        // 轮播表单提交
+        document.getElementById('carouselForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            if (!await isAdmin()) {
+                showToast('只有管理员可以管理轮播');
+                return;
+            }
+
+            const enabledRadios = document.querySelectorAll('input[name="carouselEnabled"]');
+            let enabled = false;
+            enabledRadios.forEach(radio => {
+                if (radio.checked && radio.value === '1') enabled = true;
+            });
+
+            carouselConfig.enabled = enabled;
+
+            const success = await saveCarouselConfig(carouselConfig);
+            if (success) {
+                renderCarousel();
+                renderCarouselPreview();
+                // 更新 UI 中的单选按钮
+                document.querySelectorAll('input[name="carouselEnabled"]').forEach(radio => {
+                    radio.checked = (radio.value === '1') === enabled;
+                });
+            }
+        });
+
+        // ================================================================
+        //  通知管理 - 使用独立的 site_config 表
+        // ================================================================
 
         // 初始化配置表
         async function initConfigTable() {
@@ -1837,6 +2377,33 @@
                         console.error('插入默认通知失败:', insertError);
                     } else {
                         console.log('默认通知已创建');
+                    }
+                }
+
+                // 初始化轮播配置
+                const { data: carouselExisting, error: carouselCheckError } = await supabaseClient
+                    .from(TABLE_CONFIG)
+                    .select('*')
+                    .eq('key', 'carousel')
+                    .maybeSingle();
+
+                if (carouselCheckError && carouselCheckError.code === '42P01') {
+                    console.warn('site_config 表不存在');
+                    return;
+                }
+
+                if (!carouselExisting) {
+                    const { error: insertError } = await supabaseClient
+                        .from(TABLE_CONFIG)
+                        .insert([{
+                            key: 'carousel',
+                            value: JSON.stringify(DEFAULT_CAROUSEL)
+                        }]);
+
+                    if (insertError) {
+                        console.error('插入默认轮播配置失败:', insertError);
+                    } else {
+                        console.log('默认轮播配置已创建');
                     }
                 }
             } catch (e) {
@@ -2893,6 +3460,11 @@
                     renderAdminUserList();
                     updateUserCount();
                     renderDeleteRequests();
+                    renderCarouselPreview();
+                    // 更新轮播开关状态
+                    document.querySelectorAll('input[name="carouselEnabled"]').forEach(radio => {
+                        radio.checked = (radio.value === '1') === carouselConfig.enabled;
+                    });
                 }
                 // 调整飘带位置
                 adjustNoticeBarPosition();
@@ -3226,7 +3798,10 @@
 
             currentPage = pageId;
 
-            if (pageId === 'home') renderPostList('homePostList', true);
+            if (pageId === 'home') {
+                renderPostList('homePostList', true);
+                renderCarousel();
+            }
             if (pageId === 'info') renderPostList('infoPostList', true);
             if (pageId === 'submit') updateSubmitForm();
             if (pageId === 'profile') renderProfile();
@@ -3239,6 +3814,11 @@
                 renderDeleteRequests();
                 loadNotice().then(notice => {
                     document.getElementById('noticeInput').value = notice || '';
+                });
+                renderCarouselPreview();
+                // 更新轮播开关状态
+                document.querySelectorAll('input[name="carouselEnabled"]').forEach(radio => {
+                    radio.checked = (radio.value === '1') === carouselConfig.enabled;
                 });
             }
             if (pageId === 'detail' && extraData) {
@@ -4302,8 +4882,22 @@
                     updateUIForUser();
                 }
                 await initConfigTable();
+
+                // 加载轮播配置
+                carouselConfig = await loadCarouselConfig();
+                renderCarousel();
+                renderCarouselPreview();
+
                 const notice = await loadNotice();
                 document.getElementById('noticeInput').value = notice || '';
+
+                // 设置轮播按钮事件
+                document.getElementById('carouselPrev').addEventListener('click', prevSlide);
+                document.getElementById('carouselNext').addEventListener('click', nextSlide);
+
+                // 设置轮播文件上传
+                setupCarouselFileUpload();
+
                 // 调整飘带位置
                 setTimeout(adjustNoticeBarPosition, 300);
             });
@@ -4322,6 +4916,7 @@
             console.log('✅ 管理后台已移除信息发布功能，新增通知管理');
             console.log('✅ 投稿支持作者标签，正文非必填');
             console.log('✅ 飘带通知已固定在导航栏下方');
+            console.log('✅ 轮播横幅已添加，后台可管理');
         });
 
         // 暴露全局函数
@@ -4367,6 +4962,13 @@
         window.updateNotice = updateNotice;
         window.loadNotice = loadNotice;
         window.adjustNoticeBarPosition = adjustNoticeBarPosition;
+        window.prevSlide = prevSlide;
+        window.nextSlide = nextSlide;
+        window.goToSlide = goToSlide;
+        window.addCarouselSlide = addCarouselSlide;
+        window.removeCarouselSlide = removeCarouselSlide;
+        window.renderCarousel = renderCarousel;
+        window.renderCarouselPreview = renderCarouselPreview;
     </script>
 </body>
 </html>
