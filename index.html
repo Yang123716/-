@@ -206,6 +206,9 @@
             flex-shrink: 0;
             overflow: hidden;
             background: #1a1a1a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .carousel-slide img {
             width: 100%;
@@ -2138,7 +2141,7 @@
 
             slidesContainer.innerHTML = slides.map((slide, index) => `
                     <div class="carousel-slide" data-index="${index}">
-                        <img src="${slide.image}" alt="${slide.title || '轮播图'}">
+                        <img src="${slide.image}" alt="${slide.title || '轮播图'}" loading="lazy">
                         ${(slide.title || slide.subtitle) ? `
                         <div class="slide-overlay">
                             ${slide.title ? `<h3>${escapeHtml(slide.title)}</h3>` : ''}
@@ -2210,10 +2213,12 @@
             }
         }
 
+        // 修复：重新绑定文件上传事件，解决选择图片后无法再次点击的问题
         function setupCarouselFileUpload() {
             const input = document.getElementById('carouselFileInput');
             if (!input) return;
 
+            // 移除旧的事件监听，重新克隆
             const newInput = input.cloneNode(true);
             input.parentNode.replaceChild(newInput, input);
 
@@ -2237,12 +2242,19 @@
                     const dataUrl = await readFileAsDataURL(file);
                     carouselPendingImage = dataUrl;
                     showToast('✅ 图片已选择，点击"添加到轮播"按钮添加');
-                    document.getElementById('carouselFileBtn').textContent = '已选择: ' + file.name;
+                    document.getElementById('carouselFileBtn').innerHTML = '<i class="fas fa-plus"></i> 已选择: ' + file
+                        .name +
+                        '<input type="file" id="carouselFileInput" accept="image/*">';
+                    // 重新绑定
+                    setupCarouselFileUpload();
                 } catch (err) {
                     showToast('❌ 读取图片失败');
                     this.value = '';
                 }
             });
+
+            // 确保 input 的 id 保持不变
+            newInput.id = 'carouselFileInput';
         }
 
         function addCarouselSlide() {
@@ -2271,7 +2283,8 @@
             carouselConfig.slides.push(newSlide);
             carouselPendingImage = null;
             document.getElementById('carouselFileInput').value = '';
-            document.getElementById('carouselFileBtn').textContent = '选择图片';
+            document.getElementById('carouselFileBtn').innerHTML = '<i class="fas fa-plus"></i> 选择图片<input type="file" id="carouselFileInput" accept="image/*">';
+            setupCarouselFileUpload();
 
             renderCarouselPreview();
             renderCarousel();
@@ -4729,8 +4742,8 @@
 
             console.log('✅ 人民共产网已启动');
             console.log('📌 超级管理员：杨振浩 / Yzh061110');
-            console.log('✅ 轮播横幅已添加，后台可管理');
-            console.log('✅ 图片使用 object-fit:contain 完整显示');
+            console.log('✅ 轮播横幅图片显示已修复 (object-fit:contain)');
+            console.log('✅ 后台上传按钮重新绑定事件，选择图片后仍可再次点击');
         });
 
         // 暴露全局函数
