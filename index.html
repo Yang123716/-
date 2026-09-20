@@ -2,7 +2,10 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#b30000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>人民共产网</title>
     <link rel="icon" href="./logo.png" type="image/png">
     <link rel="shortcut icon" href="./logo.png" type="image/png">
@@ -26,6 +29,8 @@
             left: 0;
             width: 100vw;
             height: 100vh;
+            height: 100dvh;
+            padding-top: env(safe-area-inset-top);
             background: linear-gradient(135deg, #b30000 0%, #cc0000 50%, #990000 100%);
             z-index: 9999999;
             display: flex;
@@ -39,10 +44,10 @@
             pointer-events: none;
         }
         #introLogo {
-            width: 140px;
-            height: 140px;
+            width: 180px;
+            height: 180px;
             border-radius: 50%;
-            background: #fff;
+            background: transparent;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -52,8 +57,8 @@
         #introLogo img {
             width: 100%;
             height: 100%;
-            object-fit: cover;
-            border-radius: 50%;
+            object-fit: contain;
+            filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.6));
         }
         #introTitle {
             margin-top: 28px;
@@ -1459,7 +1464,7 @@
             <img src="./logo.png" alt="人民共产网">
         </div>
         <div id="introTitle">人民共产网</div>
-        <div id="introSubtitle">人民 进步 民主 共产</div>
+        <div id="introSubtitle">为人民服务</div>
     </div>
     <!-- ================= 开场动画结束 ================= -->
 
