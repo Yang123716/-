@@ -18,6 +18,75 @@
             padding: 0;
             box-sizing: border-box;
         }
+
+        /* ===== 开场动画遮罩 ===== */
+        #introMask {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(135deg, #b30000 0%, #cc0000 50%, #990000 100%);
+            z-index: 9999999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.9s ease;
+        }
+        #introMask.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+        #introLogo {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.8);
+            animation: introPulse 1.8s ease-out infinite, introZoom 1s ease-out;
+        }
+        #introLogo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 50%;
+        }
+        #introTitle {
+            margin-top: 28px;
+            color: #fff;
+            font-size: 36px;
+            font-family: 'Ma Shan Zheng', cursive;
+            letter-spacing: 12px;
+            opacity: 0;
+            animation: introTextIn 1s ease-out 0.4s forwards;
+            text-shadow: 2px 2px 12px rgba(0, 0, 0, 0.4);
+        }
+        #introSubtitle {
+            margin-top: 12px;
+            color: rgba(255, 215, 0, 0.9);
+            font-size: 14px;
+            letter-spacing: 4px;
+            opacity: 0;
+            animation: introTextIn 1s ease-out 0.8s forwards;
+        }
+        @keyframes introZoom {
+            0% { transform: scale(0.3); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        @keyframes introPulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.8); }
+            70% { box-shadow: 0 0 0 30px rgba(255, 215, 0, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0); }
+        }
+        @keyframes introTextIn {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
         body {
             font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
             background: #f5f5f5;
@@ -30,49 +99,6 @@
         a {
             text-decoration: none;
             color: inherit;
-        }
-
-        /* ===== 开场视频动画 ===== */
-        #introVideo {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: #990000;
-            z-index: 9999999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: opacity 0.8s ease;
-        }
-        #introVideo video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        #introVideo.fade-out {
-            opacity: 0;
-            pointer-events: none;
-        }
-        /* 跳过按钮 */
-        #introSkip {
-            position: fixed;
-            top: 24px;
-            right: 24px;
-            z-index: 10000000;
-            padding: 8px 22px;
-            background: rgba(0, 0, 0, 0.45);
-            color: #fff;
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            border-radius: 30px;
-            font-size: 14px;
-            cursor: pointer;
-            backdrop-filter: blur(4px);
-            transition: background 0.2s;
-        }
-        #introSkip:hover {
-            background: rgba(0, 0, 0, 0.7);
         }
 
         .header {
@@ -1427,14 +1453,15 @@
 </head>
 <body>
 
-    <!-- ================= 开场视频动画 ================= -->
-    <div id="introVideo">
-        <video id="introPlayer" autoplay muted playsinline preload="auto">
-            <source src="./intro.mp4" type="video/mp4">
-        </video>
-        <button id="introSkip" onclick="skipIntro()">跳过 &gt;</button>
+    <!-- ================= 开场动画 ================= -->
+    <div id="introMask">
+        <div id="introLogo">
+            <img src="./logo.png" alt="人民共产网">
+        </div>
+        <div id="introTitle">人民共产网</div>
+        <div id="introSubtitle">为人民服务</div>
     </div>
-    <!-- ================= 开场视频动画结束 ================= -->
+    <!-- ================= 开场动画结束 ================= -->
 
     <!-- Toast -->
     <div id="toast" class="toast"></div>
@@ -1675,41 +1702,19 @@
 
     <script>
         // ================================================================
-        //  开场视频动画
+        //  开场动画
         // ================================================================
-        function endIntro() {
-            const intro = document.getElementById('introVideo');
-            if (!intro) return;
-            intro.classList.add('fade-out');
-            setTimeout(() => {
-                if (intro && intro.parentNode) intro.parentNode.removeChild(intro);
-            }, 800);
-        }
-
-        function skipIntro() {
-            endIntro();
-        }
-
         (function setupIntro() {
-            const player = document.getElementById('introPlayer');
-            const intro = document.getElementById('introVideo');
-            if (!player || !intro) return;
+            const intro = document.getElementById('introMask');
+            if (!intro) return;
 
-            // 视频播放完毕 → 自动淡出
-            player.addEventListener('ended', endIntro);
-
-            // 部分浏览器不触发 ended，用 timeupdate 兜底
-            player.addEventListener('timeupdate', function() {
-                if (player.duration && player.currentTime >= player.duration - 0.15) {
-                    endIntro();
-                }
-            });
-
-            // 播放出错（比如视频不存在）→ 直接跳过
-            player.addEventListener('error', endIntro);
-
-            // 保险：最多 8 秒后强制进入网站
-            setTimeout(endIntro, 8000);
+            // 总时长：2.6 秒后开始淡出
+            setTimeout(() => {
+                intro.classList.add('fade-out');
+                setTimeout(() => {
+                    if (intro && intro.parentNode) intro.parentNode.removeChild(intro);
+                }, 900);
+            }, 2600);
         })();
 
         // ================================================================
@@ -4219,7 +4224,7 @@
             window.addEventListener('resize', adjustNoticeBarPosition);
 
             console.log('✅ 人民共产网已启动');
-            console.log('✅ 已加入开场视频动画');
+            console.log('✅ 已加入纯 CSS 开场动画');
         });
 
         // 暴露全局函数
@@ -4265,7 +4270,6 @@
         window.updateNotice = updateNotice;
         window.loadNotice = loadNotice;
         window.adjustNoticeBarPosition = adjustNoticeBarPosition;
-        window.skipIntro = skipIntro;
     </script>
 </body>
 </html>
