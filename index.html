@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" style="background:#b30000;">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -8,19 +8,14 @@
     <link rel="icon" href="./logo.png" type="image/png">
     <link rel="shortcut icon" href="./logo.png" type="image/png">
     <link rel="apple-touch-icon" href="./logo.png">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
-    </script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+
+    <!-- ⚡ 关键：最前面先写开场遮罩的样式，让红色第一时间出现，避免白屏 -->
     <style>
-        /* ===== 完整样式 ===== */
-        * {
+        html, body {
+            background: #b30000;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
         }
-
-        /* ===== 开场动画遮罩 ===== */
         #introMask {
             position: fixed;
             top: 0;
@@ -88,6 +83,19 @@
         @keyframes introTextIn {
             0% { opacity: 0; transform: translateY(20px); }
             100% { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+    <style>
+        /* ===== 完整样式 ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
@@ -1462,7 +1470,7 @@
             <img src="./logo.png" alt="人民共产网">
         </div>
         <div id="introTitle">人民共产网</div>
-        <div id="introSubtitle">人民 进步 民主 共产</div>
+        <div id="introSubtitle">为人民服务</div>
     </div>
     <!-- ================= 开场动画结束 ================= -->
 
@@ -1711,7 +1719,6 @@
             const intro = document.getElementById('introMask');
             if (!intro) return;
 
-            // 总时长：2.6 秒后开始淡出
             setTimeout(() => {
                 intro.classList.add('fade-out');
                 setTimeout(() => {
