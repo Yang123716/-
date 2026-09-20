@@ -2,7 +2,7 @@
 <html lang="zh-CN" style="background:#b30000;">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#990000">
     <title>人民共产网</title>
     <link rel="icon" href="./logo.png" type="image/png">
@@ -16,12 +16,18 @@
             margin: 0;
             padding: 0;
         }
+        body {
+            /* 让红色背景延伸到状态栏/刘海下方 */
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
         #introMask {
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
+            padding-top: env(safe-area-inset-top);
             background: linear-gradient(135deg, #b30000 0%, #cc0000 50%, #990000 100%);
             z-index: 9999999;
             display: flex;
@@ -1470,7 +1476,7 @@
             <img src="./logo.png" alt="人民共产网">
         </div>
         <div id="introTitle">人民共产网</div>
-        <div id="introSubtitle">人民 进步 民主 共产</div>
+        <div id="introSubtitle">为人民服务</div>
     </div>
     <!-- ================= 开场动画结束 ================= -->
 
