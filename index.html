@@ -17,7 +17,6 @@
             padding: 0;
         }
         body {
-            /* 让红色背景延伸到状态栏/刘海下方 */
             padding-top: env(safe-area-inset-top);
             padding-bottom: env(safe-area-inset-bottom);
         }
@@ -418,6 +417,9 @@
             object-fit: contain;
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            /* 图片占位背景，未加载时先显示灰色，减少"内容跳变"的感觉 */
+            background: #f0f0f0;
+            min-height: 100px;
         }
         .detail-container .media-container video {
             max-width: 100%;
@@ -1476,7 +1478,7 @@
             <img src="./logo.png" alt="人民共产网">
         </div>
         <div id="introTitle">人民共产网</div>
-        <div id="introSubtitle">人民 进步 民主 共产</div>
+        <div id="introSubtitle">为人民服务</div>
     </div>
     <!-- ================= 开场动画结束 ================= -->
 
@@ -2634,15 +2636,74 @@
         }
 
         // ================================================================
-        //  文件处理
+        //  文件处理（含图片自动压缩）
         // ================================================================
-        const MAX_IMAGE_SIZE = 2 * 1024 * 1024;
-        const MAX_VIDEO_SIZE = 10 * 1024 * 1024;
+        // 原始文件大小限制（用户上传时的上限）
+        const MAX_IMAGE_SIZE = 10 * 1024 * 1024;   // 10MB（上传前允许原图大一些）
+        const MAX_VIDEO_SIZE = 15 * 1024 * 1024;   // 15MB
 
+        // 压缩参数
+        const IMAGE_MAX_WIDTH = 1000;     // 压缩后最大宽度 1000px
+        const IMAGE_QUALITY = 0.7;        // JPEG 质量 0.7（0-1，越小越糊）
+
+        /**
+         * 读取文件为 DataURL。
+         * 如果是图片，会自动压缩到 1000px 宽、JPEG 质量 0.7，大幅减小体积。
+         * 如果是视频，直接返回原始 DataURL（视频无法用 canvas 压缩）。
+         */
         function readFileAsDataURL(file) {
             return new Promise((resolve, reject) => {
+                // 视频：不压缩，直接读
+                if (file.type.startsWith('video/')) {
+                    const reader = new FileReader();
+                    reader.onload = e => resolve(e.target.result);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(file);
+                    return;
+                }
+
+                // 图片：用 canvas 压缩
                 const reader = new FileReader();
-                reader.onload = e => resolve(e.target.result);
+                reader.onload = e => {
+                    const img = new Image();
+                    img.onload = () => {
+                        try {
+                            let w = img.naturalWidth || img.width;
+                            let h = img.naturalHeight || img.height;
+
+                            // 按最大宽度等比缩放
+                            if (w > IMAGE_MAX_WIDTH) {
+                                h = Math.round(h * IMAGE_MAX_WIDTH / w);
+                                w = IMAGE_MAX_WIDTH;
+                            }
+
+                            const canvas = document.createElement('canvas');
+                            canvas.width = w;
+                            canvas.height = h;
+                            const ctx = canvas.getContext('2d');
+
+                            // 白底（防止 PNG 透明背景变黑）
+                            ctx.fillStyle = '#ffffff';
+                            ctx.fillRect(0, 0, w, h);
+                            ctx.drawImage(img, 0, 0, w, h);
+
+                            // 输出 JPEG，体积最小
+                            const compressed = canvas.toDataURL('image/jpeg', IMAGE_QUALITY);
+                            console.log(`图片压缩: ${file.name} ${(file.size/1024).toFixed(0)}KB → ${(compressed.length*0.75/1024).toFixed(0)}KB`);
+                            resolve(compressed);
+                        } catch (err) {
+                            // 压缩失败，退回原图
+                            console.warn('图片压缩失败，使用原图:', err);
+                            resolve(e.target.result);
+                        }
+                    };
+                    img.onerror = () => {
+                        // 图片解析失败，退回原图
+                        console.warn('图片解析失败，使用原图');
+                        resolve(e.target.result);
+                    };
+                    img.src = e.target.result;
+                };
                 reader.onerror = reject;
                 reader.readAsDataURL(file);
             });
@@ -2650,10 +2711,10 @@
 
         function validateFile(file, type) {
             if (type === 'image') {
-                if (file.size > MAX_IMAGE_SIZE) return { valid: false, msg: `图片 "${file.name}" 超过2MB` };
+                if (file.size > MAX_IMAGE_SIZE) return { valid: false, msg: `图片 "${file.name}" 超过10MB` };
                 if (!file.type.startsWith('image/')) return { valid: false, msg: `文件 "${file.name}" 不是图片` };
             } else if (type === 'video') {
-                if (file.size > MAX_VIDEO_SIZE) return { valid: false, msg: `视频 "${file.name}" 超过10MB` };
+                if (file.size > MAX_VIDEO_SIZE) return { valid: false, msg: `视频 "${file.name}" 超过15MB` };
                 if (!file.type.startsWith('video/')) return { valid: false, msg: `文件 "${file.name}" 不是视频` };
             }
             return { valid: true, msg: '' };
@@ -2682,6 +2743,7 @@
                     const result = validateFile(file, type);
                     if (result.valid) {
                         try {
+                            showToast(`正在处理 ${file.name}...`);
                             const dataUrl = await readFileAsDataURL(file);
                             validFiles.push({ name: file.name, data: dataUrl });
                         } catch (err) {
@@ -2705,6 +2767,7 @@
                     if (type === 'image') window._adminImages = fileData;
                     else window._adminVideo = fileData.length ? fileData[0].data : '';
                 }
+                showToast('✅ 处理完成');
             });
 
             if (scope === 'submit') {
@@ -2745,7 +2808,7 @@
             if (type === 'image') {
                 preview.innerHTML = data.map((item, index) => `
                         <div class="preview-item">
-                            <img src="${item.data}" alt="预览">
+                            <img src="${item.data}" alt="预览" loading="lazy">
                             <button class="remove-file" onclick="window['removeFile_${previewId}'](${index})">&times;</button>
                         </div>
                     `).join('');
@@ -2871,7 +2934,7 @@
                                             <i class="fas fa-images"></i> 选择图片（多选）
                                             <input type="file" id="submitImageInput" accept="image/*" multiple>
                                         </label>
-                                        <span class="file-size-info">支持 jpg, png, gif，单张不超过2MB</span>
+                                        <span class="file-size-info">上传后会自动压缩（最大10MB原图）</span>
                                     </div>
                                     <div class="file-preview" id="submitImagePreview"></div>
                                 </div>
@@ -2882,7 +2945,7 @@
                                             <i class="fas fa-video"></i> 选择视频
                                             <input type="file" id="submitVideoInput" accept="video/*">
                                         </label>
-                                        <span class="file-size-info">支持 mp4, webm，不超过10MB</span>
+                                        <span class="file-size-info">支持 mp4, webm，不超过15MB</span>
                                     </div>
                                     <div class="file-preview" id="submitVideoPreview"></div>
                                 </div>
@@ -3501,7 +3564,7 @@
                 let thumbHtml = '';
                 if (p.images && p.images.length > 0) {
                     thumbHtml =
-                    `<div class="thumb-container">${p.images.slice(0,3).map(img => `<img class="thumb" src="${img}" alt="缩略图">`).join('')}</div>`;
+                    `<div class="thumb-container">${p.images.slice(0,3).map(img => `<img class="thumb" src="${img}" alt="缩略图" loading="lazy">`).join('')}</div>`;
                 }
                 const authorTagHtml = p.authorTag ? `<span class="author-tag">${escapeHtml(p.authorTag)}</span>` : '';
                 return `
@@ -3622,11 +3685,11 @@
             let mediaHtml = '';
             if (post.images && post.images.length > 0) {
                 post.images.forEach(img => {
-                    mediaHtml += `<div class="media-item"><img src="${img}" alt="图片"></div>`;
+                    mediaHtml += `<div class="media-item"><img src="${img}" alt="图片" loading="lazy"></div>`;
                 });
             }
             if (post.video) {
-                mediaHtml += `<div class="media-item"><video controls src="${post.video}"></video></div>`;
+                mediaHtml += `<div class="media-item"><video controls src="${post.video}" preload="metadata"></video></div>`;
             }
             mediaContainer.innerHTML = mediaHtml;
 
@@ -4240,7 +4303,7 @@
             window.addEventListener('resize', adjustNoticeBarPosition);
 
             console.log('✅ 人民共产网已启动');
-            console.log('✅ 已加入纯 CSS 开场动画');
+            console.log('✅ 已加入图片自动压缩');
         });
 
         // 暴露全局函数
