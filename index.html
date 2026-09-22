@@ -89,6 +89,115 @@
             0% { opacity: 0; transform: translateY(20px); }
             100% { opacity: 1; transform: translateY(0); }
         }
+
+        /* ===== 登录墙 ===== */
+        #loginWall {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(135deg, #b30000 0%, #cc0000 50%, #990000 100%);
+            z-index: 999998;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        #loginWall.show {
+            display: flex;
+        }
+        #loginWall .wall-box {
+            background: #fff;
+            border-radius: 16px;
+            padding: 40px 36px;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+            animation: modalIn 0.4s ease;
+        }
+        #loginWall .wall-logo {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin: 0 auto 16px;
+            display: block;
+            object-fit: cover;
+            box-shadow: 0 0 0 4px rgba(179, 0, 0, 0.15);
+        }
+        #loginWall h2 {
+            color: #990000;
+            font-size: 26px;
+            text-align: center;
+            margin-bottom: 4px;
+            font-family: 'Ma Shan Zheng', cursive;
+            letter-spacing: 4px;
+        }
+        #loginWall .wall-sub {
+            text-align: center;
+            color: #888;
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+        #loginWall label {
+            display: block;
+            font-weight: 600;
+            margin: 14px 0 4px;
+            color: #333;
+        }
+        #loginWall input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #dce3ed;
+            border-radius: 8px;
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.25s;
+        }
+        #loginWall input:focus {
+            border-color: #b30000;
+        }
+        #loginWall .wall-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #b30000, #990000);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 22px;
+            transition: all 0.25s;
+        }
+        #loginWall .wall-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(179, 0, 0, 0.35);
+        }
+        #loginWall .wall-error {
+            color: #cc0000;
+            font-size: 14px;
+            text-align: center;
+            margin-top: 12px;
+            display: none;
+        }
+        #loginWall .wall-switch {
+            text-align: center;
+            margin-top: 16px;
+            font-size: 14px;
+            color: #888;
+        }
+        #loginWall .wall-switch span {
+            color: #b30000;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        #loginWall .wall-switch span:hover {
+            text-decoration: underline;
+        }
     </style>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
@@ -417,7 +526,6 @@
             object-fit: contain;
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            /* 图片占位背景，未加载时先显示灰色，减少"内容跳变"的感觉 */
             background: #f0f0f0;
             min-height: 100px;
         }
@@ -1482,6 +1590,24 @@
     </div>
     <!-- ================= 开场动画结束 ================= -->
 
+    <!-- ================= 登录墙 ================= -->
+    <div id="loginWall">
+        <div class="wall-box">
+            <img src="./logo.png" alt="人民共产网" class="wall-logo">
+            <h2>人民共产网</h2>
+            <div class="wall-sub">请登录后访问网站内容</div>
+            <form id="wallLoginForm">
+                <label for="wallUser">用户名</label>
+                <input type="text" id="wallUser" placeholder="请输入用户名" required>
+                <label for="wallPass">密码</label>
+                <input type="password" id="wallPass" placeholder="请输入密码" required>
+                <button type="submit" class="wall-btn">登 录</button>
+                <div class="wall-error" id="wallError">用户名或密码错误！</div>
+            </form>
+        </div>
+    </div>
+    <!-- ================= 登录墙结束 ================= -->
+
     <!-- Toast -->
     <div id="toast" class="toast"></div>
 
@@ -1721,7 +1847,7 @@
 
     <script>
         // ================================================================
-        //  开场动画
+        //  开场动画 —— 结束后调用 checkLoginWall
         // ================================================================
         (function setupIntro() {
             const intro = document.getElementById('introMask');
@@ -1731,9 +1857,35 @@
                 intro.classList.add('fade-out');
                 setTimeout(() => {
                     if (intro && intro.parentNode) intro.parentNode.removeChild(intro);
+                    // 动画结束后判断登录状态
+                    checkLoginWall();
                 }, 900);
             }, 2600);
         })();
+
+        // 检查是否显示登录墙
+        async function checkLoginWall() {
+            const stored = sessionStorage.getItem('currentUser');
+            let valid = false;
+            if (stored) {
+                const user = await findUser(stored);
+                if (user) {
+                    valid = true;
+                    currentUser = stored;
+                } else {
+                    sessionStorage.removeItem('currentUser');
+                }
+            }
+            if (!valid) {
+                document.getElementById('loginWall').classList.add('show');
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.getElementById('loginWall').classList.remove('show');
+                document.body.style.overflow = '';
+                updateUIForUser();
+                switchPage('home');
+            }
+        }
 
         // ================================================================
         //  Supabase 配置
@@ -2638,22 +2790,13 @@
         // ================================================================
         //  文件处理（含图片自动压缩）
         // ================================================================
-        // 原始文件大小限制（用户上传时的上限）
-        const MAX_IMAGE_SIZE = 10 * 1024 * 1024;   // 10MB（上传前允许原图大一些）
-        const MAX_VIDEO_SIZE = 15 * 1024 * 1024;   // 15MB
+        const MAX_IMAGE_SIZE = 10 * 1024 * 1024;
+        const MAX_VIDEO_SIZE = 15 * 1024 * 1024;
+        const IMAGE_MAX_WIDTH = 1000;
+        const IMAGE_QUALITY = 0.7;
 
-        // 压缩参数
-        const IMAGE_MAX_WIDTH = 1000;     // 压缩后最大宽度 1000px
-        const IMAGE_QUALITY = 0.7;        // JPEG 质量 0.7（0-1，越小越糊）
-
-        /**
-         * 读取文件为 DataURL。
-         * 如果是图片，会自动压缩到 1000px 宽、JPEG 质量 0.7，大幅减小体积。
-         * 如果是视频，直接返回原始 DataURL（视频无法用 canvas 压缩）。
-         */
         function readFileAsDataURL(file) {
             return new Promise((resolve, reject) => {
-                // 视频：不压缩，直接读
                 if (file.type.startsWith('video/')) {
                     const reader = new FileReader();
                     reader.onload = e => resolve(e.target.result);
@@ -2662,7 +2805,6 @@
                     return;
                 }
 
-                // 图片：用 canvas 压缩
                 const reader = new FileReader();
                 reader.onload = e => {
                     const img = new Image();
@@ -2671,7 +2813,6 @@
                             let w = img.naturalWidth || img.width;
                             let h = img.naturalHeight || img.height;
 
-                            // 按最大宽度等比缩放
                             if (w > IMAGE_MAX_WIDTH) {
                                 h = Math.round(h * IMAGE_MAX_WIDTH / w);
                                 w = IMAGE_MAX_WIDTH;
@@ -2682,23 +2823,19 @@
                             canvas.height = h;
                             const ctx = canvas.getContext('2d');
 
-                            // 白底（防止 PNG 透明背景变黑）
                             ctx.fillStyle = '#ffffff';
                             ctx.fillRect(0, 0, w, h);
                             ctx.drawImage(img, 0, 0, w, h);
 
-                            // 输出 JPEG，体积最小
                             const compressed = canvas.toDataURL('image/jpeg', IMAGE_QUALITY);
                             console.log(`图片压缩: ${file.name} ${(file.size/1024).toFixed(0)}KB → ${(compressed.length*0.75/1024).toFixed(0)}KB`);
                             resolve(compressed);
                         } catch (err) {
-                            // 压缩失败，退回原图
                             console.warn('图片压缩失败，使用原图:', err);
                             resolve(e.target.result);
                         }
                     };
                     img.onerror = () => {
-                        // 图片解析失败，退回原图
                         console.warn('图片解析失败，使用原图');
                         resolve(e.target.result);
                     };
@@ -3102,6 +3239,26 @@
         tabLogin.addEventListener('click', () => switchAuthTab('login'));
         tabRegister.addEventListener('click', () => switchAuthTab('register'));
 
+        // ===== 登录墙表单 =====
+        document.getElementById('wallLoginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const user = document.getElementById('wallUser').value.trim();
+            const pass = document.getElementById('wallPass').value.trim();
+            const errEl = document.getElementById('wallError');
+            errEl.style.display = 'none';
+
+            if (await loginUser(user, pass)) {
+                document.getElementById('loginWall').classList.remove('show');
+                document.body.style.overflow = '';
+                showToast('✅ 登录成功，欢迎回来！');
+                updateUIForUser();
+                switchPage('home');
+            } else {
+                errEl.style.display = 'block';
+                showToast('❌ 用户名或密码错误');
+            }
+        });
+
         // ================================================================
         //  消息中心
         // ================================================================
@@ -3254,20 +3411,12 @@
         document.getElementById('logoutBtn').addEventListener('click', function() {
             clearCurrentUser();
             showToast('已退出登录');
+            document.getElementById('loginWall').classList.add('show');
+            document.body.style.overflow = 'hidden';
+            document.getElementById('wallUser').value = '';
+            document.getElementById('wallPass').value = '';
+            document.getElementById('wallError').style.display = 'none';
             if (document.getElementById('page-admin').classList.contains('active')) {
-                switchPage('home');
-            }
-            if (document.getElementById('page-detail').classList.contains('active')) {
-                renderComments(currentPostId);
-                updateCommentForm();
-            }
-            if (document.getElementById('page-submit').classList.contains('active')) {
-                updateSubmitForm();
-            }
-            if (document.getElementById('page-profile').classList.contains('active')) {
-                switchPage('home');
-            }
-            if (document.getElementById('page-my').classList.contains('active')) {
                 switchPage('home');
             }
             updateUIForUser();
@@ -3276,6 +3425,11 @@
         document.getElementById('adminLogoutBtn').addEventListener('click', function() {
             clearCurrentUser();
             showToast('已退出登录');
+            document.getElementById('loginWall').classList.add('show');
+            document.body.style.overflow = 'hidden';
+            document.getElementById('wallUser').value = '';
+            document.getElementById('wallPass').value = '';
+            document.getElementById('wallError').style.display = 'none';
             switchPage('home');
             updateUIForUser();
         });
@@ -3459,7 +3613,8 @@
                 successEl.style.display = 'block';
                 showToast('账户已注销，所有内容已删除');
                 setTimeout(() => {
-                    switchPage('home');
+                    document.getElementById('loginWall').classList.add('show');
+                    document.body.style.overflow = 'hidden';
                     updateUIForUser();
                 }, 1500);
             } catch (err) {
@@ -4298,7 +4453,8 @@
             });
 
             setupAdminFileUpload();
-            switchPage('home');
+            // 不直接 switchPage('home')，等开场动画结束后由 checkLoginWall 决定
+            // 如果用户已登录，开场动画结束会自动进入首页
 
             window.addEventListener('resize', adjustNoticeBarPosition);
 
