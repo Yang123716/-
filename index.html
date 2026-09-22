@@ -159,7 +159,6 @@
             color: rgba(255, 215, 0, 0.9); font-weight: 300;
         }
 
-        /* 一级导航（模块切换） */
         .nav-main {
             background: #990000; color: white; position: sticky; top: 0;
             z-index: 1000; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -189,6 +188,14 @@
             margin-left: auto;
             display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
         }
+        .nav-main .user-info .admin-entry-btn {
+            background: rgba(255, 215, 0, 0.15); border: none;
+            color: #ffd700; cursor: pointer; font-size: 12px;
+            padding: 4px 12px; border-radius: 12px;
+            transition: background 0.2s; font-family: inherit;
+            display: none; align-items: center; gap: 4px;
+        }
+        .nav-main .user-info .admin-entry-btn:hover { background: rgba(255, 215, 0, 0.3); }
         .nav-main .user-info .logout-btn {
             background: rgba(255, 215, 0, 0.15); border: none;
             color: #ffd700; cursor: pointer; font-size: 12px;
@@ -214,7 +221,6 @@
             min-width: 18px; text-align: center; line-height: 18px;
         }
 
-        /* 二级导航（模块内页面切换） */
         .nav-sub {
             background: #7a0000; color: white;
             position: sticky; top: 50px; z-index: 999;
@@ -237,7 +243,6 @@
             background: rgba(255, 215, 0, 0.05);
         }
 
-        /* 飘带通知 */
         #noticeBar {
             background: linear-gradient(90deg, #ffd700, #ffec8b, #ffd700);
             color: #990000; padding: 7px 0; overflow: hidden;
@@ -262,6 +267,7 @@
             .nav-sub-inner { min-height: 40px; }
             .nav-main .site-btn { padding: 10px 14px; font-size: 13px; }
             .nav-sub a { padding: 10px 10px; font-size: 13px; }
+            .nav-main .user-info { width: 100%; border-left: none; justify-content: center; padding: 4px 0; }
         }
         @media (max-width: 480px) {
             .header h1 { font-size: 32px; letter-spacing: 5px; }
@@ -616,31 +622,6 @@
         .admin-card .btn-admin.btn-sm {
             padding: 4px 14px; font-size: 12px; margin-top: 0;
         }
-        .admin-card .file-preview { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
-        .admin-card .file-preview .preview-item {
-            position: relative; width: 60px; height: 60px;
-            border: 2px solid #e0e0e0; border-radius: 6px; overflow: hidden;
-        }
-        .admin-card .file-preview .preview-item img, .admin-card .file-preview .preview-item video {
-            width: 100%; height: 100%; object-fit: cover;
-        }
-        .admin-card .file-preview .preview-item .remove-file {
-            position: absolute; top: -6px; right: -6px;
-            background: #cc0000; color: white; border: none;
-            border-radius: 50%; width: 18px; height: 18px;
-            font-size: 10px; cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .admin-card .file-input-wrapper { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-        .admin-card .file-input-wrapper .file-btn {
-            padding: 6px 16px; background: #f0f0f0;
-            border: 2px dashed #999; border-radius: 8px;
-            cursor: pointer; color: #555; font-weight: 600;
-            transition: all 0.25s; font-size: 13px;
-        }
-        .admin-card .file-input-wrapper .file-btn:hover { background: #e0e0e0; border-color: #b30000; }
-        .admin-card .file-input-wrapper input[type="file"] { display: none; }
-        .admin-card .file-size-info { font-size: 12px; color: #888; }
         .admin-card .admin-list { max-height: 320px; overflow-y: auto; }
         .admin-card .admin-list-item {
             padding: 8px 0; border-bottom: 1px solid #f0f0f0;
@@ -694,14 +675,6 @@
         .admin-card .admin-list-item .actions .edit-btn { color: #17a2b8; }
         .admin-card .admin-list-item .actions .edit-btn:hover { background: #e2f0f5; }
         .admin-empty { color: #999; text-align: center; padding: 20px 0; }
-        .user-manage-msg {
-            padding: 10px 16px; border-radius: 6px;
-            margin-bottom: 12px; display: none;
-            font-weight: 600; border-left: 4px solid transparent;
-        }
-        .user-manage-msg.success { background: #d4edda; color: #155724; border-left-color: #28a745; display: block; }
-        .user-manage-msg.error { background: #f8d7da; color: #721c24; border-left-color: #dc3545; display: block; }
-        .user-manage-msg.info { background: #cce5ff; color: #004085; border-left-color: #007bff; display: block; }
         .user-search-bar { display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
         .user-search-bar input {
             flex: 1; padding: 8px 14px;
@@ -721,11 +694,9 @@
         .user-search-bar button.btn-clear:hover { background: #5a6268; }
         .user-search-info { font-size: 13px; color: #888; margin-bottom: 8px; }
 
-        /* 后台内的站点切换 */
         .admin-site-tabs {
             display: flex; gap: 8px; margin-bottom: 18px;
-            flex-wrap: wrap;
-            background: #f5f5f5; padding: 6px;
+            flex-wrap: wrap; background: #f5f5f5; padding: 6px;
             border-radius: 30px;
         }
         .admin-site-tabs button {
@@ -817,14 +788,12 @@
             .submit-form, .profile-container, .my-container { padding: 20px; }
             .my-post-item { flex-direction: column; align-items: flex-start; gap: 10px; }
             .my-post-item .actions { width: 100%; justify-content: flex-start; }
-            .nav-main .user-info { width: 100%; border-left: none; justify-content: center; padding: 4px 0; }
         }
         @media (max-width: 480px) {
             .header h1 { font-size: 28px; letter-spacing: 4px; }
             .main-wrapper { padding: 0 12px; margin: 16px auto; }
             .post-item h3 { font-size: 18px; }
             .modal-box .tabs button { font-size: 14px; padding: 8px 0; }
-            .file-preview .preview-item { width: 60px; height: 60px; }
             .interaction-bar { gap: 12px; }
         }
         .admin-list::-webkit-scrollbar { width: 6px; }
@@ -835,7 +804,6 @@
         .msg-modal .msg-box::-webkit-scrollbar-track { background: #f0f2f5; border-radius: 10px; }
         .msg-modal .msg-box::-webkit-scrollbar-thumb { background: #b0c0d0; border-radius: 10px; }
 
-        /* 领导班子卡片 */
         .leadership-member-card {
             background: #f8f9fa; padding: 20px; border-radius: 12px;
             border-left: 4px solid #b30000;
@@ -850,7 +818,6 @@
         .leadership-member-card .member-meta { color: #666; font-size: 13px; }
         .leadership-member-card .member-bio { color: #444; font-size: 14px; margin-top: 4px; line-height: 1.6; }
 
-        /* 支部样式 */
         .branch-list {
             display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
             gap: 16px; margin-top: 12px;
@@ -890,8 +857,6 @@
         .branch-member-table .member-actions .del-btn { color: #dc3545; }
         .branch-member-table .member-actions .del-btn:hover { background: #f8d7da; }
 
-        /* 后台内容区 */
-        #adminSiteContent { }
         .admin-site-panel { display: none; }
         .admin-site-panel.active { display: block; }
     </style>
@@ -1049,7 +1014,7 @@
         <div class="modal-box" style="max-width:600px;">
             <button class="close-modal" onclick="closeEditLeadershipModal()">&times;</button>
             <h2 id="editLeadershipModalTitle">添加领导成员</h2>
-            <form id="editLeadershipForm" onsubmit="saveLeadershipMember(event)">
+            <form id="editLeadershipForm">
                 <input type="hidden" id="editLeadershipIndex">
                 <input type="hidden" id="editLeadershipSite" value="xcb">
                 <label>姓名</label>
@@ -1063,7 +1028,7 @@
                 <label>工作经历</label>
                 <textarea id="editLeadershipExperience" rows="4" placeholder="工作经历，每行一项"></textarea>
                 <label>上传照片</label>
-                <input type="file" id="editLeadershipPhoto" accept="image/*" onchange="previewLeadershipPhoto(event)">
+                <input type="file" id="editLeadershipPhoto" accept="image/*">
                 <div style="margin:10px 0; text-align:center;" id="editLeadershipPhotoPreview"></div>
                 <button type="submit" class="submit-btn">保存成员</button>
                 <div class="error-msg" id="editLeadershipError"></div>
@@ -1076,7 +1041,7 @@
         <div class="modal-box" style="max-width:600px;">
             <button class="close-modal" onclick="closeBranchEditModal()">&times;</button>
             <h2 id="branchEditTitle">创建支部</h2>
-            <form id="branchEditForm" onsubmit="saveBranch(event)">
+            <form id="branchEditForm">
                 <input type="hidden" id="branchEditIndex">
                 <label>支部名称</label>
                 <input type="text" id="branchName" required placeholder="例如：第一支部">
@@ -1098,7 +1063,7 @@
         <div class="modal-box" style="max-width:500px;">
             <button class="close-modal" onclick="closeBranchMemberModal()">&times;</button>
             <h2 id="branchMemberTitle">添加成员</h2>
-            <form id="branchMemberForm" onsubmit="saveBranchMember(event)">
+            <form id="branchMemberForm">
                 <input type="hidden" id="branchMemberBranchIndex">
                 <input type="hidden" id="branchMemberIndex">
                 <label>姓名</label>
@@ -1118,7 +1083,7 @@
 
     <!-- 头部 -->
     <header class="header">
-        <h1 id="headerTitle">人民共产联合门户</h1>
+        <h1 id="headerTitle">人民共产</h1>
         <div class="header-sub" id="headerSub">人民 · 进步 · 民主 · 共产</div>
     </header>
 
@@ -1137,6 +1102,9 @@
 
             <span class="user-info" id="userInfo">
                 <span id="currentUserDisplay">未登录</span>
+                <button class="admin-entry-btn" id="adminEntryBtn" style="display:none;" onclick="switchPage('admin')">
+                    <i class="fas fa-user-shield"></i> 管理后台
+                </button>
                 <button class="logout-btn" id="logoutBtn" style="display:none;">退出</button>
                 <span class="profile-link" id="profileLink" style="display:none;" onclick="switchPage('profile')" title="个人中心">
                     <i class="fas fa-user-cog"></i>
@@ -1151,15 +1119,13 @@
 
     <!-- 二级导航：模块内页面切换 -->
     <nav class="nav-sub" id="subNav">
-        <div class="nav-sub-inner" id="subNavInner">
-            <!-- 由 JS 动态渲染 -->
-        </div>
+        <div class="nav-sub-inner" id="subNavInner"></div>
     </nav>
 
     <!-- 飘带通知 -->
     <div id="noticeBar">
         <div id="noticeContent">
-            <span id="noticeText">欢迎来到人民共产联合门户</span>
+            <span id="noticeText">欢迎来到人民共产</span>
         </div>
     </div>
 
@@ -1190,7 +1156,7 @@
             </div>
         </div>
         <div id="page-main-detail" class="page">
-            <div class="detail-container" id="mainDetailContainer">
+            <div class="detail-container">
                 <div class="back-link" onclick="goBackFromDetail('main')"><i class="fas fa-arrow-left"></i> 返回列表</div>
                 <h2 id="mainDetailTitle"></h2>
                 <div class="detail-meta" id="mainDetailMeta"></div>
@@ -1663,7 +1629,6 @@
         const SUPABASE_ANON_KEY = 'sb_publishable_RschSsu3ctATjS7bD5AkSQ_qP-mZ7cE';
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // 每个模块对应一整套表名
         const SITE_CONFIG = {
             main: {
                 name: '人民共产网',
@@ -1673,12 +1638,11 @@
                 commentsTable: 'comments',
                 headerTitle: '人民共产网',
                 headerSub: '人民 · 进步 · 民主 · 共产',
-                // 二级导航：page 必须与 HTML 中 id 一致（自动加前缀 page-main-）
                 nav: [
-                    { page: 'home',   label: '首页',       icon: 'fa-home' },
-                    { page: 'info',   label: '信息公开',   icon: 'fa-folder-open' },
-                    { page: 'submit', label: '我要投稿',   icon: 'fa-pen-fancy' },
-                    { page: 'my',     label: '我的',       icon: 'fa-user' }
+                    { page: 'home',   label: '首页',     icon: 'fa-home' },
+                    { page: 'info',   label: '信息公开', icon: 'fa-folder-open' },
+                    { page: 'submit', label: '我要投稿', icon: 'fa-pen-fancy' },
+                    { page: 'my',     label: '我的',     icon: 'fa-user' }
                 ],
                 defaultPage: 'home'
             },
@@ -1719,14 +1683,12 @@
         // ================================================================
         //  全局状态
         // ================================================================
-        let currentSite = 'main';        // 当前模块：main / xcb / zzb
-        let currentPage = 'home';        // 当前页面
-        let currentUser = null;          // 当前登录用户名（在当前模块的用户表中）
-        let currentUserSite = null;      // 当前登录所在模块
-        let currentPostId = null;        // 当前详情页文章 ID
-        let currentLoginSite = 'main';   // 登录墙上选择的模块
-
-        const PENDING_SITE_KEY = 'pendingSite'; // sessionStorage 键名：登录后跳哪个模块
+        let currentSite = 'main';
+        let currentPage = 'home';
+        let currentUser = null;
+        let currentUserSite = null;
+        let currentPostId = null;
+        let currentLoginSite = 'main';
 
         // ================================================================
         //  工具函数
@@ -1754,7 +1716,7 @@
         }
 
         // ================================================================
-        //  用户管理（按模块操作对应表）
+        //  用户管理
         // ================================================================
         async function getUsers(site) {
             const table = siteConf(site).usersTable;
@@ -1809,8 +1771,8 @@
             try {
                 const { data: existing, error: checkError } = await supabaseClient
                     .from(table).select('*').eq('role', 'superadmin').limit(1);
-                if (checkError && checkError.code === '42P01') {
-                    console.warn(`⚠️ 表 ${table} 不存在，请先在 Supabase 中创建`);
+                if (checkError) {
+                    console.warn(`⚠️ 表 ${table} 访问失败：`, checkError.message);
                     return;
                 }
                 if (!existing || existing.length === 0) {
@@ -1834,17 +1796,11 @@
         }
 
         // ================================================================
-        //  登录状态（按模块存储，可同时登录多个模块）
+        //  登录状态
         // ================================================================
-        function getStoredUser(site) {
-            return sessionStorage.getItem('currentUser_' + site);
-        }
-        function setStoredUser(site, username) {
-            sessionStorage.setItem('currentUser_' + site, username);
-        }
-        function clearStoredUser(site) {
-            sessionStorage.removeItem('currentUser_' + site);
-        }
+        function getStoredUser(site) { return sessionStorage.getItem('currentUser_' + site); }
+        function setStoredUser(site, username) { sessionStorage.setItem('currentUser_' + site, username); }
+        function clearStoredUser(site) { sessionStorage.removeItem('currentUser_' + site); }
 
         async function isLoggedIn(site) {
             site = site || currentSite;
@@ -1871,7 +1827,6 @@
             return !!(user && user.role === 'superadmin');
         }
 
-        // 重新加载当前模块的登录用户到内存
         async function refreshCurrentUser() {
             const stored = getStoredUser(currentSite);
             if (stored) {
@@ -1890,7 +1845,6 @@
             }
         }
 
-        // 登录（在指定模块上）
         async function loginUser(site, username, password) {
             const user = await findUser(site, username);
             if (user && user.password === password) {
@@ -1904,7 +1858,6 @@
             return false;
         }
 
-        // 注册（在指定模块上）
         async function registerUser(site, username, password) {
             const existing = await findUser(site, username);
             if (existing) return false;
@@ -1932,7 +1885,7 @@
         }
 
         // ================================================================
-        //  消息系统（按模块的用户表操作）
+        //  消息系统
         // ================================================================
         async function addMessageToUser(site, username, content, type, extra = {}) {
             const user = await findUser(site, username);
@@ -1996,16 +1949,13 @@
             return isUserMuted(user);
         }
 
-        // ================================================================
-        //  超级管理员查询
-        // ================================================================
         async function getSuperAdmins(site) {
             const users = await getUsers(site);
             return users.filter(u => u.role === 'superadmin');
         }
 
         // ================================================================
-        //  登录墙逻辑（开场后显示）
+        //  登录墙
         // ================================================================
         function setLoginWallSite(site) {
             currentLoginSite = site;
@@ -2014,42 +1964,11 @@
             });
             const hint = $('wallSiteHint');
             if (hint) hint.textContent = '当前登录：' + siteConf(site).name;
-            // 清空输入
             $('wallUser').value = '';
             $('wallPass').value = '';
             $('wallError').style.display = 'none';
         }
 
-        async function checkLoginWall() {
-            // 检查当前模块是否已登录
-            const stored = getStoredUser(currentSite);
-            let valid = false;
-            if (stored) {
-                const user = await findUser(currentSite, stored);
-                if (user) {
-                    valid = true;
-                    currentUser = stored;
-                    currentUserSite = currentSite;
-                } else {
-                    clearStoredUser(currentSite);
-                }
-            }
-            if (!valid) {
-                // 显示登录墙
-                setLoginWallSite(currentSite);
-                $('loginWall').classList.remove('hidden');
-                document.documentElement.style.overflow = 'hidden';
-                document.body.style.overflow = 'hidden';
-            } else {
-                $('loginWall').classList.add('hidden');
-                document.documentElement.style.overflow = '';
-                document.body.style.overflow = '';
-                await updateUIForUser();
-                await doSwitchPage(siteConf(currentSite).defaultPage, null);
-            }
-        }
-
-        // 登录墙表单提交
         async function handleWallLogin(e) {
             e.preventDefault();
             const user = $('wallUser').value.trim();
@@ -2063,10 +1982,8 @@
             }
             const ok = await loginUser(currentLoginSite, user, pass);
             if (ok) {
-                // 如果登录的模块和当前显示模块不一致，切到登录的模块
                 if (currentLoginSite !== currentSite) {
                     currentSite = currentLoginSite;
-                    // 渲染导航等
                     renderMainNav();
                     renderSubNav();
                 }
@@ -2085,13 +2002,12 @@
         }
 
         // ================================================================
-        //  顶部导航渲染
+        //  导航渲染
         // ================================================================
         function renderMainNav() {
             document.querySelectorAll('.nav-main .site-btn').forEach(btn => {
                 btn.classList.toggle('active-site', btn.dataset.site === currentSite);
             });
-            // 更新 header
             const conf = siteConf(currentSite);
             $('headerTitle').textContent = conf.headerTitle;
             $('headerSub').textContent = conf.headerSub;
@@ -2119,6 +2035,7 @@
             const logoutBtn = $('logoutBtn');
             const profileLink = $('profileLink');
             const msgBadge = $('msgBadge');
+            const adminEntryBtn = $('adminEntryBtn');
 
             const stored = getStoredUser(currentSite);
             if (stored) {
@@ -2127,6 +2044,13 @@
                     display.textContent = `[${siteConf(currentSite).name}] ${user.username}`;
                     logoutBtn.style.display = 'inline-block';
                     profileLink.style.display = 'inline-block';
+                    if (adminEntryBtn) {
+                        if (user.role === 'admin' || user.role === 'superadmin') {
+                            adminEntryBtn.style.display = 'inline-flex';
+                        } else {
+                            adminEntryBtn.style.display = 'none';
+                        }
+                    }
                     const unread = await getUnreadCount(currentSite, user.username);
                     if (unread > 0) {
                         msgBadge.textContent = unread;
@@ -2139,11 +2063,11 @@
                     return;
                 }
             }
-            // 未登录
             display.textContent = '未登录';
             logoutBtn.style.display = 'none';
             profileLink.style.display = 'none';
             msgBadge.style.display = 'none';
+            if (adminEntryBtn) adminEntryBtn.style.display = 'none';
             currentUser = null;
             currentUserSite = null;
         }
@@ -2153,7 +2077,6 @@
         // ================================================================
         async function switchSite(site) {
             if (site === currentSite) return;
-            // 先看这个模块是否已登录
             const stored = getStoredUser(site);
             if (stored) {
                 const user = await findUser(site, stored);
@@ -2172,7 +2095,6 @@
                     clearStoredUser(site);
                 }
             }
-            // 未登录 → 弹出登录墙并预选该模块
             currentSite = site;
             renderMainNav();
             renderSubNav();
@@ -2193,12 +2115,8 @@
         ];
 
         async function switchPage(page, extra) {
-            // 需要登录才能访问的页面
             if (page === 'my' || page === 'submit') {
-                if (!getStoredUser(currentSite)) {
-                    openLoginModal();
-                    return;
-                }
+                if (!getStoredUser(currentSite)) { openLoginModal(); return; }
             }
             if (page === 'admin') {
                 if (!getStoredUser(currentSite)) { openLoginModal(); return; }
@@ -2208,12 +2126,10 @@
         }
 
         async function doSwitchPage(page, extra) {
-            // 隐藏所有页面
             ALL_PAGES.forEach(p => {
                 const el = $('page-' + p);
                 if (el) el.classList.remove('active');
             });
-            // 显示当前页面
             let pageId;
             if (page === 'profile' || page === 'admin') {
                 pageId = 'page-' + page;
@@ -2226,17 +2142,8 @@
             currentPage = page;
             renderSubNav();
 
-            // 按需加载
-            if (page === 'home') await renderPostList(currentSite, 'homePostList');
-            if (page === 'info') {
-                if (currentSite === 'main') {
-                    await renderPostList(currentSite, 'mainInfoPostList');
-                } else if (currentSite === 'xcb') {
-                    await renderPostList(currentSite, 'xcbInfoPostList');
-                } else if (currentSite === 'zzb') {
-                    await renderPostList(currentSite, 'zzbInfoPostList');
-                }
-            }
+            if (page === 'home') await renderPostList(currentSite, currentSite + 'HomePostList');
+            if (page === 'info') await renderPostList(currentSite, currentSite + 'InfoPostList');
             if (page === 'submit') await renderSubmitForm(currentSite);
             if (page === 'my') await renderMyPage(currentSite);
             if (page === 'policy') await renderPostList(currentSite, 'xcbPolicyPostList', 'policy');
@@ -2255,7 +2162,7 @@
         }
 
         // ================================================================
-        //  通知飘带
+        //  通知
         // ================================================================
         async function loadNotice(site) {
             site = site || currentSite;
@@ -2276,14 +2183,11 @@
                 if (checkErr) { showToast('❌ 检查通知失败'); return false; }
                 let result;
                 if (existing) {
-                    result = await supabaseClient
-                        .from(table).update({ value: text }).eq('key', 'notice');
+                    result = await supabaseClient.from(table).update({ value: text }).eq('key', 'notice');
                 } else {
-                    result = await supabaseClient
-                        .from(table).insert([{ key: 'notice', value: text }]);
+                    result = await supabaseClient.from(table).insert([{ key: 'notice', value: text }]);
                 }
                 if (result.error) { showToast('❌ 更新通知失败'); return false; }
-                // 只有当前显示模块的通知才显示
                 if (site === currentSite) updateNoticeBar(text);
                 showToast('✅ 通知已更新');
                 return true;
@@ -2317,7 +2221,7 @@
         }
 
         // ================================================================
-        //  模态框：登录/注册（模块内使用）
+        //  登录/注册模态框
         // ================================================================
         function openLoginModal() {
             const modal = $('loginModal');
@@ -2442,7 +2346,7 @@
                 showToast('删除失败');
             }
         }        // ================================================================
-        //  文章操作（按模块操作对应表）
+        //  文章操作
         // ================================================================
         async function getPosts(site) {
             const table = siteConf(site).postsTable;
@@ -2652,17 +2556,16 @@
         }
 
         // ================================================================
-        //  渲染文章列表
+        //  渲染文章列表（修复：放宽 status 过滤）
         // ================================================================
         async function renderPostList(site, containerId, categoryFilter) {
             const container = $(containerId);
             if (!container) return;
             let posts = await getPosts(site);
-            posts = posts.filter(p => p.status === 'approved');
+            // 只排除 rejected，其余（含 null / 空）都显示
+            posts = posts.filter(p => p.status !== 'rejected');
             if (categoryFilter) {
                 posts = posts.filter(p => p.category === categoryFilter);
-            } else if (containerId && containerId.indexOf('Info') === -1) {
-                // 首页不限制；信息公开也不限制
             }
             if (posts.length === 0) {
                 container.innerHTML = `<div class="card" style="text-align:center;color:#999;padding:40px;">
@@ -2704,7 +2607,7 @@
         async function openDetail(site, postId) {
             const post = await getPostById(site, postId);
             if (!post) { showToast('文章不存在'); return; }
-            if (post.status !== 'approved') { showToast('该文章尚未通过审核'); return; }
+            if (post.status === 'rejected') { showToast('该文章未通过审核'); return; }
             currentSite = site;
             currentPostId = postId;
             await doSwitchPage('detail', postId);
@@ -2742,7 +2645,6 @@
 
             $(site + 'DetailContent').textContent = post.content || '（无正文内容）';
 
-            // 点赞状态
             const likeBtn = $(site + 'LikeBtn');
             const likeCnt = $(site + 'LikeCount');
             if (likeCnt) likeCnt.textContent = post.likes || 0;
@@ -2753,7 +2655,6 @@
                 else likeBtn.classList.remove('liked');
             }
 
-            // 评论框状态
             updateCommentFormState(site);
         }
 
@@ -2976,14 +2877,14 @@
         }
 
         // ================================================================
-        //  搜索（仅人民共产网信息公开）
+        //  搜索
         // ================================================================
         async function filterInfo(site) {
             const kwInput = $(site + 'InfoSearch');
             const container = $(site + 'InfoPostList');
             const kw = (kwInput.value || '').trim().toLowerCase();
             let posts = await getPosts(site);
-            posts = posts.filter(p => p.status === 'approved');
+            posts = posts.filter(p => p.status !== 'rejected');
             if (!kw) {
                 await renderPostList(site, site + 'InfoPostList');
                 return;
@@ -3058,7 +2959,7 @@
                     <div class="danger-zone">
                         <h4><i class="fas fa-exclamation-triangle"></i> 注销账户</h4>
                         <div class="warning-text">⚠️ 注销将永久删除您在本模块的账号信息，不可恢复！</div>
-                        <form id="deleteAccountForm" onsubmit="deleteAccount(event)">
+                        <form id="deleteAccountForm">
                             <div class="form-group">
                                 <label>请输入当前密码确认：</label>
                                 <input type="password" id="deleteAccountPassword" placeholder="当前密码" required>
@@ -3074,6 +2975,13 @@
                 e.preventDefault();
                 updateProfile();
             });
+            const delForm = $('deleteAccountForm');
+            if (delForm) {
+                delForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    deleteAccount();
+                });
+            }
         }
 
         async function updateProfile() {
@@ -3110,7 +3018,6 @@
             const ok = await saveUser(currentSite, updated);
             if (!ok) { errEl.textContent = '更新失败，请重试'; errEl.style.display = 'block'; return; }
             if (nameChanged) {
-                // 老数据里的作者名同步（可选）
                 setStoredUser(currentSite, newName);
                 currentUser = newName;
             }
@@ -3123,8 +3030,7 @@
             }, 500);
         }
 
-        async function deleteAccount(e) {
-            e.preventDefault();
+        async function deleteAccount() {
             const errEl = $('deleteAccountError');
             const sucEl = $('deleteAccountSuccess');
             errEl.style.display = 'none';
@@ -3176,7 +3082,7 @@
         async function renderAdminSiteContent(site) {
             const conf = siteConf(site);
             const isSuper = await isSuperAdmin(site);
-            const isAdm = await isAdmin(site);
+
             // 通知
             try {
                 const { data } = await supabaseClient
@@ -3185,13 +3091,11 @@
                 if (inp) inp.value = data ? (data.value || '') : '';
             } catch (e) {}
 
-            // 审核投稿
             await renderReviewList(site);
-            // 所有信息
             await renderAdminPostList(site);
-            // 用户管理
             await renderAdminUserList(site);
-            // 删除审核卡片显示
+            await updateUserCount(site);
+
             const delCard = $(site + 'DeleteReviewCard');
             if (delCard) delCard.style.display = isSuper ? 'block' : 'none';
             const muteCard = $(site + 'MuteReviewCard');
@@ -3200,16 +3104,15 @@
             if (unmuteCard) unmuteCard.style.display = isSuper ? 'block' : 'none';
             const accCard = $(site + 'AccountManagementCard');
             if (accCard) accCard.style.display = isSuper ? 'block' : 'none';
+
             if (isSuper) {
                 await renderDeleteRequests(site);
                 await renderMuteReviews(site);
                 await renderUnmuteReviews(site);
             }
-            // 领导班子（xcb / zzb）
             if (site === 'xcb' || site === 'zzb') {
                 await renderAdminLeadershipList(site);
             }
-            // 组织支部（仅 zzb）
             if (site === 'zzb') {
                 await renderAdminBranchList();
             }
@@ -3267,7 +3170,7 @@
         }
 
         // ================================================================
-        //  所有信息（管理）
+        //  所有信息
         // ================================================================
         async function renderAdminPostList(site) {
             const container = $(site + 'PostList');
@@ -3481,8 +3384,23 @@
         }
 
         // ================================================================
-        //  禁言审核（仅超管）
+        //  各类审核
         // ================================================================
+        async function getPendingRequests(site, type) {
+            const supers = await getSuperAdmins(site);
+            const out = [];
+            for (const admin of supers) {
+                const u = await findUser(site, admin.username);
+                if (!u || !Array.isArray(u.messages)) continue;
+                for (const m of u.messages) {
+                    if (m.type === type && m.processed === false) {
+                        out.push({ id: m.id, adminUsername: admin.username, data: m });
+                    }
+                }
+            }
+            return out;
+        }
+
         async function renderMuteReviews(site) {
             const container = $(site + 'MuteReviewList');
             if (!container) return;
@@ -3502,21 +3420,6 @@
                     </div>
                 </div>
             `).join('');
-        }
-
-        async function getPendingRequests(site, type) {
-            const supers = await getSuperAdmins(site);
-            const out = [];
-            for (const admin of supers) {
-                const u = await findUser(site, admin.username);
-                if (!u || !Array.isArray(u.messages)) continue;
-                for (const m of u.messages) {
-                    if (m.type === type && m.processed === false) {
-                        out.push({ id: m.id, adminUsername: admin.username, data: m });
-                    }
-                }
-            }
-            return out;
         }
 
         async function approveMuteRequest(site, reqId, adminUsername) {
@@ -3559,9 +3462,6 @@
             await renderMuteReviews(site);
         }
 
-        // ================================================================
-        //  解除禁言审核
-        // ================================================================
         async function renderUnmuteReviews(site) {
             const container = $(site + 'UnmuteReviewList');
             if (!container) return;
@@ -3732,7 +3632,7 @@
         }
 
         // ================================================================
-        //  领导班子（使用 config 表的 leadership 键）
+        //  领导班子
         // ================================================================
         async function getLeadership(site) {
             const table = siteConf(site).configTable;
@@ -3829,16 +3729,6 @@
             $('editLeadershipModal').classList.remove('show');
         }
 
-        function previewLeadershipPhoto(e) {
-            const f = e.target.files[0];
-            if (!f) return;
-            const r = new FileReader();
-            r.onload = ev => {
-                $('editLeadershipPhotoPreview').innerHTML = `<img src="${ev.target.result}" style="max-width:150px;border-radius:8px;">`;
-            };
-            r.readAsDataURL(f);
-        }
-
         async function saveLeadershipMember(e) {
             e.preventDefault();
             const site = $('editLeadershipSite').value;
@@ -3886,7 +3776,7 @@
         }
 
         // ================================================================
-        //  组织支部（仅 zzb）
+        //  组织支部
         // ================================================================
         async function getBranches() {
             try {
@@ -3918,6 +3808,10 @@
             if (!container) return;
             detailC.style.display = 'none';
             container.style.display = 'block';
+            // 创建支部按钮
+            const addBtn = $('addBranchBtn');
+            if (addBtn) addBtn.style.display = (await isAdmin('zzb')) ? 'inline-block' : 'none';
+
             const branches = await getBranches();
             if (branches.length === 0) { container.innerHTML = '<div class="branch-empty">暂无支部</div>'; return; }
             container.innerHTML = '<div class="branch-list">' + branches.map((b, i) => `
@@ -4060,7 +3954,6 @@
             } else showToast('删除失败');
         }
 
-        // 支部成员
         function openAddBranchMemberModal(branchIndex) {
             $('branchMemberTitle').textContent = '添加成员';
             $('branchMemberBranchIndex').value = branchIndex;
@@ -4129,7 +4022,7 @@
         }
 
         // ================================================================
-        //  后台：统一事件绑定
+        //  后台统一事件绑定
         // ================================================================
         function bindAdminEvents() {
             // 通知表单
@@ -4143,7 +4036,7 @@
                 });
             });
 
-            // 发布信息表单
+            // 发布信息
             document.querySelectorAll('.add-post-form').forEach(form => {
                 form.addEventListener('submit', async (e) => {
                     e.preventDefault();
@@ -4175,7 +4068,7 @@
                 });
             });
 
-            // 账号分发表单
+            // 账号分发
             document.querySelectorAll('.add-account-form').forEach(form => {
                 form.addEventListener('submit', async (e) => {
                     e.preventDefault();
@@ -4212,6 +4105,18 @@
                     }
                 });
             });
+
+            // 领导班子表单
+            const lf = $('editLeadershipForm');
+            if (lf) lf.addEventListener('submit', saveLeadershipMember);
+
+            // 支部表单
+            const bf = $('branchEditForm');
+            if (bf) bf.addEventListener('submit', saveBranch);
+
+            // 支部成员表单
+            const bmf = $('branchMemberForm');
+            if (bmf) bmf.addEventListener('submit', saveBranchMember);
         }
 
         // ================================================================
@@ -4224,7 +4129,6 @@
             currentUserSite = null;
             showToast('已退出 ' + siteConf(site).name);
             updateUIForUser().then(() => {
-                // 显示登录墙
                 setLoginWallSite(site);
                 $('loginWall').classList.remove('hidden');
                 document.documentElement.style.overflow = 'hidden';
@@ -4236,27 +4140,24 @@
         //  初始化
         // ================================================================
         document.addEventListener('DOMContentLoaded', async () => {
-            // 1) 开场动画
             const intro = $('introMask');
             const wall = $('loginWall');
             document.documentElement.style.overflow = 'hidden';
             document.body.style.overflow = 'hidden';
-
-            // 默认隐藏登录墙，让开场动画先展示
             if (wall) wall.classList.add('hidden');
 
-            // 2) 初始化三个模块的用户表（首次运行时自动创建超管）
+            // 初始化三个用户表
             await initUsersTable('main');
             await initUsersTable('xcb');
             await initUsersTable('zzb');
 
-            // 3) 提前渲染导航
+            // 渲染导航
             renderMainNav();
             renderSubNav();
             await refreshCurrentUser();
             await updateUIForUser();
 
-            // 4) 绑定事件
+            // ---- 事件绑定 ----
             // 登录墙模块选择
             document.querySelectorAll('#wallSiteSelector button').forEach(btn => {
                 btn.addEventListener('click', () => setLoginWallSite(btn.dataset.site));
@@ -4267,11 +4168,11 @@
             $('logoutBtn').addEventListener('click', handleLogout);
             $('adminLogoutBtn').addEventListener('click', handleLogout);
 
-            // 消息中心关闭
+            // 消息中心
             $('closeMsgModal').addEventListener('click', closeMsgModal);
             $('msgModal').addEventListener('click', (e) => { if (e.target === $('msgModal')) closeMsgModal(); });
 
-            // 登录/注册模态框（模块内）
+            // 模块内登录/注册
             $('closeLoginModal').addEventListener('click', closeLoginModal);
             $('loginModal').addEventListener('click', (e) => { if (e.target === $('loginModal')) closeLoginModal(); });
             $('tabLogin').addEventListener('click', () => switchAuthTab('login'));
@@ -4279,10 +4180,10 @@
             $('loginForm').addEventListener('submit', handleLoginForm);
             $('registerForm').addEventListener('submit', handleRegisterForm);
 
-            // 禁言模态框
+            // 禁言
             $('muteForm').addEventListener('submit', handleMuteForm);
 
-            // 删除申请模态框
+            // 删除申请
             $('deleteRequestForm').addEventListener('submit', handleDeleteRequestForm);
             document.querySelectorAll('#deleteRequestModal .close-modal').forEach(el => {
                 el.addEventListener('click', closeDeleteRequestModal);
@@ -4291,19 +4192,32 @@
                 if (e.target === $('deleteRequestModal')) closeDeleteRequestModal();
             });
 
-            // 后台事件
+            // 领导照片预览
+            const photoInput = $('editLeadershipPhoto');
+            if (photoInput) {
+                photoInput.addEventListener('change', (e) => {
+                    const f = e.target.files[0];
+                    if (!f) return;
+                    const r = new FileReader();
+                    r.onload = ev => {
+                        $('editLeadershipPhotoPreview').innerHTML = `<img src="${ev.target.result}" style="max-width:150px;border-radius:8px;">`;
+                    };
+                    r.readAsDataURL(f);
+                });
+            }
+
+            // 后台事件绑定
             bindAdminEvents();
 
             // 窗口尺寸变化
             window.addEventListener('resize', adjustNoticeBarPosition);
 
-            // 5) 开场动画结束后，检查登录墙
+            // 开场动画结束后检查登录
             setTimeout(() => {
                 if (intro) {
                     intro.classList.add('fade-out');
                     setTimeout(async () => {
                         if (intro.parentNode) intro.parentNode.removeChild(intro);
-                        // 判断是否已登录当前模块
                         const stored = getStoredUser(currentSite);
                         let valid = false;
                         if (stored) {
@@ -4330,7 +4244,7 @@
         });
 
         // ================================================================
-        //  暴露全局函数（供 HTML 内 onclick 调用）
+        //  暴露全局函数
         // ================================================================
         window.switchSite = switchSite;
         window.switchPage = switchPage;
@@ -4375,7 +4289,6 @@
         window.closeEditLeadershipModal = closeEditLeadershipModal;
         window.saveLeadershipMember = saveLeadershipMember;
         window.deleteLeadershipMember = deleteLeadershipMember;
-        window.previewLeadershipPhoto = previewLeadershipPhoto;
         window.openAddBranchModal = openAddBranchModal;
         window.openEditBranchModal = openEditBranchModal;
         window.closeBranchEditModal = closeBranchEditModal;
@@ -4389,9 +4302,9 @@
         window.saveBranchMember = saveBranchMember;
         window.deleteBranchMember = deleteBranchMember;
 
-        console.log('✅ 人民共产户已启动');
+        console.log('✅ 人民共产已启动');
         console.log('📌 三个模块的超级管理员：杨振浩 / Yzh061110');
-        console.log('📌 首次运行时请确保已创建：users/xcb_users/zzb_users、posts/xcb_posts/zzb_posts 等表');
+        console.log('📌 请确保三套表都在 Supabase 中创建，并关闭 RLS');
     </script>
 </body>
 </html>
