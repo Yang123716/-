@@ -9,7 +9,6 @@
     <link rel="shortcut icon" href="./logo.png" type="image/png">
     <link rel="apple-touch-icon" href="./logo.png">
 
-    <!-- ⚡ 关键：最前面先写开场遮罩的样式，让红色第一时间出现，避免白屏 -->
     <style>
         html, body {
             background: #b30000;
@@ -98,8 +97,8 @@
             width: 100vw;
             height: 100vh;
             background: linear-gradient(135deg, #b30000 0%, #cc0000 50%, #990000 100%);
-            z-index: 999998;
-            display: none;
+            z-index: 9999998;
+            display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
@@ -107,8 +106,8 @@
             padding-top: env(safe-area-inset-top);
             padding-bottom: env(safe-area-inset-bottom);
         }
-        #loginWall.show {
-            display: flex;
+        #loginWall.hidden {
+            display: none;
         }
         #loginWall .wall-box {
             background: #fff;
@@ -184,33 +183,14 @@
             margin-top: 12px;
             display: none;
         }
-        #loginWall .wall-switch {
-            text-align: center;
-            margin-top: 16px;
-            font-size: 14px;
-            color: #888;
-        }
-        #loginWall .wall-switch span {
-            color: #b30000;
-            font-weight: 600;
-            cursor: pointer;
-        }
-        #loginWall .wall-switch span:hover {
-            text-decoration: underline;
-        }
     </style>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
     <style>
         /* ===== 完整样式 ===== */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
@@ -221,10 +201,7 @@
             display: flex;
             flex-direction: column;
         }
-        a {
-            text-decoration: none;
-            color: inherit;
-        }
+        a { text-decoration: none; color: inherit; }
 
         .header {
             background: linear-gradient(135deg, #b30000 0%, #cc0000 50%, #990000 100%);
@@ -241,7 +218,6 @@
             font-weight: 400;
         }
 
-        /* ===== 导航栏 ===== */
         .nav {
             background: #990000;
             color: white;
@@ -306,18 +282,14 @@
             border-radius: 12px;
             transition: background 0.2s;
         }
-        .nav .user-info .logout-btn:hover {
-            background: rgba(255, 215, 0, 0.2);
-        }
+        .nav .user-info .logout-btn:hover { background: rgba(255, 215, 0, 0.2); }
         .nav .user-info .profile-link {
             color: rgba(255, 255, 255, 0.7);
             font-size: 14px;
             cursor: pointer;
             transition: color 0.2s;
         }
-        .nav .user-info .profile-link:hover {
-            color: #ffd700;
-        }
+        .nav .user-info .profile-link:hover { color: #ffd700; }
         .nav .user-info .msg-bell {
             position: relative;
             cursor: pointer;
@@ -326,9 +298,7 @@
             transition: color 0.2s;
             margin-left: 6px;
         }
-        .nav .user-info .msg-bell:hover {
-            color: #ffd700;
-        }
+        .nav .user-info .msg-bell:hover { color: #ffd700; }
         .nav .user-info .msg-bell .badge {
             position: absolute;
             top: -8px;
@@ -344,7 +314,6 @@
             line-height: 18px;
         }
 
-        /* ===== 飘带通知 - 固定在导航栏下方 ===== */
         #noticeBar {
             background: linear-gradient(90deg, #ffd700, #ffec8b, #ffd700);
             color: #990000;
@@ -364,10 +333,7 @@
             animation: scrollNotice 25s linear infinite;
             padding-left: 100%;
         }
-        #noticeText {
-            font-size: 16px;
-            letter-spacing: 1px;
-        }
+        #noticeText { font-size: 16px; letter-spacing: 1px; }
         @keyframes scrollNotice {
             0% { transform: translateX(0); }
             100% { transform: translateX(-100%); }
@@ -389,13 +355,8 @@
             padding: 0 24px;
             width: 100%;
         }
-        .page {
-            display: none;
-            animation: fadeIn 0.35s ease;
-        }
-        .page.active {
-            display: block;
-        }
+        .page { display: none; animation: fadeIn 0.35s ease; }
+        .page.active { display: block; }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(12px); }
             to { opacity: 1; transform: translateY(0); }
@@ -408,9 +369,7 @@
             margin-bottom: 20px;
             transition: box-shadow 0.2s;
         }
-        .card:hover {
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-        }
+        .card:hover { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); }
 
         .post-item {
             border-left: 4px solid #b30000;
@@ -422,16 +381,8 @@
             cursor: pointer;
         }
         .post-item:hover { background: #f0f0f0; }
-        .post-item h3 {
-            color: #990000;
-            font-size: 20px;
-            margin-bottom: 4px;
-        }
-        .post-item .meta {
-            font-size: 13px;
-            color: #888;
-            margin-bottom: 6px;
-        }
+        .post-item h3 { color: #990000; font-size: 20px; margin-bottom: 4px; }
+        .post-item .meta { font-size: 13px; color: #888; margin-bottom: 6px; }
         .post-item .meta .author-tag {
             display: inline-block;
             background: #ffd700;
@@ -456,12 +407,7 @@
             margin-top: 6px;
             display: inline-block;
         }
-        .post-item .thumb-container {
-            display: flex;
-            gap: 6px;
-            margin-top: 8px;
-            flex-wrap: wrap;
-        }
+        .post-item .thumb-container { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
         .post-item .thumb-container .thumb {
             width: 60px;
             height: 60px;
@@ -484,11 +430,7 @@
             cursor: pointer;
         }
         .detail-container .back-link:hover { text-decoration: underline; }
-        .detail-container h2 {
-            color: #990000;
-            font-size: 28px;
-            margin-bottom: 6px;
-        }
+        .detail-container h2 { color: #990000; font-size: 28px; margin-bottom: 6px; }
         .detail-container .detail-meta {
             color: #888;
             font-size: 14px;
@@ -558,10 +500,7 @@
             gap: 6px;
         }
         .interaction-bar .like-btn:hover { background: #f0f0f0; }
-        .interaction-bar .like-btn.liked {
-            color: #b30000;
-            font-weight: 600;
-        }
+        .interaction-bar .like-btn.liked { color: #b30000; font-weight: 600; }
         .interaction-bar .like-btn.liked i { color: #b30000; }
         .interaction-bar .view-count {
             color: #888;
@@ -576,11 +515,7 @@
             padding-top: 24px;
             margin-top: 10px;
         }
-        .comment-section h4 {
-            color: #990000;
-            font-size: 20px;
-            margin-bottom: 16px;
-        }
+        .comment-section h4 { color: #990000; font-size: 20px; margin-bottom: 16px; }
         .comment-item {
             padding: 14px 0;
             border-bottom: 1px solid #f0f0f0;
@@ -593,19 +528,9 @@
             flex-wrap: wrap;
             gap: 8px;
         }
-        .comment-item .comment-author {
-            font-weight: 700;
-            color: #990000;
-        }
-        .comment-item .comment-time {
-            font-size: 12px;
-            color: #999;
-        }
-        .comment-item .comment-content {
-            margin-top: 4px;
-            color: #444;
-            font-size: 15px;
-        }
+        .comment-item .comment-author { font-weight: 700; color: #990000; }
+        .comment-item .comment-time { font-size: 12px; color: #999; }
+        .comment-item .comment-content { margin-top: 4px; color: #444; font-size: 15px; }
         .comment-item .comment-pinned {
             display: inline-block;
             background: #ffd700;
@@ -635,10 +560,7 @@
             transition: all 0.2s;
         }
         .comment-item .comment-actions .like-comment-btn:hover { background: #f0f0f0; }
-        .comment-item .comment-actions .like-comment-btn.liked {
-            color: #b30000;
-            font-weight: 600;
-        }
+        .comment-item .comment-actions .like-comment-btn.liked { color: #b30000; font-weight: 600; }
         .comment-item .admin-actions {
             display: flex;
             gap: 8px;
@@ -658,11 +580,7 @@
         .comment-item .admin-actions .del-btn { color: #cc0000; }
         .comment-item .admin-actions .del-btn:hover { background: #fdd; }
         .comment-form { margin-top: 20px; }
-        .comment-form .comment-user-info {
-            font-size: 14px;
-            color: #666;
-            margin-bottom: 8px;
-        }
+        .comment-form .comment-user-info { font-size: 14px; color: #666; margin-bottom: 8px; }
         .comment-form .comment-user-info strong { color: #990000; }
         .comment-form textarea {
             width: 100%;
@@ -690,24 +608,16 @@
             transition: background 0.25s;
         }
         .comment-form button:hover { background: #990000; }
-        .comment-form .login-prompt {
-            color: #b30000;
-            font-weight: 600;
-            cursor: pointer;
-        }
+        .comment-form .login-prompt { color: #b30000; font-weight: 600; cursor: pointer; }
         .comment-form .login-prompt:hover { text-decoration: underline; }
 
-        .submit-form,
-        .profile-container,
-        .my-container {
+        .submit-form, .profile-container, .my-container {
             background: white;
             border-radius: 12px;
             padding: 32px 36px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
         }
-        .submit-form .sub,
-        .profile-container .sub,
-        .my-container .sub {
+        .submit-form .sub, .profile-container .sub, .my-container .sub {
             color: #666;
             margin-bottom: 24px;
         }
@@ -719,8 +629,7 @@
             color: #333;
             margin-bottom: 4px;
         }
-        .form-group input,
-        .form-group textarea {
+        .form-group input, .form-group textarea {
             width: 100%;
             padding: 12px 16px;
             border: 2px solid #dce3ed;
@@ -730,14 +639,9 @@
             outline: none;
             transition: border-color 0.25s;
         }
-        .form-group input:focus,
-        .form-group textarea:focus { border-color: #b30000; }
-        .form-group textarea {
-            min-height: 200px;
-            resize: vertical;
-        }
-        .btn-submit,
-        .btn-admin {
+        .form-group input:focus, .form-group textarea:focus { border-color: #b30000; }
+        .form-group textarea { min-height: 200px; resize: vertical; }
+        .btn-submit, .btn-admin {
             padding: 12px 40px;
             background: #b30000;
             color: white;
@@ -748,41 +652,16 @@
             cursor: pointer;
             transition: background 0.25s;
         }
-        .btn-submit:hover,
-        .btn-admin:hover { background: #990000; }
+        .btn-submit:hover, .btn-admin:hover { background: #990000; }
         .btn-submit.btn-secondary { background: #6c757d; }
         .btn-submit.btn-secondary:hover { background: #5a6268; }
         .btn-submit.btn-danger { background: #dc3545; }
         .btn-submit.btn-danger:hover { background: #c82333; }
-        .btn-group {
-            display: flex;
-            gap: 16px;
-            margin-top: 10px;
-            flex-wrap: wrap;
-        }
-        .error-msg {
-            color: #dc3545;
-            font-size: 14px;
-            margin-top: 6px;
-            display: none;
-        }
-        .success-msg {
-            color: #28a745;
-            font-size: 14px;
-            margin-top: 6px;
-            display: none;
-        }
-        .help-text {
-            font-size: 13px;
-            color: #888;
-            margin-top: 4px;
-        }
-        .file-preview {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 8px;
-        }
+        .btn-group { display: flex; gap: 16px; margin-top: 10px; flex-wrap: wrap; }
+        .error-msg { color: #dc3545; font-size: 14px; margin-top: 6px; display: none; }
+        .success-msg { color: #28a745; font-size: 14px; margin-top: 6px; display: none; }
+        .help-text { font-size: 13px; color: #888; margin-top: 4px; }
+        .file-preview { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
         .file-preview .preview-item {
             position: relative;
             width: 80px;
@@ -791,11 +670,8 @@
             border-radius: 6px;
             overflow: hidden;
         }
-        .file-preview .preview-item img,
-        .file-preview .preview-item video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+        .file-preview .preview-item img, .file-preview .preview-item video {
+            width: 100%; height: 100%; object-fit: cover;
         }
         .file-preview .preview-item .remove-file {
             position: absolute;
@@ -813,12 +689,7 @@
             align-items: center;
             justify-content: center;
         }
-        .file-input-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
+        .file-input-wrapper { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
         .file-input-wrapper .file-btn {
             padding: 8px 20px;
             background: #f0f0f0;
@@ -830,21 +701,11 @@
             transition: all 0.25s;
             font-size: 14px;
         }
-        .file-input-wrapper .file-btn:hover {
-            background: #e0e0e0;
-            border-color: #b30000;
-        }
+        .file-input-wrapper .file-btn:hover { background: #e0e0e0; border-color: #b30000; }
         .file-input-wrapper input[type="file"] { display: none; }
-        .file-size-info {
-            font-size: 13px;
-            color: #888;
-        }
+        .file-size-info { font-size: 13px; color: #888; }
 
-        .login-prompt {
-            color: #b30000;
-            font-weight: 600;
-            cursor: pointer;
-        }
+        .login-prompt { color: #b30000; font-weight: 600; cursor: pointer; }
         .login-prompt:hover { text-decoration: underline; }
 
         .profile-container .danger-zone {
@@ -852,11 +713,7 @@
             padding-top: 20px;
             border-top: 3px solid #dc3545;
         }
-        .profile-container .danger-zone h4 {
-            color: #dc3545;
-            font-size: 18px;
-            margin-bottom: 12px;
-        }
+        .profile-container .danger-zone h4 { color: #dc3545; font-size: 18px; margin-bottom: 12px; }
         .profile-container .danger-zone .warning-text {
             color: #666;
             font-size: 14px;
@@ -879,41 +736,19 @@
             transition: background 0.2s;
         }
         .my-post-item:hover { background: #f8f9fa; }
-        .my-post-item .post-info {
-            flex: 1;
-            min-width: 180px;
-        }
-        .my-post-item .post-info h4 {
-            color: #990000;
-            font-size: 18px;
-            margin-bottom: 2px;
-        }
-        .my-post-item .post-info .meta {
-            font-size: 13px;
-            color: #888;
-        }
+        .my-post-item .post-info { flex: 1; min-width: 180px; }
+        .my-post-item .post-info h4 { color: #990000; font-size: 18px; margin-bottom: 2px; }
+        .my-post-item .post-info .meta { font-size: 13px; color: #888; }
         .my-post-item .post-info .status-tag {
             font-size: 12px;
             padding: 0 10px;
             border-radius: 12px;
             margin-left: 8px;
         }
-        .my-post-item .post-info .status-tag.approved {
-            background: #d4edda;
-            color: #155724;
-        }
-        .my-post-item .post-info .status-tag.pending {
-            background: #fff3cd;
-            color: #856404;
-        }
-        .my-post-item .post-info .status-tag.rejected {
-            background: #f8d7da;
-            color: #721c24;
-        }
-        .my-post-item .actions {
-            display: flex;
-            gap: 8px;
-        }
+        .my-post-item .post-info .status-tag.approved { background: #d4edda; color: #155724; }
+        .my-post-item .post-info .status-tag.pending { background: #fff3cd; color: #856404; }
+        .my-post-item .post-info .status-tag.rejected { background: #f8d7da; color: #721c24; }
+        .my-post-item .actions { display: flex; gap: 8px; }
         .my-post-item .actions button {
             background: none;
             border: none;
@@ -927,11 +762,7 @@
         .my-post-item .actions .delete-btn:hover { background: #f8d7da; }
         .my-post-item .actions .view-btn { color: #17a2b8; }
         .my-post-item .actions .view-btn:hover { background: #e2f0f5; }
-        .my-empty {
-            color: #999;
-            text-align: center;
-            padding: 40px 0;
-        }
+        .my-empty { color: #999; text-align: center; padding: 40px 0; }
 
         .modal-overlay {
             display: none;
@@ -971,18 +802,8 @@
             border: none;
         }
         .modal-box .close-modal:hover { color: #333; }
-        .modal-box h2 {
-            color: #990000;
-            font-size: 24px;
-            margin-bottom: 6px;
-            text-align: center;
-        }
-        .modal-box .sub {
-            text-align: center;
-            color: #888;
-            font-size: 14px;
-            margin-bottom: 20px;
-        }
+        .modal-box h2 { color: #990000; font-size: 24px; margin-bottom: 6px; text-align: center; }
+        .modal-box .sub { text-align: center; color: #888; font-size: 14px; margin-bottom: 20px; }
         .modal-box .tabs {
             display: flex;
             gap: 0;
@@ -1002,19 +823,11 @@
             transition: all 0.25s;
             color: #b30000;
         }
-        .modal-box .tabs button.active-tab {
-            background: #b30000;
-            color: white;
-        }
+        .modal-box .tabs button.active-tab { background: #b30000; color: white; }
         .modal-box .tabs button:hover:not(.active-tab) { background: #ffe6e6; }
         .modal-box .form-container { display: block; }
         .modal-box .form-container.hidden { display: none; }
-        .modal-box label {
-            display: block;
-            font-weight: 600;
-            margin: 14px 0 4px;
-            color: #333;
-        }
+        .modal-box label { display: block; font-weight: 600; margin: 14px 0 4px; color: #333; }
         .modal-box input {
             width: 100%;
             padding: 12px 16px;
@@ -1038,23 +851,10 @@
             margin-top: 20px;
             transition: all 0.25s;
         }
-        .modal-box .submit-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(179, 0, 0, 0.35);
-        }
-        .modal-box .error-msg {
-            color: #cc0000;
-            font-size: 14px;
-            text-align: center;
-            margin-top: 12px;
-            display: none;
-        }
+        .modal-box .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(179, 0, 0, 0.35); }
+        .modal-box .error-msg { color: #cc0000; font-size: 14px; text-align: center; margin-top: 12px; display: none; }
 
-        .admin-panel {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 24px;
-        }
+        .admin-panel { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; }
         .admin-card {
             background: white;
             border-radius: 12px;
@@ -1071,15 +871,8 @@
         }
         .admin-card.full-width { grid-column: 1 / -1; }
         .admin-card .form-group { margin-bottom: 12px; }
-        .admin-card label {
-            display: block;
-            font-weight: 600;
-            font-size: 14px;
-            color: #333;
-            margin-bottom: 4px;
-        }
-        .admin-card input,
-        .admin-card textarea {
+        .admin-card label { display: block; font-weight: 600; font-size: 14px; color: #333; margin-bottom: 4px; }
+        .admin-card input, .admin-card textarea {
             width: 100%;
             padding: 10px 14px;
             border: 2px solid #dce3ed;
@@ -1089,12 +882,8 @@
             outline: none;
             transition: border-color 0.25s;
         }
-        .admin-card input:focus,
-        .admin-card textarea:focus { border-color: #b30000; }
-        .admin-card textarea {
-            min-height: 70px;
-            resize: vertical;
-        }
+        .admin-card input:focus, .admin-card textarea:focus { border-color: #b30000; }
+        .admin-card textarea { min-height: 70px; resize: vertical; }
         .admin-card .btn-admin {
             padding: 10px 28px;
             background: #b30000;
@@ -1108,17 +897,8 @@
             margin-top: 4px;
         }
         .admin-card .btn-admin:hover { background: #990000; }
-        .admin-card .btn-admin.btn-sm {
-            padding: 4px 14px;
-            font-size: 12px;
-            margin-top: 0;
-        }
-        .admin-card .file-preview {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            margin-top: 6px;
-        }
+        .admin-card .btn-admin.btn-sm { padding: 4px 14px; font-size: 12px; margin-top: 0; }
+        .admin-card .file-preview { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
         .admin-card .file-preview .preview-item {
             position: relative;
             width: 60px;
@@ -1127,11 +907,8 @@
             border-radius: 6px;
             overflow: hidden;
         }
-        .admin-card .file-preview .preview-item img,
-        .admin-card .file-preview .preview-item video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+        .admin-card .file-preview .preview-item img, .admin-card .file-preview .preview-item video {
+            width: 100%; height: 100%; object-fit: cover;
         }
         .admin-card .file-preview .preview-item .remove-file {
             position: absolute;
@@ -1149,12 +926,7 @@
             align-items: center;
             justify-content: center;
         }
-        .admin-card .file-input-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
+        .admin-card .file-input-wrapper { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
         .admin-card .file-input-wrapper .file-btn {
             padding: 6px 16px;
             background: #f0f0f0;
@@ -1166,19 +938,10 @@
             transition: all 0.25s;
             font-size: 13px;
         }
-        .admin-card .file-input-wrapper .file-btn:hover {
-            background: #e0e0e0;
-            border-color: #b30000;
-        }
+        .admin-card .file-input-wrapper .file-btn:hover { background: #e0e0e0; border-color: #b30000; }
         .admin-card .file-input-wrapper input[type="file"] { display: none; }
-        .admin-card .file-size-info {
-            font-size: 12px;
-            color: #888;
-        }
-        .admin-card .admin-list {
-            max-height: 280px;
-            overflow-y: auto;
-        }
+        .admin-card .file-size-info { font-size: 12px; color: #888; }
+        .admin-card .admin-list { max-height: 280px; overflow-y: auto; }
         .admin-card .admin-list-item {
             padding: 8px 0;
             border-bottom: 1px solid #f0f0f0;
@@ -1189,11 +952,7 @@
             flex-wrap: wrap;
         }
         .admin-card .admin-list-item:last-child { border-bottom: none; }
-        .admin-card .admin-list-item .item-info {
-            flex: 1;
-            font-size: 14px;
-            min-width: 120px;
-        }
+        .admin-card .admin-list-item .item-info { flex: 1; font-size: 14px; min-width: 120px; }
         .admin-card .admin-list-item .item-info strong { color: #990000; }
         .admin-card .admin-list-item .item-info .status-tag {
             font-size: 11px;
@@ -1201,18 +960,9 @@
             border-radius: 10px;
             margin-left: 6px;
         }
-        .admin-card .admin-list-item .item-info .status-tag.pending {
-            background: #fff3cd;
-            color: #856404;
-        }
-        .admin-card .admin-list-item .item-info .status-tag.approved {
-            background: #d4edda;
-            color: #155724;
-        }
-        .admin-card .admin-list-item .item-info .status-tag.rejected {
-            background: #f8d7da;
-            color: #721c24;
-        }
+        .admin-card .admin-list-item .item-info .status-tag.pending { background: #fff3cd; color: #856404; }
+        .admin-card .admin-list-item .item-info .status-tag.approved { background: #d4edda; color: #155724; }
+        .admin-card .admin-list-item .item-info .status-tag.rejected { background: #f8d7da; color: #721c24; }
         .admin-card .admin-list-item .item-info .role-tag {
             font-size: 12px;
             padding: 2px 12px;
@@ -1245,12 +995,7 @@
             color: white;
             margin-left: 4px;
         }
-        .admin-card .admin-list-item .actions {
-            display: flex;
-            gap: 4px;
-            flex-shrink: 0;
-            flex-wrap: wrap;
-        }
+        .admin-card .admin-list-item .actions { display: flex; gap: 4px; flex-shrink: 0; flex-wrap: wrap; }
         .admin-card .admin-list-item .actions button {
             background: none;
             border: none;
@@ -1272,11 +1017,7 @@
         .admin-card .admin-list-item .actions .mute-btn:hover { background: #fff3cd; }
         .admin-card .admin-list-item .actions .unmute-btn { color: #28a745; }
         .admin-card .admin-list-item .actions .unmute-btn:hover { background: #d4edda; }
-        .admin-empty {
-            color: #999;
-            text-align: center;
-            padding: 20px 0;
-        }
+        .admin-empty { color: #999; text-align: center; padding: 20px 0; }
         .user-manage-msg {
             padding: 10px 16px;
             border-radius: 6px;
@@ -1285,30 +1026,10 @@
             font-weight: 600;
             border-left: 4px solid transparent;
         }
-        .user-manage-msg.success {
-            background: #d4edda;
-            color: #155724;
-            border-left-color: #28a745;
-            display: block;
-        }
-        .user-manage-msg.error {
-            background: #f8d7da;
-            color: #721c24;
-            border-left-color: #dc3545;
-            display: block;
-        }
-        .user-manage-msg.info {
-            background: #cce5ff;
-            color: #004085;
-            border-left-color: #007bff;
-            display: block;
-        }
-        .user-search-bar {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 12px;
-            flex-wrap: wrap;
-        }
+        .user-manage-msg.success { background: #d4edda; color: #155724; border-left-color: #28a745; display: block; }
+        .user-manage-msg.error { background: #f8d7da; color: #721c24; border-left-color: #dc3545; display: block; }
+        .user-manage-msg.info { background: #cce5ff; color: #004085; border-left-color: #007bff; display: block; }
+        .user-search-bar { display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
         .user-search-bar input {
             flex: 1;
             padding: 8px 14px;
@@ -1334,11 +1055,7 @@
         .user-search-bar button:hover { background: #990000; }
         .user-search-bar button.btn-clear { background: #6c757d; }
         .user-search-bar button.btn-clear:hover { background: #5a6268; }
-        .user-search-info {
-            font-size: 13px;
-            color: #888;
-            margin-bottom: 8px;
-        }
+        .user-search-info { font-size: 13px; color: #888; margin-bottom: 8px; }
 
         .msg-modal {
             display: none;
@@ -1394,15 +1111,8 @@
         }
         .msg-modal .msg-item:last-child { border-bottom: none; }
         .msg-modal .msg-item .msg-left { flex: 1; }
-        .msg-modal .msg-item .msg-time {
-            font-size: 12px;
-            color: #999;
-            margin-right: 10px;
-        }
-        .msg-modal .msg-item .msg-content {
-            font-size: 15px;
-            color: #333;
-        }
+        .msg-modal .msg-item .msg-time { font-size: 12px; color: #999; margin-right: 10px; }
+        .msg-modal .msg-item .msg-content { font-size: 15px; color: #333; }
         .msg-modal .msg-item .msg-delete-btn {
             background: none;
             border: none;
@@ -1415,15 +1125,8 @@
             flex-shrink: 0;
             margin-top: 2px;
         }
-        .msg-modal .msg-item .msg-delete-btn:hover {
-            color: #cc0000;
-            background: #fdd;
-        }
-        .msg-modal .empty-msg {
-            color: #999;
-            text-align: center;
-            padding: 30px 0;
-        }
+        .msg-modal .msg-item .msg-delete-btn:hover { color: #cc0000; background: #fdd; }
+        .msg-modal .empty-msg { color: #999; text-align: center; padding: 30px 0; }
 
         .footer {
             background: #990000;
@@ -1457,10 +1160,7 @@
             transition: opacity 0.4s, transform 0.4s;
             pointer-events: none;
         }
-        .toast.show {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-        }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
         #diagnostic-box {
             background: #fff3cd;
@@ -1472,115 +1172,50 @@
             font-size: 14px;
             display: none;
         }
-        #diagnostic-box.error {
-            background: #f8d7da;
-            color: #721c24;
-            border-left-color: #dc3545;
-            display: block;
-        }
-        #diagnostic-box.success {
-            background: #d4edda;
-            color: #155724;
-            border-left-color: #28a745;
-            display: block;
-        }
-        #diagnostic-box.info {
-            background: #cce5ff;
-            color: #004085;
-            border-left-color: #007bff;
-            display: block;
-        }
+        #diagnostic-box.error { background: #f8d7da; color: #721c24; border-left-color: #dc3545; display: block; }
+        #diagnostic-box.success { background: #d4edda; color: #155724; border-left-color: #28a745; display: block; }
+        #diagnostic-box.info { background: #cce5ff; color: #004085; border-left-color: #007bff; display: block; }
 
         @media (max-width: 1024px) {
             .admin-panel { grid-template-columns: 1fr 1fr; }
             .admin-card.full-width { grid-column: auto; }
-            .header h1 {
-                font-size: 72px;
-                letter-spacing: 12px;
-            }
+            .header h1 { font-size: 72px; letter-spacing: 12px; }
         }
         @media (max-width: 768px) {
             .admin-panel { grid-template-columns: 1fr; }
-            .header h1 {
-                font-size: 52px;
-                letter-spacing: 8px;
-            }
+            .header h1 { font-size: 52px; letter-spacing: 8px; }
             .header { padding: 20px 0 16px; }
-            .nav a {
-                padding: 10px 12px;
-                font-size: 14px;
-            }
+            .nav a { padding: 10px 12px; font-size: 14px; }
             .detail-container { padding: 24px 20px; }
             .admin-card { padding: 20px; }
             .modal-box { padding: 30px 20px; }
-            .nav .user-info {
-                font-size: 12px;
-                padding: 0 6px;
-            }
-            .submit-form,
-            .profile-container,
-            .my-container { padding: 20px; }
-            .my-post-item {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 10px;
-            }
-            .my-post-item .actions {
-                width: 100%;
-                justify-content: flex-start;
-            }
+            .nav .user-info { font-size: 12px; padding: 0 6px; }
+            .submit-form, .profile-container, .my-container { padding: 20px; }
+            .my-post-item { flex-direction: column; align-items: flex-start; gap: 10px; }
+            .my-post-item .actions { width: 100%; justify-content: flex-start; }
         }
         @media (max-width: 480px) {
-            .header h1 {
-                font-size: 36px;
-                letter-spacing: 6px;
-            }
-            .nav a {
-                padding: 8px 8px;
-                font-size: 13px;
-            }
-            .main-wrapper {
-                padding: 0 12px;
-                margin: 16px auto;
-            }
+            .header h1 { font-size: 36px; letter-spacing: 6px; }
+            .nav a { padding: 8px 8px; font-size: 13px; }
+            .main-wrapper { padding: 0 12px; margin: 16px auto; }
             .post-item h3 { font-size: 18px; }
-            .modal-box .tabs button {
-                font-size: 14px;
-                padding: 8px 0;
-            }
+            .modal-box .tabs button { font-size: 14px; padding: 8px 0; }
             .admin-card .admin-list-item { flex-wrap: wrap; }
             .admin-card .admin-list-item .actions { margin-top: 4px; }
-            .file-preview .preview-item {
-                width: 60px;
-                height: 60px;
-            }
+            .file-preview .preview-item { width: 60px; height: 60px; }
             .profile-container .btn-group { flex-direction: column; }
             .interaction-bar { gap: 12px; }
         }
         .admin-list::-webkit-scrollbar { width: 6px; }
-        .admin-list::-webkit-scrollbar-track {
-            background: #f0f2f5;
-            border-radius: 10px;
-        }
-        .admin-list::-webkit-scrollbar-thumb {
-            background: #b0c0d0;
-            border-radius: 10px;
-        }
+        .admin-list::-webkit-scrollbar-track { background: #f0f2f5; border-radius: 10px; }
+        .admin-list::-webkit-scrollbar-thumb { background: #b0c0d0; border-radius: 10px; }
         .admin-list::-webkit-scrollbar-thumb:hover { background: #8aa0b8; }
         .msg-modal .msg-box::-webkit-scrollbar { width: 6px; }
-        .msg-modal .msg-box::-webkit-scrollbar-track {
-            background: #f0f2f5;
-            border-radius: 10px;
-        }
-        .msg-modal .msg-box::-webkit-scrollbar-thumb {
-            background: #b0c0d0;
-            border-radius: 10px;
-        }
+        .msg-modal .msg-box::-webkit-scrollbar-track { background: #f0f2f5; border-radius: 10px; }
+        .msg-modal .msg-box::-webkit-scrollbar-thumb { background: #b0c0d0; border-radius: 10px; }
     </style>
-</head>
-<body>
+</head><body>
 
-    <!-- ================= 开场动画 ================= -->
     <div id="introMask">
         <div id="introLogo">
             <img src="./logo.png" alt="人民共产网">
@@ -1588,9 +1223,7 @@
         <div id="introTitle">人民共产网</div>
         <div id="introSubtitle">人民 进步 民主 共产</div>
     </div>
-    <!-- ================= 开场动画结束 ================= -->
 
-    <!-- ================= 登录墙 ================= -->
     <div id="loginWall">
         <div class="wall-box">
             <img src="./logo.png" alt="人民共产网" class="wall-logo">
@@ -1606,15 +1239,10 @@
             </form>
         </div>
     </div>
-    <!-- ================= 登录墙结束 ================= -->
 
-    <!-- Toast -->
     <div id="toast" class="toast"></div>
-
-    <!-- 诊断信息 -->
     <div id="diagnostic-box"></div>
 
-    <!-- 消息中心 -->
     <div class="msg-modal" id="msgModal">
         <div class="msg-box">
             <button class="close-msg" id="closeMsgModal">&times;</button>
@@ -1623,7 +1251,6 @@
         </div>
     </div>
 
-    <!-- 登录模态框 -->
     <div class="modal-overlay" id="loginModal">
         <div class="modal-box">
             <button class="close-modal" id="closeLoginModal">&times;</button>
@@ -1658,7 +1285,6 @@
         </div>
     </div>
 
-    <!-- 删除申请模态框（普通管理员使用） -->
     <div class="modal-overlay" id="deleteRequestModal">
         <div class="modal-box">
             <button class="close-modal" onclick="closeDeleteRequestModal()">&times;</button>
@@ -1673,14 +1299,12 @@
         </div>
     </div>
 
-    <!-- 头部 -->
     <header class="header">
         <div class="header-content">
             <h1>人民共产网</h1>
         </div>
     </header>
 
-    <!-- 导航栏 -->
     <nav class="nav" id="mainNav">
         <div class="nav-inner">
             <a href="#" class="active-page" data-page="home">首页</a>
@@ -1704,22 +1328,18 @@
         </div>
     </nav>
 
-    <!-- 飘带通知 - 固定在导航栏下方 -->
     <div id="noticeBar">
         <div id="noticeContent">
             <span id="noticeText">欢迎来到人民共产网</span>
         </div>
     </div>
 
-    <!-- 主容器 -->
     <div class="main-wrapper">
 
-        <!-- 首页 -->
         <div id="page-home" class="page active">
             <div id="homePostList"></div>
         </div>
 
-        <!-- 信息公开 -->
         <div id="page-info" class="page">
             <div class="search-bar" style="display:flex; gap:12px; margin-bottom:24px; flex-wrap:wrap;">
                 <input type="text" id="infoSearch" placeholder="搜索标题..." oninput="filterInfo()" style="flex:1; padding:10px 18px; border:2px solid #dce3ed; border-radius:30px; font-size:15px; outline:none; min-width:180px;">
@@ -1728,7 +1348,6 @@
             <div id="infoPostList"></div>
         </div>
 
-        <!-- 投稿 -->
         <div id="page-submit" class="page">
             <div class="submit-form">
                 <div class="sub">欢迎投稿，管理员审核通过后将自动发布在首页和信息公开栏目。</div>
@@ -1736,7 +1355,6 @@
             </div>
         </div>
 
-        <!-- 详情页 -->
         <div id="page-detail" class="page">
             <div class="detail-container" id="detailContainer">
                 <div class="back-link" onclick="goBackFromDetail()"><i class="fas fa-arrow-left"></i> 返回列表</div>
@@ -1767,7 +1385,6 @@
             </div>
         </div>
 
-        <!-- 个人中心 -->
         <div id="page-profile" class="page">
             <div class="profile-container">
                 <div class="sub">修改您的个人信息</div>
@@ -1775,7 +1392,6 @@
             </div>
         </div>
 
-        <!-- 我的 -->
         <div id="page-my" class="page">
             <div class="my-container">
                 <div class="sub">管理您发布的所有信息</div>
@@ -1783,14 +1399,12 @@
             </div>
         </div>
 
-        <!-- 管理后台 -->
         <div id="page-admin" class="page">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap;">
                 <span></span>
                 <button id="adminLogoutBtn" style="padding:8px 24px; background:#b30000; color:white; border:none; border-radius:30px; font-size:15px; cursor:pointer;">退出登录</button>
             </div>
             <div class="admin-panel">
-                <!-- 发布通知 -->
                 <div class="admin-card">
                     <h3><i class="fas fa-bullhorn"></i> 发布通知</h3>
                     <form id="noticeForm">
@@ -1825,7 +1439,6 @@
                     <div class="admin-list" id="adminUserList"></div>
                 </div>
 
-                <!-- 删除审核卡片（仅超级管理员可见） -->
                 <div class="admin-card full-width" id="deleteReviewCard" style="display:none;">
                     <h3><i class="fas fa-trash-alt"></i> 删除审核</h3>
                     <div class="admin-list" id="deleteRequestList"></div>
@@ -1835,7 +1448,6 @@
 
     </div>
 
-    <!-- 页脚 -->
     <footer class="footer">
         <div class="footer-inner">
             <div class="copyright">
@@ -1845,25 +1457,35 @@
         </div>
     </footer>
 
-    <script>
-        // ================================================================
-        //  开场动画 —— 结束后调用 checkLoginWall
+    <script>        // ================================================================
+        //  开场动画 + 登录墙检测（关键改动）
         // ================================================================
         (function setupIntro() {
             const intro = document.getElementById('introMask');
-            if (!intro) return;
+            const wall = document.getElementById('loginWall');
+
+            // 开场期间锁定滚动，防止用户在动画期间看到或滑到下方内容
+            document.body.style.overflow = 'hidden';
+
+            // 开场动画期间就让登录墙在下面准备好（默认未登录状态），
+            // 因为 loginWall 的 z-index 低于 introMask，会被遮住，不会提前露出
+            if (wall) wall.classList.remove('hidden');
+
+            if (!intro) {
+                checkLoginWall();
+                return;
+            }
 
             setTimeout(() => {
                 intro.classList.add('fade-out');
                 setTimeout(() => {
                     if (intro && intro.parentNode) intro.parentNode.removeChild(intro);
-                    // 动画结束后判断登录状态
                     checkLoginWall();
                 }, 900);
             }, 2600);
         })();
 
-        // 检查是否显示登录墙
+        // 检查登录状态：未登录保持登录墙，已登录进首页
         async function checkLoginWall() {
             const stored = sessionStorage.getItem('currentUser');
             let valid = false;
@@ -1877,10 +1499,10 @@
                 }
             }
             if (!valid) {
-                document.getElementById('loginWall').classList.add('show');
+                document.getElementById('loginWall').classList.remove('hidden');
                 document.body.style.overflow = 'hidden';
             } else {
-                document.getElementById('loginWall').classList.remove('show');
+                document.getElementById('loginWall').classList.add('hidden');
                 document.body.style.overflow = '';
                 updateUIForUser();
                 switchPage('home');
@@ -1895,107 +1517,62 @@
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         // ================================================================
-        //  通知管理 - 使用独立的 site_config 表
+        //  通知管理
         // ================================================================
         const TABLE_CONFIG = 'site_config';
 
         async function initConfigTable() {
             try {
                 const { data: existing, error: checkError } = await supabaseClient
-                    .from(TABLE_CONFIG)
-                    .select('*')
-                    .eq('key', 'notice')
-                    .maybeSingle();
-
+                    .from(TABLE_CONFIG).select('*').eq('key', 'notice').maybeSingle();
                 if (checkError && checkError.code === '42P01') {
                     console.warn('site_config 表不存在，请先在 Supabase SQL Editor 中创建');
                     return;
                 }
-
                 if (!existing) {
                     const { error: insertError } = await supabaseClient
-                        .from(TABLE_CONFIG)
-                        .insert([{
-                            key: 'notice',
-                            value: '欢迎来到人民共产网'
-                        }]);
-
-                    if (insertError) {
-                        console.error('插入默认通知失败:', insertError);
-                    } else {
-                        console.log('默认通知已创建');
-                    }
+                        .from(TABLE_CONFIG).insert([{ key: 'notice', value: '欢迎来到人民共产网' }]);
+                    if (insertError) console.error('插入默认通知失败:', insertError);
+                    else console.log('默认通知已创建');
                 }
-            } catch (e) {
-                console.error('初始化配置表失败:', e);
-            }
+            } catch (e) { console.error('初始化配置表失败:', e); }
         }
 
         async function loadNotice() {
             try {
                 const { data, error } = await supabaseClient
-                    .from(TABLE_CONFIG)
-                    .select('value')
-                    .eq('key', 'notice')
-                    .maybeSingle();
-
-                if (error) {
-                    console.error('加载通知失败:', error);
-                    return '欢迎来到人民共产网';
-                }
-
+                    .from(TABLE_CONFIG).select('value').eq('key', 'notice').maybeSingle();
+                if (error) { console.error('加载通知失败:', error); return '欢迎来到人民共产网'; }
                 if (data && data.value) {
-                    const noticeText = data.value;
-                    updateNoticeBar(noticeText);
-                    return noticeText;
+                    updateNoticeBar(data.value);
+                    return data.value;
                 }
                 return '欢迎来到人民共产网';
-            } catch (e) {
-                console.error('加载通知异常:', e);
-                return '欢迎来到人民共产网';
-            }
+            } catch (e) { console.error('加载通知异常:', e); return '欢迎来到人民共产网'; }
         }
 
         async function updateNotice(noticeText) {
             try {
                 const { data: existing, error: checkError } = await supabaseClient
-                    .from(TABLE_CONFIG)
-                    .select('*')
-                    .eq('key', 'notice')
-                    .maybeSingle();
-
+                    .from(TABLE_CONFIG).select('*').eq('key', 'notice').maybeSingle();
                 if (checkError) {
-                    console.error('检查通知记录失败:', checkError);
                     showToast('❌ 检查通知记录失败: ' + checkError.message);
                     return false;
                 }
-
                 let result;
                 if (existing) {
-                    result = await supabaseClient
-                        .from(TABLE_CONFIG)
-                        .update({ value: noticeText })
-                        .eq('key', 'notice');
+                    result = await supabaseClient.from(TABLE_CONFIG).update({ value: noticeText }).eq('key', 'notice');
                 } else {
-                    result = await supabaseClient
-                        .from(TABLE_CONFIG)
-                        .insert([{
-                            key: 'notice',
-                            value: noticeText
-                        }]);
+                    result = await supabaseClient.from(TABLE_CONFIG).insert([{ key: 'notice', value: noticeText }]);
                 }
-
                 if (result.error) {
-                    console.error('更新通知失败:', result.error);
                     showToast('❌ 更新通知失败: ' + result.error.message);
                     return false;
                 }
-
                 updateNoticeBar(noticeText);
                 showToast('✅ 通知已更新');
                 return true;
             } catch (e) {
-                console.error('更新通知异常:', e);
                 showToast('❌ 更新通知异常: ' + e.message);
                 return false;
             }
@@ -2004,7 +1581,6 @@
         function updateNoticeBar(text) {
             const noticeBar = document.getElementById('noticeBar');
             const noticeText = document.getElementById('noticeText');
-
             if (text && text.trim() !== '') {
                 noticeText.textContent = text;
                 noticeBar.style.display = 'block';
@@ -2022,145 +1598,72 @@
             const nav = document.getElementById('mainNav');
             const noticeBar = document.getElementById('noticeBar');
             if (nav && noticeBar) {
-                const navHeight = nav.offsetHeight;
-                noticeBar.style.top = navHeight + 'px';
+                noticeBar.style.top = nav.offsetHeight + 'px';
             }
         }
 
         // ================================================================
-        //  用户管理 - 使用 Supabase 表 'users'
+        //  用户管理
         // ================================================================
         const TABLE_USERS = 'users';
 
         async function initUsersTable() {
             try {
                 const { data: existing, error: checkError } = await supabaseClient
-                    .from(TABLE_USERS)
-                    .select('*')
-                    .eq('role', 'superadmin')
-                    .limit(1);
-
-                if (checkError) {
-                    console.error('检查超级管理员失败:', checkError);
-                    return;
-                }
-
+                    .from(TABLE_USERS).select('*').eq('role', 'superadmin').limit(1);
+                if (checkError) { console.error('检查超级管理员失败:', checkError); return; }
                 if (!existing || existing.length === 0) {
-                    const { error: insertError } = await supabaseClient
-                        .from(TABLE_USERS)
-                        .insert([{
-                            username: '杨振浩',
-                            password: 'Yzh061110',
-                            role: 'superadmin',
-                            messages: [],
-                            muted: false,
-                            muted_until: 0
-                        }]);
-
-                    if (insertError) {
-                        console.error('创建超级管理员失败:', insertError);
-                    } else {
-                        console.log('超级管理员已创建');
-                    }
+                    const { error: insertError } = await supabaseClient.from(TABLE_USERS).insert([{
+                        username: '杨振浩', password: 'Yzh061110', role: 'superadmin',
+                        messages: [], muted: false, muted_until: 0
+                    }]);
+                    if (insertError) console.error('创建超级管理员失败:', insertError);
+                    else console.log('超级管理员已创建');
                 } else {
                     console.log('超级管理员已存在，无需创建');
                 }
-            } catch (e) {
-                console.error('初始化用户表失败:', e);
-            }
+            } catch (e) { console.error('初始化用户表失败:', e); }
         }
 
         async function getUsers() {
             try {
-                const { data, error } = await supabaseClient
-                    .from(TABLE_USERS)
-                    .select('*')
-                    .order('username');
-
-                if (error) {
-                    console.error('获取用户列表失败:', error);
-                    return [];
-                }
+                const { data, error } = await supabaseClient.from(TABLE_USERS).select('*').order('username');
+                if (error) { console.error('获取用户列表失败:', error); return []; }
                 return data || [];
-            } catch (e) {
-                console.error('获取用户列表异常:', e);
-                return [];
-            }
+            } catch (e) { console.error('获取用户列表异常:', e); return []; }
         }
 
         async function findUser(username) {
             try {
                 const { data, error } = await supabaseClient
-                    .from(TABLE_USERS)
-                    .select('*')
-                    .eq('username', username)
-                    .maybeSingle();
-
-                if (error) {
-                    console.error('查找用户失败:', error);
-                    return null;
-                }
+                    .from(TABLE_USERS).select('*').eq('username', username).maybeSingle();
+                if (error) { console.error('查找用户失败:', error); return null; }
                 return data;
-            } catch (e) {
-                console.error('查找用户异常:', e);
-                return null;
-            }
+            } catch (e) { console.error('查找用户异常:', e); return null; }
         }
 
         async function saveUser(userData) {
-            console.log('saveUser 被调用，数据:', userData);
             try {
                 const existing = await findUser(userData.username);
                 if (existing) {
                     const { error } = await supabaseClient
-                        .from(TABLE_USERS)
-                        .update(userData)
-                        .eq('username', userData.username);
-                    if (error) {
-                        console.error('更新用户失败:', error);
-                        showToast('❌ 更新用户失败: ' + error.message);
-                        return false;
-                    }
-                    console.log('用户更新成功:', userData.username);
+                        .from(TABLE_USERS).update(userData).eq('username', userData.username);
+                    if (error) { showToast('❌ 更新用户失败: ' + error.message); return false; }
                     return true;
                 } else {
-                    const { error } = await supabaseClient
-                        .from(TABLE_USERS)
-                        .insert([userData]);
-                    if (error) {
-                        console.error('新增用户失败:', error);
-                        showToast('❌ 新增用户失败: ' + error.message);
-                        return false;
-                    }
-                    console.log('用户新增成功:', userData.username);
+                    const { error } = await supabaseClient.from(TABLE_USERS).insert([userData]);
+                    if (error) { showToast('❌ 新增用户失败: ' + error.message); return false; }
                     return true;
                 }
-            } catch (e) {
-                console.error('保存用户异常:', e);
-                showToast('❌ 保存用户异常: ' + e.message);
-                return false;
-            }
+            } catch (e) { showToast('❌ 保存用户异常: ' + e.message); return false; }
         }
 
         async function deleteUser(username) {
             try {
-                const { error } = await supabaseClient
-                    .from(TABLE_USERS)
-                    .delete()
-                    .eq('username', username);
-
-                if (error) {
-                    console.error('删除用户失败:', error);
-                    showToast('❌ 删除用户失败: ' + error.message);
-                    return false;
-                }
-                console.log('用户删除成功:', username);
+                const { error } = await supabaseClient.from(TABLE_USERS).delete().eq('username', username);
+                if (error) { showToast('❌ 删除用户失败: ' + error.message); return false; }
                 return true;
-            } catch (e) {
-                console.error('删除用户异常:', e);
-                showToast('❌ 删除用户异常: ' + e.message);
-                return false;
-            }
+            } catch (e) { showToast('❌ 删除用户异常: ' + e.message); return false; }
         }
 
         // ================================================================
@@ -2171,13 +1674,8 @@
             if (!user) return;
             const messages = user.messages || [];
             messages.push({
-                id: Date.now(),
-                content: content,
-                time: new Date().toLocaleString('zh-CN'),
-                read: false,
-                type: type,
-                processed: false,
-                ...extra
+                id: Date.now(), content, time: new Date().toLocaleString('zh-CN'),
+                read: false, type, processed: false, ...extra
             });
             await saveUser({ ...user, messages });
         }
@@ -2224,9 +1722,8 @@
         }
 
         // ================================================================
-        //  删除申请相关功能
+        //  删除申请
         // ================================================================
-
         async function getSuperAdmins() {
             const users = await getUsers();
             return users.filter(u => u.role === 'superadmin');
@@ -2240,12 +1737,10 @@
                 for (const msg of msgs) {
                     if (msg.type === 'delete_request' && msg.processed === false) {
                         allRequests.push({
-                            id: msg.id,
-                            target: msg.target || '未知用户',
+                            id: msg.id, target: msg.target || '未知用户',
                             requester: msg.requester || '未知管理员',
                             reason: msg.reason || '无理由',
-                            time: msg.time,
-                            adminUsername: admin.username
+                            time: msg.time, adminUsername: admin.username
                         });
                     }
                 }
@@ -2257,64 +1752,40 @@
             if (!currentUser) return false;
             const requester = currentUser;
             const pending = await getPendingDeleteRequests();
-            const existing = pending.find(r => r.target === username);
-            if (existing) {
+            if (pending.find(r => r.target === username)) {
                 showToast('该用户已有待处理的删除申请，请等待审核。');
                 return false;
             }
             const superAdmins = await getSuperAdmins();
-            if (superAdmins.length === 0) {
-                showToast('未找到超级管理员，无法提交申请。');
-                return false;
-            }
+            if (superAdmins.length === 0) { showToast('未找到超级管理员，无法提交申请。'); return false; }
             for (const admin of superAdmins) {
-                await addMessageToUser(
-                    admin.username,
+                await addMessageToUser(admin.username,
                     `删除申请：用户 ${requester} 申请删除 ${username}，理由：${reason}`,
-                    'delete_request', {
-                        target: username,
-                        requester: requester,
-                        reason: reason,
-                        processed: false
-                    }
-                );
+                    'delete_request',
+                    { target: username, requester, reason, processed: false });
             }
-            await addMessageToUser(
-                requester,
+            await addMessageToUser(requester,
                 `已向超级管理员提交删除用户 ${username} 的申请，请等待审核。`,
-                'delete_request_feedback'
-            );
+                'delete_request_feedback');
             showToast('✅ 删除申请已提交，等待超级管理员审核。');
             return true;
         }
 
         async function approveDeleteRequest(requestId, adminUsername) {
             const updated = await updateMessageStatus(adminUsername, requestId, true);
-            if (!updated) {
-                showToast('请求不存在或已处理');
-                return false;
-            }
+            if (!updated) { showToast('请求不存在或已处理'); return false; }
             const user = await findUser(adminUsername);
             if (!user) return false;
             const msg = user.messages.find(m => m.id === requestId);
             if (!msg) return false;
             const targetUsername = msg.target;
-            if (!targetUsername) {
-                showToast('请求数据异常，缺少目标用户');
-                return false;
-            }
+            if (!targetUsername) { showToast('请求数据异常，缺少目标用户'); return false; }
             const delSuccess = await deleteUser(targetUsername);
-            if (!delSuccess) {
-                showToast('删除用户失败');
-                return false;
-            }
+            if (!delSuccess) { showToast('删除用户失败'); return false; }
             const requester = msg.requester;
             if (requester) {
-                await addMessageToUser(
-                    requester,
-                    `您的删除 ${targetUsername} 的申请已通过，用户已删除。`,
-                    'delete_approved'
-                );
+                await addMessageToUser(requester,
+                    `您的删除 ${targetUsername} 的申请已通过，用户已删除。`, 'delete_approved');
             }
             showToast(`✅ 已批准删除用户 ${targetUsername}`);
             return true;
@@ -2322,10 +1793,7 @@
 
         async function rejectDeleteRequest(requestId, adminUsername) {
             const updated = await updateMessageStatus(adminUsername, requestId, true);
-            if (!updated) {
-                showToast('请求不存在或已处理');
-                return false;
-            }
+            if (!updated) { showToast('请求不存在或已处理'); return false; }
             const user = await findUser(adminUsername);
             if (!user) return false;
             const msg = user.messages.find(m => m.id === requestId);
@@ -2333,11 +1801,8 @@
             const targetUsername = msg.target;
             const requester = msg.requester;
             if (requester) {
-                await addMessageToUser(
-                    requester,
-                    `您的删除 ${targetUsername} 的申请已被拒绝。`,
-                    'delete_rejected'
-                );
+                await addMessageToUser(requester,
+                    `您的删除 ${targetUsername} 的申请已被拒绝。`, 'delete_rejected');
             }
             showToast('已拒绝该删除申请');
             return true;
@@ -2379,9 +1844,8 @@
             const stored = sessionStorage.getItem('currentUser');
             if (stored) {
                 findUser(stored).then(user => {
-                    if (user) {
-                        currentUser = stored;
-                    } else {
+                    if (user) currentUser = stored;
+                    else {
                         sessionStorage.removeItem('currentUser');
                         currentUser = null;
                         updateUIForUser();
@@ -2416,21 +1880,14 @@
         async function registerUser(username, password) {
             const existing = await findUser(username);
             if (existing) return false;
-
             const newUser = {
-                username: username,
-                password: password,
-                role: 'user',
-                messages: [],
-                muted: false,
-                muted_until: 0
+                username, password, role: 'user',
+                messages: [], muted: false, muted_until: 0
             };
-
             const success = await saveUser(newUser);
             if (success) {
                 setCurrentUser(username);
-                if (document.getElementById('page-admin') && document.getElementById('page-admin').classList.contains(
-                        'active')) {
+                if (document.getElementById('page-admin') && document.getElementById('page-admin').classList.contains('active')) {
                     renderAdminUserList();
                     updateUserCount();
                 }
@@ -2465,13 +1922,8 @@
 
         async function getPosts() {
             const { data, error } = await supabaseClient
-                .from(TABLE_POSTS)
-                .select('*')
-                .order('created_at', { ascending: false });
-            if (error) {
-                console.error('获取文章失败:', error);
-                return [];
-            }
+                .from(TABLE_POSTS).select('*').order('created_at', { ascending: false });
+            if (error) { console.error('获取文章失败:', error); return []; }
             return data || [];
         }
 
@@ -2482,50 +1934,29 @@
 
         async function getPostById(id) {
             const { data, error } = await supabaseClient
-                .from(TABLE_POSTS)
-                .select('*')
-                .eq('id', id)
-                .maybeSingle();
-            if (error) {
-                console.error('获取文章失败:', error);
-                return null;
-            }
+                .from(TABLE_POSTS).select('*').eq('id', id).maybeSingle();
+            if (error) { console.error('获取文章失败:', error); return null; }
             return data;
         }
 
-        async function addPost(title, date, content, author, images = [], video = '', authorTag = '', status = 'pending',
-            rejectReason = '') {
+        async function addPost(title, date, content, author, images = [], video = '', authorTag = '', status = 'pending', rejectReason = '') {
             const newPost = {
-                id: Date.now(),
-                title,
-                date,
-                content: content || '',
-                author: author || '匿名',
-                authorTag: authorTag || '',
-                created_at: Date.now(),
-                status: status,
+                id: Date.now(), title, date, content: content || '',
+                author: author || '匿名', authorTag: authorTag || '',
+                created_at: Date.now(), status,
                 reject_reason: rejectReason,
-                images: images || [],
-                video: video || '',
-                likes: 0,
-                liked_users: [],
-                views: 0
+                images: images || [], video: video || '',
+                likes: 0, liked_users: [], views: 0
             };
             const { data, error } = await supabaseClient
-                .from(TABLE_POSTS)
-                .insert([newPost])
-                .select();
+                .from(TABLE_POSTS).insert([newPost]).select();
             if (error) {
-                console.error('新增文章失败:', error);
                 showToast('❌ 投稿失败：' + error.message);
                 throw error;
             }
             if (status === 'pending' && author !== '管理员') {
                 const { data: admins, error: adminError } = await supabaseClient
-                    .from(TABLE_USERS)
-                    .select('*')
-                    .eq('role', 'superadmin')
-                    .limit(1);
+                    .from(TABLE_USERS).select('*').eq('role', 'superadmin').limit(1);
                 if (!adminError && admins && admins.length > 0) {
                     addMessageToUser(admins[0].username, `新投稿《${title}》来自 ${author}，请审核。`, 'new_post');
                 }
@@ -2538,52 +1969,34 @@
             if (status === 'rejected') {
                 updates.reject_reason = rejectReason;
                 const post = await getPostById(postId);
-                if (post) {
-                    addMessageToUser(post.author, `您的投稿《${post.title}》审核未通过，原因：${rejectReason}`, 'reject');
-                }
+                if (post) addMessageToUser(post.author, `您的投稿《${post.title}》审核未通过，原因：${rejectReason}`, 'reject');
             } else if (status === 'approved') {
                 updates.reject_reason = '';
                 const post = await getPostById(postId);
-                if (post) {
-                    addMessageToUser(post.author, `您的投稿《${post.title}》已通过审核，现已发布。`, 'approve');
-                }
+                if (post) addMessageToUser(post.author, `您的投稿《${post.title}》已通过审核，现已发布。`, 'approve');
             }
-            const { error } = await supabaseClient
-                .from(TABLE_POSTS)
-                .update(updates)
-                .eq('id', postId);
-            if (error) {
-                console.error('更新状态失败:', error);
-                return false;
-            }
+            const { error } = await supabaseClient.from(TABLE_POSTS).update(updates).eq('id', postId);
+            if (error) { console.error('更新状态失败:', error); return false; }
             return true;
         }
 
         async function deletePost(postId) {
             await supabaseClient.from(TABLE_COMMENTS).delete().eq('post_id', postId);
             const { error } = await supabaseClient.from(TABLE_POSTS).delete().eq('id', postId);
-            if (error) {
-                console.error('删除文章失败:', error);
-                return false;
-            }
+            if (error) { console.error('删除文章失败:', error); return false; }
             return true;
         }
 
         // ================================================================
         //  点赞功能
         // ================================================================
-
         async function togglePostLike(postId, username) {
             try {
                 const post = await getPostById(postId);
-                if (!post) {
-                    return { success: false, message: '文章不存在' };
-                }
-
+                if (!post) return { success: false, message: '文章不存在' };
                 const likedUsers = Array.isArray(post.liked_users) ? post.liked_users : [];
                 const currentLikes = post.likes || 0;
                 const alreadyLiked = likedUsers.includes(username);
-
                 let newLikedUsers, newLikes;
                 if (alreadyLiked) {
                     newLikedUsers = likedUsers.filter(u => u !== username);
@@ -2592,102 +2005,43 @@
                     newLikedUsers = [...likedUsers, username];
                     newLikes = currentLikes + 1;
                 }
-
-                const { error } = await supabaseClient
-                    .from(TABLE_POSTS)
-                    .update({
-                        likes: newLikes,
-                        liked_users: newLikedUsers
-                    })
-                    .eq('id', postId);
-
-                if (error) {
-                    console.error('Supabase 更新失败:', error);
-                    return { success: false, message: error.message || '数据库更新失败' };
-                }
-
-                return {
-                    success: true,
-                    isLiked: !alreadyLiked,
-                    likes: newLikes
-                };
+                const { error } = await supabaseClient.from(TABLE_POSTS)
+                    .update({ likes: newLikes, liked_users: newLikedUsers }).eq('id', postId);
+                if (error) return { success: false, message: error.message || '数据库更新失败' };
+                return { success: true, isLiked: !alreadyLiked, likes: newLikes };
             } catch (error) {
-                console.error('togglePostLike 异常:', error);
-                return {
-                    success: false,
-                    message: error.message || '点赞操作异常，请重试'
-                };
+                return { success: false, message: error.message || '点赞操作异常，请重试' };
             }
         }
 
         async function toggleLike() {
-            if (!await isLoggedIn()) {
-                showToast('请先登录后点赞');
-                openLoginModal();
-                return;
-            }
-
+            if (!await isLoggedIn()) { showToast('请先登录后点赞'); openLoginModal(); return; }
             const postId = currentPostId;
-            if (!postId) {
-                showToast('请先打开一篇文章');
-                return;
-            }
-
+            if (!postId) { showToast('请先打开一篇文章'); return; }
             const likeBtn = document.getElementById('likeBtn');
-            if (!likeBtn) return;
-            if (likeBtn.disabled) return;
-
+            if (!likeBtn || likeBtn.disabled) return;
             likeBtn.disabled = true;
-
             try {
                 const result = await togglePostLike(postId, currentUser);
-
-                if (!result || !result.success) {
-                    showToast(result?.message || '点赞失败，请重试');
-                    return;
-                }
-
+                if (!result || !result.success) { showToast(result?.message || '点赞失败，请重试'); return; }
                 const likeCountEl = document.getElementById('likeCount');
-                if (likeCountEl) {
-                    likeCountEl.textContent = result.likes;
-                }
-
-                if (result.isLiked) {
-                    likeBtn.classList.add('liked');
-                    showToast('❤️ 点赞成功！');
-                } else {
-                    likeBtn.classList.remove('liked');
-                    showToast('已取消点赞');
-                }
-
+                if (likeCountEl) likeCountEl.textContent = result.likes;
+                if (result.isLiked) { likeBtn.classList.add('liked'); showToast('❤️ 点赞成功！'); }
+                else { likeBtn.classList.remove('liked'); showToast('已取消点赞'); }
                 await renderPostList('homePostList', true);
                 await renderPostList('infoPostList', true);
-
-            } catch (error) {
-                console.error('点赞流程异常:', error);
-                showToast('操作异常，请重试');
-            } finally {
-                likeBtn.disabled = false;
-            }
+            } catch (error) { showToast('操作异常，请重试'); }
+            finally { likeBtn.disabled = false; }
         }
 
         async function initLikeButtonState(post) {
             const likeBtn = document.getElementById('likeBtn');
             const likeCountEl = document.getElementById('likeCount');
-
             if (!likeBtn) return;
-
-            if (likeCountEl) {
-                likeCountEl.textContent = post.likes || 0;
-            }
-
+            if (likeCountEl) likeCountEl.textContent = post.likes || 0;
             const likedUsers = Array.isArray(post.liked_users) ? post.liked_users : [];
-            if (await isLoggedIn() && likedUsers.includes(currentUser)) {
-                likeBtn.classList.add('liked');
-            } else {
-                likeBtn.classList.remove('liked');
-            }
-
+            if (await isLoggedIn() && likedUsers.includes(currentUser)) likeBtn.classList.add('liked');
+            else likeBtn.classList.remove('liked');
             likeBtn.disabled = false;
         }
 
@@ -2702,73 +2056,45 @@
         //  评论操作
         // ================================================================
         async function getComments(postId) {
-            const { data, error } = await supabaseClient
-                .from(TABLE_COMMENTS)
-                .select('*')
-                .eq('post_id', postId)
+            const { data, error } = await supabaseClient.from(TABLE_COMMENTS)
+                .select('*').eq('post_id', postId)
                 .order('pinned', { ascending: false })
                 .order('id', { ascending: false });
-            if (error) {
-                console.error('获取评论失败:', error);
-                return [];
-            }
+            if (error) { console.error('获取评论失败:', error); return []; }
             return data || [];
         }
 
         async function addComment(postId, author, content) {
             const newComment = {
-                id: Date.now(),
-                post_id: postId,
-                author: author || '匿名',
-                content,
+                id: Date.now(), post_id: postId, author: author || '匿名', content,
                 time: new Date().toLocaleString('zh-CN'),
-                pinned: false,
-                likes: 0,
-                liked_users: []
+                pinned: false, likes: 0, liked_users: []
             };
-            const { data, error } = await supabaseClient
-                .from(TABLE_COMMENTS)
-                .insert([newComment])
-                .select();
-            if (error) {
-                console.error('发表评论失败:', error);
-                showToast('❌ 评论失败：' + error.message);
-                throw error;
-            }
+            const { data, error } = await supabaseClient.from(TABLE_COMMENTS).insert([newComment]).select();
+            if (error) { showToast('❌ 评论失败：' + error.message); throw error; }
             return data ? data[0] : newComment;
         }
 
         async function deleteComment(commentId) {
             const { error } = await supabaseClient.from(TABLE_COMMENTS).delete().eq('id', commentId);
-            if (error) {
-                console.error('删除评论失败:', error);
-                return false;
-            }
+            if (error) return false;
             return true;
         }
 
         async function togglePinComment(commentId) {
             const { data, error: fetchError } = await supabaseClient
-                .from(TABLE_COMMENTS)
-                .select('pinned')
-                .eq('id', commentId)
-                .maybeSingle();
+                .from(TABLE_COMMENTS).select('pinned').eq('id', commentId).maybeSingle();
             if (fetchError || !data) return false;
             const newPinned = !data.pinned;
             const { error } = await supabaseClient
-                .from(TABLE_COMMENTS)
-                .update({ pinned: newPinned })
-                .eq('id', commentId);
+                .from(TABLE_COMMENTS).update({ pinned: newPinned }).eq('id', commentId);
             if (error) return false;
             return true;
         }
 
         async function toggleCommentLike(commentId, username) {
             const { data, error: fetchError } = await supabaseClient
-                .from(TABLE_COMMENTS)
-                .select('likes, liked_users')
-                .eq('id', commentId)
-                .maybeSingle();
+                .from(TABLE_COMMENTS).select('likes, liked_users').eq('id', commentId).maybeSingle();
             if (fetchError || !data) return false;
             let likedUsers = data.liked_users || [];
             let newLikes = data.likes || 0;
@@ -2779,10 +2105,8 @@
                 likedUsers.push(username);
                 newLikes += 1;
             }
-            const { error } = await supabaseClient
-                .from(TABLE_COMMENTS)
-                .update({ likes: newLikes, liked_users: likedUsers })
-                .eq('id', commentId);
+            const { error } = await supabaseClient.from(TABLE_COMMENTS)
+                .update({ likes: newLikes, liked_users: likedUsers }).eq('id', commentId);
             if (error) return false;
             return true;
         }
@@ -2804,7 +2128,6 @@
                     reader.readAsDataURL(file);
                     return;
                 }
-
                 const reader = new FileReader();
                 reader.onload = e => {
                     const img = new Image();
@@ -2812,33 +2135,20 @@
                         try {
                             let w = img.naturalWidth || img.width;
                             let h = img.naturalHeight || img.height;
-
                             if (w > IMAGE_MAX_WIDTH) {
                                 h = Math.round(h * IMAGE_MAX_WIDTH / w);
                                 w = IMAGE_MAX_WIDTH;
                             }
-
                             const canvas = document.createElement('canvas');
-                            canvas.width = w;
-                            canvas.height = h;
+                            canvas.width = w; canvas.height = h;
                             const ctx = canvas.getContext('2d');
-
                             ctx.fillStyle = '#ffffff';
                             ctx.fillRect(0, 0, w, h);
                             ctx.drawImage(img, 0, 0, w, h);
-
-                            const compressed = canvas.toDataURL('image/jpeg', IMAGE_QUALITY);
-                            console.log(`图片压缩: ${file.name} ${(file.size/1024).toFixed(0)}KB → ${(compressed.length*0.75/1024).toFixed(0)}KB`);
-                            resolve(compressed);
-                        } catch (err) {
-                            console.warn('图片压缩失败，使用原图:', err);
-                            resolve(e.target.result);
-                        }
+                            resolve(canvas.toDataURL('image/jpeg', IMAGE_QUALITY));
+                        } catch (err) { resolve(e.target.result); }
                     };
-                    img.onerror = () => {
-                        console.warn('图片解析失败，使用原图');
-                        resolve(e.target.result);
-                    };
+                    img.onerror = () => resolve(e.target.result);
                     img.src = e.target.result;
                 };
                 reader.onerror = reject;
@@ -2861,21 +2171,18 @@
             const input = document.getElementById(inputId);
             const preview = document.getElementById(previewId);
             if (!input || !preview) return;
-
             let fileData = [];
             const newInput = input.cloneNode(true);
             input.parentNode.replaceChild(newInput, input);
             const newPreview = preview.cloneNode(true);
             preview.parentNode.replaceChild(newPreview, preview);
-
             const freshInput = document.getElementById(inputId);
             const freshPreview = document.getElementById(previewId);
 
             freshInput.addEventListener('change', async function(e) {
                 const files = Array.from(e.target.files);
                 if (!files.length) return;
-                let validFiles = [],
-                    errors = [];
+                let validFiles = [], errors = [];
                 for (const file of files) {
                     const result = validateFile(file, type);
                     if (result.valid) {
@@ -2883,12 +2190,8 @@
                             showToast(`正在处理 ${file.name}...`);
                             const dataUrl = await readFileAsDataURL(file);
                             validFiles.push({ name: file.name, data: dataUrl });
-                        } catch (err) {
-                            errors.push(`读取 ${file.name} 失败`);
-                        }
-                    } else {
-                        errors.push(result.msg);
-                    }
+                        } catch (err) { errors.push(`读取 ${file.name} 失败`); }
+                    } else errors.push(result.msg);
                 }
                 if (errors.length) showToast(errors.join('；'));
                 if (!validFiles.length) return;
@@ -2984,18 +2287,12 @@
                         if (unread > 0) {
                             msgBadge.textContent = unread;
                             msgBadge.style.display = 'inline-block';
-                        } else {
-                            msgBadge.style.display = 'none';
-                        }
+                        } else msgBadge.style.display = 'none';
                     });
                     isSuperAdmin().then(isSuper => {
                         const card = document.getElementById('deleteReviewCard');
-                        if (card) {
-                            card.style.display = isSuper ? 'block' : 'none';
-                        }
-                        if (isSuper) {
-                            renderDeleteRequests();
-                        }
+                        if (card) card.style.display = isSuper ? 'block' : 'none';
+                        if (isSuper) renderDeleteRequests();
                     });
                 } else {
                     display.textContent = '未登录';
@@ -3017,8 +2314,7 @@
                     renderDetail(currentPostId);
                     renderComments(currentPostId);
                 }
-                if (document.getElementById('page-admin') && document.getElementById('page-admin').classList.contains(
-                        'active')) {
+                if (document.getElementById('page-admin') && document.getElementById('page-admin').classList.contains('active')) {
                     renderAdminUserList();
                     updateUserCount();
                     renderDeleteRequests();
@@ -3101,8 +2397,7 @@
                         submitPost();
                     });
                 } else {
-                    container.innerHTML =
-                        `<p style="color:#666;font-size:16px;">您需要 <span class="login-prompt" onclick="openLoginModal()">登录</span> 后才能投稿。</p>`;
+                    container.innerHTML = `<p style="color:#666;font-size:16px;">您需要 <span class="login-prompt" onclick="openLoginModal()">登录</span> 后才能投稿。</p>`;
                 }
             });
         }
@@ -3187,9 +2482,7 @@
                 if (document.getElementById('page-submit').classList.contains('active')) updateSubmitForm();
                 if (document.getElementById('page-profile').classList.contains('active')) renderProfile();
                 if (document.getElementById('page-my').classList.contains('active')) renderMyPage();
-                if (document.getElementById('page-detail').classList.contains('active') && currentPostId) {
-                    renderComments(currentPostId);
-                }
+                if (document.getElementById('page-detail').classList.contains('active') && currentPostId) renderComments(currentPostId);
             } else {
                 loginError.style.display = 'block';
                 showToast('❌ 用户名或密码错误');
@@ -3224,9 +2517,7 @@
                 if (document.getElementById('page-submit').classList.contains('active')) updateSubmitForm();
                 if (document.getElementById('page-profile').classList.contains('active')) renderProfile();
                 if (document.getElementById('page-my').classList.contains('active')) renderMyPage();
-                if (document.getElementById('page-detail').classList.contains('active') && currentPostId) {
-                    renderComments(currentPostId);
-                }
+                if (document.getElementById('page-detail').classList.contains('active') && currentPostId) renderComments(currentPostId);
             } else {
                 registerError.textContent = '注册失败，请稍后重试或检查网络';
                 registerError.style.display = 'block';
@@ -3246,9 +2537,8 @@
             const pass = document.getElementById('wallPass').value.trim();
             const errEl = document.getElementById('wallError');
             errEl.style.display = 'none';
-
             if (await loginUser(user, pass)) {
-                document.getElementById('loginWall').classList.remove('show');
+                document.getElementById('loginWall').classList.add('hidden');
                 document.body.style.overflow = '';
                 showToast('✅ 登录成功，欢迎回来！');
                 updateUIForUser();
@@ -3305,9 +2595,7 @@
                     renderMessages();
                     updateUIForUser();
                     showToast('消息已删除');
-                } else {
-                    showToast('删除失败');
-                }
+                } else showToast('删除失败');
             }
         }
 
@@ -3328,21 +2616,12 @@
         let currentPostId = null;
 
         function switchPage(pageId, extraData) {
-            if (pageId === 'login') {
-                openLoginModal();
-                return;
-            }
+            if (pageId === 'login') { openLoginModal(); return; }
             if (pageId === 'admin') {
                 isLoggedIn().then(loggedIn => {
-                    if (!loggedIn) {
-                        openLoginModal();
-                        return;
-                    }
+                    if (!loggedIn) { openLoginModal(); return; }
                     isAdmin().then(admin => {
-                        if (!admin) {
-                            showToast('只有管理员可以访问后台');
-                            return;
-                        }
+                        if (!admin) { showToast('只有管理员可以访问后台'); return; }
                         doSwitchPage(pageId, extraData);
                     });
                 });
@@ -3350,10 +2629,7 @@
             }
             if (pageId === 'my') {
                 isLoggedIn().then(loggedIn => {
-                    if (!loggedIn) {
-                        openLoginModal();
-                        return;
-                    }
+                    if (!loggedIn) { openLoginModal(); return; }
                     doSwitchPage(pageId, extraData);
                 });
                 return;
@@ -3363,17 +2639,13 @@
 
         function doSwitchPage(pageId, extraData) {
             Object.values(pages).forEach(p => p.classList.remove('active'));
-
             const target = pages[pageId];
             if (target) target.classList.add('active');
-
             document.querySelectorAll('.nav a').forEach(link => {
                 link.classList.remove('active-page');
                 if (link.dataset.page === pageId) link.classList.add('active-page');
             });
-
             currentPage = pageId;
-
             if (pageId === 'home') renderPostList('homePostList', true);
             if (pageId === 'info') renderPostList('infoPostList', true);
             if (pageId === 'submit') updateSubmitForm();
@@ -3411,21 +2683,19 @@
         document.getElementById('logoutBtn').addEventListener('click', function() {
             clearCurrentUser();
             showToast('已退出登录');
-            document.getElementById('loginWall').classList.add('show');
+            document.getElementById('loginWall').classList.remove('hidden');
             document.body.style.overflow = 'hidden';
             document.getElementById('wallUser').value = '';
             document.getElementById('wallPass').value = '';
             document.getElementById('wallError').style.display = 'none';
-            if (document.getElementById('page-admin').classList.contains('active')) {
-                switchPage('home');
-            }
+            if (document.getElementById('page-admin').classList.contains('active')) switchPage('home');
             updateUIForUser();
         });
 
         document.getElementById('adminLogoutBtn').addEventListener('click', function() {
             clearCurrentUser();
             showToast('已退出登录');
-            document.getElementById('loginWall').classList.add('show');
+            document.getElementById('loginWall').classList.remove('hidden');
             document.body.style.overflow = 'hidden';
             document.getElementById('wallUser').value = '';
             document.getElementById('wallPass').value = '';
@@ -3519,7 +2789,6 @@
                 errorEl.style.display = 'block';
                 return;
             }
-
             let usernameChanged = false;
             if (newUsername && newUsername !== currentUser) {
                 const existing = await findUser(newUsername);
@@ -3530,7 +2799,6 @@
                 }
                 usernameChanged = true;
             }
-
             let passwordChanged = false;
             if (newPassword) {
                 if (newPassword.length < 6) {
@@ -3545,27 +2813,19 @@
                 }
                 passwordChanged = true;
             }
-
             const updatedUser = { ...user };
-            if (usernameChanged) {
-                updatedUser.username = newUsername;
-            }
-            if (passwordChanged) {
-                updatedUser.password = newPassword;
-            }
-
+            if (usernameChanged) updatedUser.username = newUsername;
+            if (passwordChanged) updatedUser.password = newPassword;
             const success = await saveUser(updatedUser);
             if (!success) {
                 errorEl.textContent = '更新用户信息失败，请重试';
                 errorEl.style.display = 'block';
                 return;
             }
-
             if (usernameChanged) {
                 currentUser = newUsername;
                 sessionStorage.setItem('currentUser', newUsername);
             }
-
             successEl.textContent = '✅ 个人信息更新成功！';
             successEl.style.display = 'block';
             setTimeout(() => {
@@ -3581,31 +2841,24 @@
             const successEl = document.getElementById('deleteAccountSuccess');
             errorEl.style.display = 'none';
             successEl.style.display = 'none';
-
             if (await isSuperAdmin()) {
                 errorEl.textContent = '超级管理员不可注销账户';
                 errorEl.style.display = 'block';
                 return;
             }
-
             const password = document.getElementById('deleteAccountPassword').value.trim();
             if (!password) {
                 errorEl.textContent = '请输入当前密码';
                 errorEl.style.display = 'block';
                 return;
             }
-
             const user = await findUser(currentUser);
             if (!user || user.password !== password) {
                 errorEl.textContent = '密码错误，请重新输入';
                 errorEl.style.display = 'block';
                 return;
             }
-
-            if (!confirm(`⚠️ 确定要永久注销账户 "${currentUser}" 吗？\n\n此操作将永久删除您发布的所有内容和评论，不可恢复！`)) {
-                return;
-            }
-
+            if (!confirm(`⚠️ 确定要永久注销账户 "${currentUser}" 吗？\n\n此操作将永久删除您发布的所有内容和评论，不可恢复！`)) return;
             try {
                 await deleteUser(currentUser);
                 clearCurrentUser();
@@ -3613,7 +2866,7 @@
                 successEl.style.display = 'block';
                 showToast('账户已注销，所有内容已删除');
                 setTimeout(() => {
-                    document.getElementById('loginWall').classList.add('show');
+                    document.getElementById('loginWall').classList.remove('hidden');
                     document.body.style.overflow = 'hidden';
                     updateUIForUser();
                 }, 1500);
@@ -3633,23 +2886,18 @@
                 container.innerHTML = `<p style="color:#666;">请先登录。</p>`;
                 return;
             }
-
             const allPosts = await getPosts();
             const posts = allPosts.filter(p => p.author === currentUser);
             if (posts.length === 0) {
                 container.innerHTML = `<div class="my-empty">您还没有发布任何信息。</div>`;
                 return;
             }
-
             let html = '';
             posts.forEach(p => {
-                let statusText = '';
-                let statusClass = '';
-                if (p.status === 'approved') { statusText = '已发布';
-                    statusClass = 'approved'; } else if (p.status === 'pending') { statusText = '待审核';
-                    statusClass = 'pending'; } else if (p.status === 'rejected') { statusText = '已拒绝';
-                    statusClass = 'rejected'; }
-
+                let statusText = '', statusClass = '';
+                if (p.status === 'approved') { statusText = '已发布'; statusClass = 'approved'; }
+                else if (p.status === 'pending') { statusText = '待审核'; statusClass = 'pending'; }
+                else if (p.status === 'rejected') { statusText = '已拒绝'; statusClass = 'rejected'; }
                 html += `
                         <div class="my-post-item">
                             <div class="post-info">
@@ -3670,15 +2918,9 @@
         }
 
         async function deleteMyPost(postId) {
-            if (!await isLoggedIn()) {
-                showToast('请先登录');
-                return;
-            }
+            if (!await isLoggedIn()) { showToast('请先登录'); return; }
             const post = await getPostById(postId);
-            if (!post) {
-                showToast('信息不存在');
-                return;
-            }
+            if (!post) { showToast('信息不存在'); return; }
             if (post.author !== currentUser && !await isAdmin()) {
                 showToast('您没有权限删除此信息');
                 return;
@@ -3688,13 +2930,9 @@
                 if (success) {
                     refreshAllLists();
                     renderMyPage();
-                    if (currentPage === 'detail' && currentPostId === postId) {
-                        switchPage('home');
-                    }
+                    if (currentPage === 'detail' && currentPostId === postId) switchPage('home');
                     showToast('已删除');
-                } else {
-                    showToast('删除失败');
-                }
+                } else showToast('删除失败');
             }
         }
 
@@ -3705,9 +2943,7 @@
             const container = document.getElementById(containerId);
             if (!container) return;
             let posts = await getPosts();
-            if (onlyApproved) {
-                posts = posts.filter(p => p.status === 'approved');
-            }
+            if (onlyApproved) posts = posts.filter(p => p.status === 'approved');
             if (posts.length === 0) {
                 container.innerHTML = `<div class="card" style="text-align:center;color:#999;padding:40px;">
                         <i class="fas fa-inbox" style="font-size:32px;display:block;margin-bottom:12px;color:#dce3ed;"></i>
@@ -3718,8 +2954,7 @@
             container.innerHTML = posts.map(p => {
                 let thumbHtml = '';
                 if (p.images && p.images.length > 0) {
-                    thumbHtml =
-                    `<div class="thumb-container">${p.images.slice(0,3).map(img => `<img class="thumb" src="${img}" alt="缩略图" loading="lazy">`).join('')}</div>`;
+                    thumbHtml = `<div class="thumb-container">${p.images.slice(0,3).map(img => `<img class="thumb" src="${img}" alt="缩略图" loading="lazy">`).join('')}</div>`;
                 }
                 const authorTagHtml = p.authorTag ? `<span class="author-tag">${escapeHtml(p.authorTag)}</span>` : '';
                 return `
@@ -3748,37 +2983,23 @@
         //  投稿
         // ================================================================
         async function submitPost() {
-            if (!await isLoggedIn()) {
-                showToast('请先登录');
-                openLoginModal();
-                return;
-            }
+            if (!await isLoggedIn()) { showToast('请先登录'); openLoginModal(); return; }
             const title = document.getElementById('submitTitle').value.trim();
             const authorTag = document.getElementById('submitAuthorTag').value.trim();
             const date = document.getElementById('submitDate').value;
             const content = document.getElementById('submitContentText').value.trim();
-
-            if (!title || !date) {
-                showToast('请完整填写标题和日期');
-                return;
-            }
-
+            if (!title || !date) { showToast('请完整填写标题和日期'); return; }
             if (window._submitImages === undefined) window._submitImages = [];
             if (window._submitVideo === undefined) window._submitVideo = '';
-
             const images = window._submitImages || [];
             const imageData = images.map(item => item.data);
             const videoData = window._submitVideo || '';
-
             try {
                 const isAdminUser = await isAdmin();
                 const status = isAdminUser ? 'approved' : 'pending';
                 await addPost(title, date, content, currentUser, imageData, videoData, authorTag, status);
-                if (isAdminUser) {
-                    showToast('✅ 信息发布成功（管理员直接发布）！');
-                } else {
-                    showToast('✅ 投稿已提交，请等待管理员审核。');
-                }
+                if (isAdminUser) showToast('✅ 信息发布成功（管理员直接发布）！');
+                else showToast('✅ 投稿已提交，请等待管理员审核。');
                 document.getElementById('submitTitle').value = '';
                 document.getElementById('submitAuthorTag').value = '';
                 document.getElementById('submitDate').value = '';
@@ -3790,13 +3011,8 @@
                 document.getElementById('submitImageInput').value = '';
                 document.getElementById('submitVideoInput').value = '';
                 updateUIForUser();
-                if (currentPage === 'my') {
-                    renderMyPage();
-                }
-            } catch (err) {
-                showToast('投稿失败，请重试');
-                console.error(err);
-            }
+                if (currentPage === 'my') renderMyPage();
+            } catch (err) { showToast('投稿失败，请重试'); console.error(err); }
         }
 
         // ================================================================
@@ -3804,14 +3020,8 @@
         // ================================================================
         async function openDetail(postId) {
             const post = await getPostById(postId);
-            if (!post) {
-                showToast('信息不存在');
-                return;
-            }
-            if (post.status !== 'approved') {
-                showToast('该信息尚未通过审核');
-                return;
-            }
+            if (!post) { showToast('信息不存在'); return; }
+            if (post.status !== 'approved') { showToast('该信息尚未通过审核'); return; }
             currentPostId = postId;
             switchPage('detail', postId);
             await incrementView(postId);
@@ -3835,7 +3045,6 @@
                     ${post.images && post.images.length > 0 ? ` &nbsp;|&nbsp; <i class="fas fa-image"></i> ${post.images.length}张图片` : ''}
                     ${post.video ? ` &nbsp;|&nbsp; <i class="fas fa-video"></i> 视频` : ''}
                 `;
-
             const mediaContainer = document.getElementById('detailMedia');
             let mediaHtml = '';
             if (post.images && post.images.length > 0) {
@@ -3847,9 +3056,7 @@
                 mediaHtml += `<div class="media-item"><video controls src="${post.video}" preload="metadata"></video></div>`;
             }
             mediaContainer.innerHTML = mediaHtml;
-
             document.getElementById('detailContent').textContent = post.content || '（无正文内容）';
-
             await renderComments(postId);
             updateCommentForm();
             document.getElementById('commentContent').value = '';
@@ -3867,7 +3074,6 @@
             }
             const isAdminUser = await isAdmin();
             const isLoggedInUser = await isLoggedIn();
-
             container.innerHTML = comments.map(c => `
                     <div class="comment-item">
                         <div class="comment-header">
@@ -3898,77 +3104,46 @@
         }
 
         async function toggleCommentLikeAction(postId, commentId) {
-            if (!await isLoggedIn()) {
-                showToast('请先登录');
-                openLoginModal();
-                return;
-            }
+            if (!await isLoggedIn()) { showToast('请先登录'); openLoginModal(); return; }
             const result = await toggleCommentLike(commentId, currentUser);
-            if (result) {
-                await renderComments(postId);
-            } else {
-                showToast('操作失败');
-            }
+            if (result) await renderComments(postId);
+            else showToast('操作失败');
         }
 
         async function submitComment() {
-            if (!currentPostId) {
-                showToast('请先打开一篇文章');
-                return;
-            }
-            if (!await isLoggedIn()) {
-                showToast('请先登录');
-                openLoginModal();
-                return;
-            }
+            if (!currentPostId) { showToast('请先打开一篇文章'); return; }
+            if (!await isLoggedIn()) { showToast('请先登录'); openLoginModal(); return; }
             const content = document.getElementById('commentContent').value.trim();
-            if (!content) {
-                showToast('请输入评论内容');
-                return;
-            }
+            if (!content) { showToast('请输入评论内容'); return; }
             try {
                 await addComment(currentPostId, currentUser, content);
                 await renderComments(currentPostId);
                 document.getElementById('commentContent').value = '';
                 showToast('评论发表成功');
-            } catch (err) {
-                showToast('评论失败，请重试');
-            }
+            } catch (err) { showToast('评论失败，请重试'); }
         }
 
         async function togglePin(postId, commentId) {
-            if (!await isAdmin()) {
-                showToast('只有管理员可以置顶评论');
-                return;
-            }
+            if (!await isAdmin()) { showToast('只有管理员可以置顶评论'); return; }
             const result = await togglePinComment(commentId);
             if (result) {
                 await renderComments(postId);
                 showToast('置顶状态已更新');
-            } else {
-                showToast('操作失败');
-            }
+            } else showToast('操作失败');
         }
 
         async function deleteCommentAction(postId, commentId) {
-            if (!await isAdmin()) {
-                showToast('只有管理员可以删除评论');
-                return;
-            }
+            if (!await isAdmin()) { showToast('只有管理员可以删除评论'); return; }
             if (confirm('确定要删除这条评论吗？')) {
                 const result = await deleteComment(commentId);
                 if (result) {
                     await renderComments(postId);
                     showToast('评论已删除');
-                } else {
-                    showToast('删除失败');
-                }
+                } else showToast('删除失败');
             }
         }
 
-        function goBackFromDetail() {
-            switchPage('home');
-        }
+        function goBackFromDetail() { switchPage('home'); }
 
         // ================================================================
         //  管理后台
@@ -3976,16 +3151,11 @@
         let adminImages = [];
         let adminVideo = '';
 
-        function setupAdminFileUpload() {
-            console.log('管理后台已精简，移除信息发布功能');
-        }
+        function setupAdminFileUpload() {}
 
         document.getElementById('noticeForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            if (!await isAdmin()) {
-                showToast('只有管理员可以发布通知');
-                return;
-            }
+            if (!await isAdmin()) { showToast('只有管理员可以发布通知'); return; }
             const noticeText = document.getElementById('noticeInput').value.trim();
             await updateNotice(noticeText);
         });
@@ -4028,9 +3198,7 @@
                 refreshAllLists();
                 showToast('✅ 已通过，信息已发布');
                 updateUIForUser();
-            } else {
-                showToast('操作失败');
-            }
+            } else showToast('操作失败');
         }
 
         async function rejectPost(postId) {
@@ -4042,9 +3210,7 @@
                 renderAdminPostList();
                 showToast('已拒绝');
                 updateUIForUser();
-            } else {
-                showToast('操作失败');
-            }
+            } else showToast('操作失败');
         }
 
         async function renderAdminPostList() {
@@ -4060,12 +3226,10 @@
                 return;
             }
             container.innerHTML = posts.map(p => {
-                let statusText = '',
-                    statusClass = '';
-                if (p.status === 'approved') { statusText = '已通过';
-                    statusClass = 'approved'; } else if (p.status === 'pending') { statusText = '待审核';
-                    statusClass = 'pending'; } else if (p.status === 'rejected') { statusText = '已拒绝';
-                    statusClass = 'rejected'; }
+                let statusText = '', statusClass = '';
+                if (p.status === 'approved') { statusText = '已通过'; statusClass = 'approved'; }
+                else if (p.status === 'pending') { statusText = '待审核'; statusClass = 'pending'; }
+                else if (p.status === 'rejected') { statusText = '已拒绝'; statusClass = 'rejected'; }
                 return `
                         <div class="admin-list-item">
                             <span class="item-info">
@@ -4089,16 +3253,10 @@
                     refreshAllLists();
                     renderAdminPostList();
                     renderAdminReviewList();
-                    if (currentPage === 'detail' && currentPostId === postId) {
-                        switchPage('home');
-                    }
-                    if (currentPage === 'my') {
-                        renderMyPage();
-                    }
+                    if (currentPage === 'detail' && currentPostId === postId) switchPage('home');
+                    if (currentPage === 'my') renderMyPage();
                     showToast('已删除');
-                } else {
-                    showToast('删除失败');
-                }
+                } else showToast('删除失败');
             }
         }
 
@@ -4124,9 +3282,7 @@
         async function updateUserCount() {
             const users = await getUsers();
             let filtered = users;
-            if (userSearchKeyword) {
-                filtered = users.filter(u => u.username.toLowerCase().includes(userSearchKeyword));
-            }
+            if (userSearchKeyword) filtered = users.filter(u => u.username.toLowerCase().includes(userSearchKeyword));
             document.getElementById('totalUserCount').textContent = filtered.length;
         }
 
@@ -4149,38 +3305,23 @@
                 container.innerHTML = '<div class="admin-empty">权限不足</div>';
                 return;
             }
-
             let users = await getUsers();
-
-            if (userSearchKeyword) {
-                users = users.filter(u => u.username.toLowerCase().includes(userSearchKeyword));
-            }
-
+            if (userSearchKeyword) users = users.filter(u => u.username.toLowerCase().includes(userSearchKeyword));
             if (users.length === 0) {
                 container.innerHTML = '<div class="admin-empty">没有找到匹配的用户</div>';
                 return;
             }
-
             const currentUsername = getCurrentUser();
             const isSuper = await isSuperAdmin();
             const isAdminUser = await isAdmin();
-
             container.innerHTML = users.map(u => {
                 const isSelf = u.username === currentUsername;
-                const isSuperAdmin = u.role === 'superadmin';
+                const isSuperAdminUser = u.role === 'superadmin';
                 const isTargetAdmin = u.role === 'admin';
                 const isMuted = u.muted && (u.muted_until === -1 || u.muted_until > Date.now());
-
-                let roleLabel = '用户';
-                let roleClass = 'user';
-                if (isSuperAdmin) {
-                    roleLabel = '超级管理员';
-                    roleClass = 'superadmin';
-                } else if (isTargetAdmin) {
-                    roleLabel = '管理员';
-                    roleClass = 'admin';
-                }
-
+                let roleLabel = '用户', roleClass = 'user';
+                if (isSuperAdminUser) { roleLabel = '超级管理员'; roleClass = 'superadmin'; }
+                else if (isTargetAdmin) { roleLabel = '管理员'; roleClass = 'admin'; }
                 let muteLabel = '';
                 if (isMuted) {
                     if (u.muted_until === -1) muteLabel = '永久禁言';
@@ -4189,34 +3330,18 @@
                         muteLabel = `禁言中(${remaining}天)`;
                     }
                 }
-
                 let actionsHtml = '';
-
-                if (isSuper && !isSelf && !isSuperAdmin) {
+                if (isSuper && !isSelf && !isSuperAdminUser) {
                     const targetRole = isTargetAdmin ? 'user' : 'admin';
                     const label = isTargetAdmin ? '降级为普通用户' : '提升为管理员';
                     const icon = isTargetAdmin ? 'fa-user-minus' : 'fa-user-plus';
-                    actionsHtml += `
-                        <button class="role-btn" onclick="changeUserRole('${u.username}', '${targetRole}')" title="${label}">
-                            <i class="fas ${icon}"></i>
-                        </button>
-                    `;
+                    actionsHtml += `<button class="role-btn" onclick="changeUserRole('${u.username}', '${targetRole}')" title="${label}"><i class="fas ${icon}"></i></button>`;
                 }
-
-                if (isSuper && !isSelf && !isSuperAdmin) {
-                    actionsHtml += `
-                        <button class="del-btn" onclick="deleteUserDirectly('${u.username}')" title="删除用户">
-                            <i class="fas fa-trash-alt"></i>
-                        </button>
-                    `;
-                } else if (isAdminUser && !isSelf && !isSuperAdmin) {
-                    actionsHtml += `
-                        <button class="del-btn" onclick="openDeleteRequestModal('${u.username}')" title="申请删除" style="color:#b8860b;">
-                            <i class="fas fa-clock"></i>
-                        </button>
-                    `;
+                if (isSuper && !isSelf && !isSuperAdminUser) {
+                    actionsHtml += `<button class="del-btn" onclick="deleteUserDirectly('${u.username}')" title="删除用户"><i class="fas fa-trash-alt"></i></button>`;
+                } else if (isAdminUser && !isSelf && !isSuperAdminUser) {
+                    actionsHtml += `<button class="del-btn" onclick="openDeleteRequestModal('${u.username}')" title="申请删除" style="color:#b8860b;"><i class="fas fa-clock"></i></button>`;
                 }
-
                 return `
                     <div class="admin-list-item">
                         <span class="item-info">
@@ -4234,80 +3359,38 @@
         }
 
         async function changeUserRole(username, newRole) {
-            if (!await isSuperAdmin()) {
-                showToast('只有超级管理员可以修改角色');
-                return;
-            }
+            if (!await isSuperAdmin()) { showToast('只有超级管理员可以修改角色'); return; }
             try {
                 const user = await findUser(username);
-                if (!user) {
-                    showToast('用户不存在');
-                    return;
-                }
-                if (user.role === 'superadmin') {
-                    showToast('不能修改超级管理员');
-                    return;
-                }
-
+                if (!user) { showToast('用户不存在'); return; }
+                if (user.role === 'superadmin') { showToast('不能修改超级管理员'); return; }
                 user.role = newRole;
                 const success = await saveUser(user);
-                if (!success) {
-                    showToast('更新角色失败，请重试');
-                    return;
-                }
-
+                if (!success) { showToast('更新角色失败，请重试'); return; }
                 await renderAdminUserList();
                 await updateUserCount();
-
                 const roleLabel = newRole === 'admin' ? '管理员' : '普通用户';
                 showToast(`✅ 用户 ${username} 已${newRole === 'admin' ? '提升为' : '降级为'}${roleLabel}`);
                 await addMessageToUser(username, `您的角色已变更为 ${roleLabel}。`, 'role_change');
-                if (username === getCurrentUser()) {
-                    updateUIForUser();
-                }
-            } catch (error) {
-                console.error('changeUserRole 出错:', error);
-                showToast('操作失败: ' + error.message);
-            }
+                if (username === getCurrentUser()) updateUIForUser();
+            } catch (error) { showToast('操作失败: ' + error.message); }
         }
 
         async function deleteUserDirectly(username) {
-            if (!await isSuperAdmin()) {
-                showToast('只有超级管理员可以执行此操作');
-                return;
-            }
-            if (username === getCurrentUser()) {
-                showToast('不能删除自己');
-                return;
-            }
+            if (!await isSuperAdmin()) { showToast('只有超级管理员可以执行此操作'); return; }
+            if (username === getCurrentUser()) { showToast('不能删除自己'); return; }
             try {
                 const user = await findUser(username);
-                if (!user) {
-                    showToast('用户不存在');
-                    return;
-                }
-                if (user.role === 'superadmin') {
-                    showToast('不能删除超级管理员');
-                    return;
-                }
-                if (!confirm(`确定要永久删除用户 "${username}" 吗？此操作不可恢复！`)) {
-                    return;
-                }
-
+                if (!user) { showToast('用户不存在'); return; }
+                if (user.role === 'superadmin') { showToast('不能删除超级管理员'); return; }
+                if (!confirm(`确定要永久删除用户 "${username}" 吗？此操作不可恢复！`)) return;
                 const success = await deleteUser(username);
-                if (!success) {
-                    showToast('删除用户失败，请重试');
-                    return;
-                }
-
+                if (!success) { showToast('删除用户失败，请重试'); return; }
                 await renderAdminUserList();
                 await updateUserCount();
                 showToast(`用户 ${username} 已删除`);
                 updateUIForUser();
-            } catch (error) {
-                console.error('deleteUserDirectly 出错:', error);
-                showToast('删除失败: ' + error.message);
-            }
+            } catch (error) { showToast('删除失败: ' + error.message); }
         }
 
         // ================================================================
@@ -4316,20 +3399,11 @@
         let deleteRequestTarget = null;
 
         function openDeleteRequestModal(username) {
-            if (!currentUser) {
-                showToast('请先登录');
-                return;
-            }
+            if (!currentUser) { showToast('请先登录'); return; }
             isAdmin().then(admin => {
-                if (!admin) {
-                    showToast('只有管理员可以申请删除');
-                    return;
-                }
+                if (!admin) { showToast('只有管理员可以申请删除'); return; }
                 isSuperAdmin().then(superAdmin => {
-                    if (superAdmin) {
-                        showToast('超级管理员请直接使用删除按钮');
-                        return;
-                    }
+                    if (superAdmin) { showToast('超级管理员请直接使用删除按钮'); return; }
                     deleteRequestTarget = username;
                     document.getElementById('deleteTargetUser').textContent = username;
                     document.getElementById('deleteReason').value = '';
@@ -4352,18 +3426,13 @@
                 document.getElementById('deleteRequestError').style.display = 'block';
                 return;
             }
-            if (!deleteRequestTarget) {
-                showToast('目标用户不存在');
-                return;
-            }
+            if (!deleteRequestTarget) { showToast('目标用户不存在'); return; }
             const success = await requestDeleteUser(deleteRequestTarget, reason);
             if (success) {
                 closeDeleteRequestModal();
                 renderAdminUserList();
                 updateUserCount();
-                if (await isSuperAdmin()) {
-                    renderDeleteRequests();
-                }
+                if (await isSuperAdmin()) renderDeleteRequests();
             } else {
                 document.getElementById('deleteRequestError').textContent = '申请提交失败，请重试';
                 document.getElementById('deleteRequestError').style.display = 'block';
@@ -4384,14 +3453,9 @@
             const keyword = document.getElementById('infoSearch').value.trim().toLowerCase();
             const container = document.getElementById('infoPostList');
             const posts = await getApprovedPosts();
-            if (!keyword) {
-                renderPostList('infoPostList', true);
-                return;
-            }
+            if (!keyword) { renderPostList('infoPostList', true); return; }
             const filtered = posts.filter(p =>
-                p.title.includes(keyword) ||
-                p.content.includes(keyword) ||
-                p.author.includes(keyword)
+                p.title.includes(keyword) || p.content.includes(keyword) || p.author.includes(keyword)
             );
             if (filtered.length === 0) {
                 container.innerHTML = `<div class="card" style="text-align:center;color:#999;padding:40px;">没有找到匹配的信息</div>`;
@@ -4422,9 +3486,7 @@
             toast.textContent = msg;
             toast.classList.add('show');
             clearTimeout(toast._timer);
-            toast._timer = setTimeout(() => {
-                toast.classList.remove('show');
-            }, duration);
+            toast._timer = setTimeout(() => { toast.classList.remove('show'); }, duration);
         }
 
         // ================================================================
@@ -4435,12 +3497,8 @@
                 const storedUser = sessionStorage.getItem('currentUser');
                 if (storedUser) {
                     const user = await findUser(storedUser);
-                    if (user) {
-                        currentUser = storedUser;
-                    } else {
-                        sessionStorage.removeItem('currentUser');
-                        currentUser = null;
-                    }
+                    if (user) currentUser = storedUser;
+                    else { sessionStorage.removeItem('currentUser'); currentUser = null; }
                     updateUIForUser();
                 } else {
                     currentUser = null;
@@ -4453,8 +3511,7 @@
             });
 
             setupAdminFileUpload();
-            // 不直接 switchPage('home')，等开场动画结束后由 checkLoginWall 决定
-            // 如果用户已登录，开场动画结束会自动进入首页
+            // 不直接 switchPage('home')，等开场动画结束由 checkLoginWall 决定
 
             window.addEventListener('resize', adjustNoticeBarPosition);
 
