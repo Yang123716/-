@@ -859,6 +859,13 @@
 
         .admin-site-panel { display: none; }
         .admin-site-panel.active { display: block; }
+
+        /* 压缩进度提示 */
+        .compress-progress {
+            display: none; font-size: 13px; color: #b30000;
+            margin-top: 6px; font-weight: 600;
+        }
+        .compress-progress.show { display: block; }
     </style>
 </head><body>
 
@@ -885,6 +892,7 @@
             </div>
             <div class="site-hint" id="wallSiteHint">当前登录：人民共产网</div>
 
+            <!-- 登录表单 -->
             <form id="wallLoginForm">
                 <label for="wallUser">用户名</label>
                 <input type="text" id="wallUser" placeholder="请输入用户名" required autocomplete="username">
@@ -894,8 +902,20 @@
                 <div class="wall-error" id="wallError">用户名或密码错误！</div>
             </form>
 
+            <!-- 注册表单 -->
+            <form id="wallRegisterForm" style="display:none;">
+                <label for="wallRegUser">用户名</label>
+                <input type="text" id="wallRegUser" placeholder="请设置用户名" required autocomplete="username">
+                <label for="wallRegPass">密码</label>
+                <input type="password" id="wallRegPass" placeholder="请设置密码（至少6位）" required minlength="6" autocomplete="new-password">
+                <label for="wallRegPassConfirm">确认密码</label>
+                <input type="password" id="wallRegPassConfirm" placeholder="再次输入密码" required autocomplete="new-password">
+                <button type="submit" class="wall-btn">注 册</button>
+                <div class="wall-error" id="wallRegError">注册失败，请检查信息</div>
+            </form>
+
             <div class="wall-switch">
-                <span id="wallSwitchToRegister">没有账号？去注册</span>
+                <span id="wallSwitchToRegister" data-mode="login">没有账号？去注册</span>
             </div>
         </div>
     </div>
@@ -1127,9 +1147,7 @@
         <div id="noticeContent">
             <span id="noticeText">欢迎来到人民共产</span>
         </div>
-    </div>
-
-    <!-- 主容器 -->
+    </div>    <!-- 主容器 -->
     <div class="main-wrapper">
 
         <!-- ================= 人民共产网页面 ================= -->
@@ -1145,7 +1163,7 @@
         </div>
         <div id="page-main-submit" class="page">
             <div class="submit-form">
-                <div class="sub">欢迎投稿，管理员审核通过后将自动发布在首页和信息公开栏目。</div>
+                <div class="sub">欢迎投稿，管理员审核通过后将自动发布在首页和信息公开栏目。支持图片和视频上传（自动压缩）。</div>
                 <div id="mainSubmitContent"></div>
             </div>
         </div>
@@ -1336,6 +1354,14 @@
                                 <label>正文</label>
                                 <textarea class="post-content" placeholder="正文"></textarea>
                             </div>
+                            <div class="form-group">
+                                <label>上传图片（自动压缩，可多选）</label>
+                                <input type="file" class="post-images" accept="image/*" multiple>
+                            </div>
+                            <div class="form-group">
+                                <label>上传视频（自动压缩）</label>
+                                <input type="file" class="post-video" accept="video/*">
+                            </div>
                             <button type="submit" class="btn-admin"><i class="fas fa-paper-plane"></i> 发布</button>
                             <div class="error-msg"></div>
                         </form>
@@ -1436,6 +1462,14 @@
                                 <label>正文</label>
                                 <textarea class="post-content" placeholder="正文"></textarea>
                             </div>
+                            <div class="form-group">
+                                <label>上传图片（自动压缩，可多选）</label>
+                                <input type="file" class="post-images" accept="image/*" multiple>
+                            </div>
+                            <div class="form-group">
+                                <label>上传视频（自动压缩）</label>
+                                <input type="file" class="post-video" accept="video/*">
+                            </div>
                             <button type="submit" class="btn-admin"><i class="fas fa-paper-plane"></i> 发布</button>
                             <div class="error-msg"></div>
                         </form>
@@ -1535,6 +1569,14 @@
                                 <label>正文</label>
                                 <textarea class="post-content" placeholder="正文"></textarea>
                             </div>
+                            <div class="form-group">
+                                <label>上传图片（自动压缩，可多选）</label>
+                                <input type="file" class="post-images" accept="image/*" multiple>
+                            </div>
+                            <div class="form-group">
+                                <label>上传视频（自动压缩）</label>
+                                <input type="file" class="post-video" accept="video/*">
+                            </div>
                             <button type="submit" class="btn-admin"><i class="fas fa-paper-plane"></i> 发布</button>
                             <div class="error-msg"></div>
                         </form>
@@ -1620,9 +1662,8 @@
             <p>人民共产网 · 人民共产中央宣传部 · 人民共产中央组织部</p>
             <p>© 2026 人民共产 版权所有</p>
         </div>
-    </footer>
-
-    <script>        // ================================================================
+    </footer>    <script>
+        // ================================================================
         //  全局配置：三个模块的表映射
         // ================================================================
         const SUPABASE_URL = 'https://fommjeqnlkhxyrzzhhlz.supabase.co';
@@ -1689,6 +1730,7 @@
         let currentUserSite = null;
         let currentPostId = null;
         let currentLoginSite = 'main';
+        let currentAdminSite = 'main';
 
         // ================================================================
         //  工具函数
@@ -1713,6 +1755,154 @@
 
         function siteConf(site) {
             return SITE_CONFIG[site] || SITE_CONFIG.main;
+        }
+
+        // ================================================================
+        //  媒体压缩工具
+        // ================================================================
+
+        // 图片压缩：等比缩放到 maxWidth 内，输出 JPEG
+        function compressImage(file, maxWidth = 1280, quality = 0.75) {
+            return new Promise((resolve, reject) => {
+                if (!file.type.startsWith('image/')) { reject(new Error('非图片文件')); return; }
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        let { width, height } = img;
+                        if (width > maxWidth) {
+                            height = Math.round(height * maxWidth / width);
+                            width = maxWidth;
+                        }
+                        const canvas = document.createElement('canvas');
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        // 白色背景，防止透明 PNG 转 JPEG 变黑
+                        ctx.fillStyle = '#ffffff';
+                        ctx.fillRect(0, 0, width, height);
+                        ctx.drawImage(img, 0, 0, width, height);
+                        try {
+                            const dataUrl = canvas.toDataURL('image/jpeg', quality);
+                            resolve(dataUrl);
+                        } catch (err) { reject(err); }
+                    };
+                    img.onerror = reject;
+                    img.src = e.target.result;
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // 缩略图：小尺寸，用于列表页
+        function compressThumbnail(file, maxWidth = 320, quality = 0.7) {
+            return compressImage(file, maxWidth, quality);
+        }
+
+        // 视频压缩：canvas + MediaRecorder 重新编码
+        function compressVideo(file, maxWidth = 640, maxHeight = 360, bitrate = 800000) {
+            return new Promise((resolve) => {
+                if (!window.MediaRecorder || !HTMLCanvasElement.prototype.captureStream) {
+                    console.warn('浏览器不支持视频压缩，使用原视频');
+                    return resolve({ dataUrl: null, file, compressed: false });
+                }
+                const video = document.createElement('video');
+                video.muted = true;
+                video.playsInline = true;
+                video.crossOrigin = 'anonymous';
+                const url = URL.createObjectURL(file);
+                video.src = url;
+
+                let finished = false;
+                const finish = (result) => {
+                    if (finished) return;
+                    finished = true;
+                    try { URL.revokeObjectURL(url); } catch (e) {}
+                    resolve(result);
+                };
+
+                video.onloadedmetadata = () => {
+                    let w = video.videoWidth, h = video.videoHeight;
+                    if (!w || !h) { finish({ dataUrl: null, file, compressed: false }); return; }
+                    if (w > maxWidth) { h = Math.round(h * maxWidth / w); w = maxWidth; }
+                    if (h > maxHeight) { w = Math.round(w * maxHeight / h); h = maxHeight; }
+
+                    const canvas = document.createElement('canvas');
+                    canvas.width = w;
+                    canvas.height = h;
+                    const ctx = canvas.getContext('2d');
+                    const stream = canvas.captureStream(25);
+
+                    // 尝试录制音频（部分浏览器会失败，忽略即可）
+                    try {
+                        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                        const source = audioCtx.createMediaElementSource(video);
+                        const dest = audioCtx.createMediaStreamDestination();
+                        source.connect(dest);
+                        dest.stream.getAudioTracks().forEach(t => stream.addTrack(t));
+                    } catch (e) { /* 无音频轨道 */ }
+
+                    let mimeType = 'video/webm;codecs=vp8';
+                    if (!MediaRecorder.isTypeSupported(mimeType)) {
+                        mimeType = 'video/webm';
+                        if (!MediaRecorder.isTypeSupported(mimeType)) {
+                            finish({ dataUrl: null, file, compressed: false });
+                            return;
+                        }
+                    }
+
+                    const recorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: bitrate });
+                    const chunks = [];
+                    recorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
+                    recorder.onstop = () => {
+                        const blob = new Blob(chunks, { type: mimeType });
+                        if (blob.size === 0) { finish({ dataUrl: null, file, compressed: false }); return; }
+                        const reader = new FileReader();
+                        reader.onload = () => finish({ dataUrl: reader.result, file: blob, compressed: true });
+                        reader.onerror = () => finish({ dataUrl: null, file, compressed: false });
+                        reader.readAsDataURL(blob);
+                    };
+
+                    recorder.start(200);
+                    video.play().catch(() => {});
+
+                    function drawFrame() {
+                        if (video.paused || video.ended) return;
+                        try { ctx.drawImage(video, 0, 0, w, h); } catch (e) {}
+                        requestAnimationFrame(drawFrame);
+                    }
+                    drawFrame();
+
+                    video.onended = () => {
+                        if (recorder.state !== 'inactive') recorder.stop();
+                    };
+                    // 安全超时：最多录制 60 秒
+                    setTimeout(() => {
+                        if (recorder.state !== 'inactive') recorder.stop();
+                    }, 60000);
+                };
+                video.onerror = () => finish({ dataUrl: null, file, compressed: false });
+            });
+        }
+
+        // 批量处理图片：返回 { images, thumbs }
+        async function processImages(fileList, onProgress) {
+            const images = [];
+            const thumbs = [];
+            const files = Array.from(fileList);
+            for (let i = 0; i < files.length; i++) {
+                try {
+                    if (onProgress) onProgress(i + 1, files.length);
+                    const big = await compressImage(files[i], 1280, 0.75);
+                    const small = await compressThumbnail(files[i], 320, 0.7);
+                    images.push(big);
+                    thumbs.push(small);
+                } catch (e) {
+                    console.error('图片处理失败:', e);
+                }
+            }
+            return { images, thumbs };
         }
 
         // ================================================================
@@ -1955,7 +2145,7 @@
         }
 
         // ================================================================
-        //  登录墙
+        //  登录墙（含注册）
         // ================================================================
         function setLoginWallSite(site) {
             currentLoginSite = site;
@@ -1964,11 +2154,39 @@
             });
             const hint = $('wallSiteHint');
             if (hint) hint.textContent = '当前登录：' + siteConf(site).name;
+            // 重置表单
             $('wallUser').value = '';
             $('wallPass').value = '';
+            $('wallRegUser').value = '';
+            $('wallRegPass').value = '';
+            $('wallRegPassConfirm').value = '';
             $('wallError').style.display = 'none';
+            $('wallRegError').style.display = 'none';
+            setWallMode('login');
         }
 
+        // 切换登录墙的登录/注册表单
+        function setWallMode(mode) {
+            const loginForm = $('wallLoginForm');
+            const regForm = $('wallRegisterForm');
+            const switchSpan = $('wallSwitchToRegister');
+            if (!loginForm || !regForm) return;
+            if (mode === 'register') {
+                loginForm.style.display = 'none';
+                regForm.style.display = 'block';
+                switchSpan.textContent = '已有账号？去登录';
+                switchSpan.dataset.mode = 'register';
+                $('wallRegError').style.display = 'none';
+            } else {
+                loginForm.style.display = 'block';
+                regForm.style.display = 'none';
+                switchSpan.textContent = '没有账号？去注册';
+                switchSpan.dataset.mode = 'login';
+                $('wallError').style.display = 'none';
+            }
+        }
+
+        // 登录墙：登录（优化：先关墙切页，再异步刷新）
         async function handleWallLogin(e) {
             e.preventDefault();
             const user = $('wallUser').value.trim();
@@ -1987,17 +2205,68 @@
                     renderMainNav();
                     renderSubNav();
                 }
+                // 1. 立即关闭登录墙，让用户马上看到界面
                 $('loginWall').classList.add('hidden');
                 document.documentElement.style.overflow = '';
                 document.body.style.overflow = '';
                 showToast('✅ 登录成功，欢迎回来！');
-                await refreshCurrentUser();
-                await updateUIForUser();
+
+                // 2. 立即切页（渲染任务在 doSwitchPage 内并行执行）
                 await doSwitchPage(siteConf(currentSite).defaultPage, null);
+
+                // 3. 用户信息、通知后台异步刷新，不阻塞界面
+                refreshCurrentUser().then(updateUIForUser).catch(console.error);
+                loadNotice(currentSite).catch(console.error);
             } else {
                 errEl.textContent = '用户名或密码错误，或该账号不属于此模块';
                 errEl.style.display = 'block';
                 showToast('❌ 登录失败');
+            }
+        }
+
+        // 登录墙：注册
+        async function handleWallRegister(e) {
+            e.preventDefault();
+            const user = $('wallRegUser').value.trim();
+            const pass = $('wallRegPass').value.trim();
+            const confirm = $('wallRegPassConfirm').value.trim();
+            const errEl = $('wallRegError');
+            errEl.style.display = 'none';
+
+            if (!user || !pass) {
+                errEl.textContent = '请输入用户名和密码';
+                errEl.style.display = 'block';
+                return;
+            }
+            if (pass.length < 6) {
+                errEl.textContent = '密码至少6位';
+                errEl.style.display = 'block';
+                return;
+            }
+            if (pass !== confirm) {
+                errEl.textContent = '两次密码不一致';
+                errEl.style.display = 'block';
+                return;
+            }
+
+            const ok = await registerUser(currentLoginSite, user, pass);
+            if (ok) {
+                if (currentLoginSite !== currentSite) {
+                    currentSite = currentLoginSite;
+                    renderMainNav();
+                    renderSubNav();
+                }
+                $('loginWall').classList.add('hidden');
+                document.documentElement.style.overflow = '';
+                document.body.style.overflow = '';
+                showToast('✅ 注册成功，已自动登录！');
+
+                await doSwitchPage(siteConf(currentSite).defaultPage, null);
+                refreshCurrentUser().then(updateUIForUser).catch(console.error);
+                loadNotice(currentSite).catch(console.error);
+            } else {
+                errEl.textContent = '注册失败，用户名可能已被占用';
+                errEl.style.display = 'block';
             }
         }
 
@@ -2028,7 +2297,7 @@
         }
 
         // ================================================================
-        //  更新用户区 UI
+        //  更新用户区 UI（优化：复用 user.messages，避免二次请求）
         // ================================================================
         async function updateUIForUser() {
             const display = $('currentUserDisplay');
@@ -2045,13 +2314,12 @@
                     logoutBtn.style.display = 'inline-block';
                     profileLink.style.display = 'inline-block';
                     if (adminEntryBtn) {
-                        if (user.role === 'admin' || user.role === 'superadmin') {
-                            adminEntryBtn.style.display = 'inline-flex';
-                        } else {
-                            adminEntryBtn.style.display = 'none';
-                        }
+                        adminEntryBtn.style.display =
+                            (user.role === 'admin' || user.role === 'superadmin') ? 'inline-flex' : 'none';
                     }
-                    const unread = await getUnreadCount(currentSite, user.username);
+                    // 直接用 user.messages，避免再次请求
+                    const msgs = Array.isArray(user.messages) ? user.messages : [];
+                    const unread = msgs.filter(m => !m.read).length;
                     if (unread > 0) {
                         msgBadge.textContent = unread;
                         msgBadge.style.display = 'inline-block';
@@ -2105,7 +2373,7 @@
         }
 
         // ================================================================
-        //  页面切换
+        //  页面切换（优化：渲染任务并行执行，不阻塞页面显示）
         // ================================================================
         const ALL_PAGES = [
             'main-home', 'main-info', 'main-submit', 'main-my', 'main-detail',
@@ -2126,6 +2394,7 @@
         }
 
         async function doSwitchPage(page, extra) {
+            // 先让目标页面 active，UI 立即响应
             ALL_PAGES.forEach(p => {
                 const el = $('page-' + p);
                 if (el) el.classList.remove('active');
@@ -2142,20 +2411,24 @@
             currentPage = page;
             renderSubNav();
 
-            if (page === 'home') await renderPostList(currentSite, currentSite + 'HomePostList');
-            if (page === 'info') await renderPostList(currentSite, currentSite + 'InfoPostList');
-            if (page === 'submit') await renderSubmitForm(currentSite);
-            if (page === 'my') await renderMyPage(currentSite);
-            if (page === 'policy') await renderPostList(currentSite, 'xcbPolicyPostList', 'policy');
-            if (page === 'leadership') await renderLeadership(currentSite);
-            if (page === 'branch') await renderBranchList();
-            if (page === 'profile') await renderProfile();
-            if (page === 'admin') await renderAdmin();
+            // 收集渲染任务，并行执行，不逐个 await
+            const renderTasks = [];
+            if (page === 'home') renderTasks.push(renderPostList(currentSite, currentSite + 'HomePostList'));
+            if (page === 'info') renderTasks.push(renderPostList(currentSite, currentSite + 'InfoPostList'));
+            if (page === 'submit') renderTasks.push(renderSubmitForm(currentSite));
+            if (page === 'my') renderTasks.push(renderMyPage(currentSite));
+            if (page === 'policy') renderTasks.push(renderPostList(currentSite, 'xcbPolicyPostList', 'policy'));
+            if (page === 'leadership') renderTasks.push(renderLeadership(currentSite));
+            if (page === 'branch') renderTasks.push(renderBranchList());
+            if (page === 'profile') renderTasks.push(renderProfile());
+            if (page === 'admin') renderTasks.push(renderAdmin());
             if (page === 'detail' && extra) {
                 currentPostId = extra;
-                await renderDetail(currentSite, extra);
-                await renderComments(currentSite, extra);
+                renderTasks.push(renderDetail(currentSite, extra));
+                renderTasks.push(renderComments(currentSite, extra));
             }
+
+            await Promise.allSettled(renderTasks);
 
             window.scrollTo({ top: 0, behavior: 'smooth' });
             setTimeout(adjustNoticeBarPosition, 100);
@@ -2221,7 +2494,7 @@
         }
 
         // ================================================================
-        //  登录/注册模态框
+        //  登录/注册模态框（模块内使用）
         // ================================================================
         function openLoginModal() {
             const modal = $('loginModal');
@@ -2270,9 +2543,9 @@
             if (await loginUser(currentSite, user, pass)) {
                 closeLoginModal();
                 showToast('✅ 登录成功！');
-                await refreshCurrentUser();
-                await updateUIForUser();
+                // 优化：先切页再异步刷新
                 await doSwitchPage(currentPage, currentPostId);
+                refreshCurrentUser().then(updateUIForUser).catch(console.error);
             } else {
                 $('loginError').style.display = 'block';
                 showToast('❌ 用户名或密码错误');
@@ -2292,9 +2565,8 @@
             if (ok) {
                 closeLoginModal();
                 showToast('✅ 注册成功，已自动登录！');
-                await refreshCurrentUser();
-                await updateUIForUser();
                 await doSwitchPage(currentPage, currentPostId);
+                refreshCurrentUser().then(updateUIForUser).catch(console.error);
             } else {
                 errEl.textContent = '注册失败，用户名可能已被占用';
                 errEl.style.display = 'block';
@@ -2368,7 +2640,8 @@
             } catch (e) { console.error(e); return null; }
         }
 
-        async function addPost(site, title, date, content, author, images, video, category, status, authorTag) {
+        // 新增文章（支持 images / images_thumb / video）
+        async function addPost(site, title, date, content, author, images, video, category, status, authorTag, imagesThumb) {
             const table = siteConf(site).postsTable;
             const newPost = {
                 id: Date.now(),
@@ -2382,6 +2655,7 @@
                 reject_reason: '',
                 category: category || 'info',
                 images: images || [],
+                images_thumb: imagesThumb || [],
                 video: video || '',
                 likes: 0,
                 liked_users: [],
@@ -2537,9 +2811,7 @@
                 if (error) { showToast('点赞失败'); return; }
                 const cntEl = $(site + 'LikeCount');
                 if (cntEl) cntEl.textContent = likes;
-                if (likeBtn) {
-                    likeBtn.classList.toggle('liked', !liked);
-                }
+                if (likeBtn) likeBtn.classList.toggle('liked', !liked);
                 showToast(liked ? '已取消点赞' : '❤️ 点赞成功！');
                 await renderPostList(site, site + 'HomePostList');
             } finally {
@@ -2556,29 +2828,43 @@
         }
 
         // ================================================================
-        //  渲染文章列表（修复：放宽 status 过滤）
+        //  渲染文章列表（列表页优先使用缩略图 images_thumb）
         // ================================================================
         async function renderPostList(site, containerId, categoryFilter) {
             const container = $(containerId);
             if (!container) return;
-            let posts = await getPosts(site);
-            // 只排除 rejected，其余（含 null / 空）都显示
-            posts = posts.filter(p => p.status !== 'rejected');
-            if (categoryFilter) {
-                posts = posts.filter(p => p.category === categoryFilter);
+            // 先显示加载提示
+            if (!container.dataset.loaded) {
+                container.innerHTML = `<div class="card" style="text-align:center;color:#999;padding:40px;">
+                    <i class="fas fa-spinner fa-spin" style="font-size:28px;display:block;margin-bottom:12px;color:#dce3ed;"></i>
+                    加载中...
+                </div>`;
             }
+            let posts = await getPosts(site);
+            posts = posts.filter(p => p.status !== 'rejected');
+            if (categoryFilter) posts = posts.filter(p => p.category === categoryFilter);
+
             if (posts.length === 0) {
                 container.innerHTML = `<div class="card" style="text-align:center;color:#999;padding:40px;">
                     <i class="fas fa-inbox" style="font-size:32px;display:block;margin-bottom:12px;color:#dce3ed;"></i>
                     暂无已发布内容
                 </div>`;
+                container.dataset.loaded = '1';
                 return;
             }
             container.innerHTML = posts.map(p => {
+                // 列表页优先用缩略图
+                let thumbSource = null;
+                if (Array.isArray(p.images_thumb) && p.images_thumb.length > 0) {
+                    thumbSource = p.images_thumb;
+                } else if (Array.isArray(p.images) && p.images.length > 0) {
+                    thumbSource = p.images; // 兼容旧数据
+                }
                 let thumbHtml = '';
-                if (Array.isArray(p.images) && p.images.length > 0) {
+                if (thumbSource) {
                     thumbHtml = `<div class="thumb-container">${
-                        p.images.slice(0, 3).map(img => `<img class="thumb" src="${img}" alt="缩略图" loading="lazy">`).join('')
+                        thumbSource.slice(0, 3).map(img =>
+                            `<img class="thumb" src="${img}" alt="缩略图" loading="lazy">`).join('')
                     }</div>`;
                 }
                 const authorTagHtml = p.authorTag ? `<span class="author-tag">${escapeHtml(p.authorTag)}</span>` : '';
@@ -2599,6 +2885,7 @@
                     </div>
                 `;
             }).join('');
+            container.dataset.loaded = '1';
         }
 
         // ================================================================
@@ -2654,6 +2941,8 @@
                 if (stored && likedUsers.includes(stored)) likeBtn.classList.add('liked');
                 else likeBtn.classList.remove('liked');
             }
+            const vc = $(site + 'ViewCount');
+            if (vc) vc.textContent = post.views || 0;
 
             updateCommentFormState(site);
         }
@@ -2764,7 +3053,7 @@
         }
 
         // ================================================================
-        //  投稿表单
+        //  投稿表单（带图片/视频上传压缩）
         // ================================================================
         async function renderSubmitForm(site) {
             const container = $(site + 'SubmitContent');
@@ -2792,6 +3081,17 @@
                         <label>正文内容</label>
                         <textarea id="${site}SubmitContentText" placeholder="详细内容（选填）"></textarea>
                     </div>
+                    <div class="form-group">
+                        <label>上传图片（可多选，自动压缩）</label>
+                        <input type="file" id="${site}SubmitImages" accept="image/*" multiple>
+                        <div class="compress-progress" id="${site}SubmitImagesProgress"></div>
+                        <div class="file-preview" id="${site}SubmitImagesPreview"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>上传视频（自动压缩，建议小于 50MB）</label>
+                        <input type="file" id="${site}SubmitVideo" accept="video/*">
+                        <div class="compress-progress" id="${site}SubmitVideoProgress"></div>
+                    </div>
                     <button type="submit" class="btn-submit"><i class="fas fa-paper-plane"></i> 提交投稿</button>
                     <p style="margin-top:12px;color:#888;font-size:14px;">提交后请等待管理员审核，审核结果将通过消息中心通知您。</p>
                 </form>
@@ -2800,26 +3100,83 @@
                 e.preventDefault();
                 submitPostForm(site);
             });
+
+            // 图片选择后预览
+            const imgInput = $(site + 'SubmitImages');
+            imgInput.addEventListener('change', async (e) => {
+                const preview = $(site + 'SubmitImagesPreview');
+                preview.innerHTML = '';
+                const prog = $(site + 'SubmitImagesProgress');
+                const files = Array.from(e.target.files);
+                if (!files.length) { prog.classList.remove('show'); return; }
+                prog.textContent = `正在压缩 ${files.length} 张图片...`;
+                prog.classList.add('show');
+                const { thumbs } = await processImages(files, (i, total) => {
+                    prog.textContent = `正在压缩图片 ${i}/${total}...`;
+                });
+                prog.classList.remove('show');
+                thumbs.forEach(t => {
+                    const d = document.createElement('div');
+                    d.className = 'preview-item';
+                    d.innerHTML = `<img src="${t}" alt="预览">`;
+                    preview.appendChild(d);
+                });
+            });
         }
 
         async function submitPostForm(site) {
             const stored = getStoredUser(site);
             if (!stored) { showToast('请先登录'); openLoginModal(); return; }
             if (await checkUserMuted(site)) { showToast('❌ 您已被禁言，无法发布'); return; }
+
             const title = $(site + 'SubmitTitle').value.trim();
             const authorTag = $(site + 'SubmitAuthorTag').value.trim();
             const date = $(site + 'SubmitDate').value;
             const content = $(site + 'SubmitContentText').value.trim();
             if (!title || !date) { showToast('请完整填写标题和日期'); return; }
+
+            // 压缩图片
+            let images = [], imagesThumb = [];
+            const imageInput = $(site + 'SubmitImages');
+            if (imageInput && imageInput.files.length > 0) {
+                const prog = $(site + 'SubmitImagesProgress');
+                prog.textContent = '正在压缩图片...';
+                prog.classList.add('show');
+                try {
+                    const r = await processImages(imageInput.files, (i, total) => {
+                        prog.textContent = `正在压缩图片 ${i}/${total}...`;
+                    });
+                    images = r.images;
+                    imagesThumb = r.thumbs;
+                } catch (e) { console.error(e); }
+                prog.classList.remove('show');
+            }
+
+            // 压缩视频
+            let videoData = '';
+            const videoInput = $(site + 'SubmitVideo');
+            if (videoInput && videoInput.files[0]) {
+                const prog = $(site + 'SubmitVideoProgress');
+                prog.textContent = '正在压缩视频，请稍候...';
+                prog.classList.add('show');
+                const r = await compressVideo(videoInput.files[0]);
+                if (r.dataUrl) videoData = r.dataUrl;
+                prog.classList.remove('show');
+            }
+
             try {
                 const adm = await isAdmin(site);
                 const status = adm ? 'approved' : 'pending';
-                await addPost(site, title, date, content, stored, [], '', 'info', status, authorTag);
+                await addPost(site, title, date, content, stored, images, videoData, 'info', status, authorTag, imagesThumb);
                 showToast(adm ? '✅ 信息发布成功（管理员直接发布）！' : '✅ 投稿已提交，请等待管理员审核。');
+                // 清空
                 $(site + 'SubmitTitle').value = '';
                 $(site + 'SubmitAuthorTag').value = '';
                 $(site + 'SubmitDate').value = '';
                 $(site + 'SubmitContentText').value = '';
+                if (imageInput) imageInput.value = '';
+                if (videoInput) videoInput.value = '';
+                $(site + 'SubmitImagesPreview').innerHTML = '';
                 if (currentPage === 'my') await renderMyPage(site);
             } catch (e) {
                 showToast('投稿失败，请重试');
@@ -2898,14 +3255,27 @@
                 container.innerHTML = `<div class="card" style="text-align:center;color:#999;padding:40px;">没有找到匹配的信息</div>`;
                 return;
             }
-            container.innerHTML = filtered.map(p => `
-                <div class="post-item" onclick="openDetail('${site}', ${p.id})">
-                    <h3>${escapeHtml(p.title || '')}</h3>
-                    <div class="meta"><i class="far fa-calendar-alt"></i> ${escapeHtml(p.date || '')} &nbsp;|&nbsp; 作者：${escapeHtml(p.author || '')}</div>
-                    <div class="summary">${escapeHtml(String(p.content || '').substring(0, 80))}...</div>
-                    <span class="read-more">阅读全文 <i class="fas fa-arrow-right"></i></span>
-                </div>
-            `).join('');
+            container.innerHTML = filtered.map(p => {
+                let thumbSource = null;
+                if (Array.isArray(p.images_thumb) && p.images_thumb.length > 0) thumbSource = p.images_thumb;
+                else if (Array.isArray(p.images) && p.images.length > 0) thumbSource = p.images;
+                let thumbHtml = '';
+                if (thumbSource) {
+                    thumbHtml = `<div class="thumb-container">${
+                        thumbSource.slice(0, 3).map(img =>
+                            `<img class="thumb" src="${img}" alt="缩略图" loading="lazy">`).join('')
+                    }</div>`;
+                }
+                return `
+                    <div class="post-item" onclick="openDetail('${site}', ${p.id})">
+                        <h3>${escapeHtml(p.title || '')}</h3>
+                        <div class="meta"><i class="far fa-calendar-alt"></i> ${escapeHtml(p.date || '')} &nbsp;|&nbsp; 作者：${escapeHtml(p.author || '')}</div>
+                        <div class="summary">${escapeHtml(String(p.content || '').substring(0, 80))}...</div>
+                        ${thumbHtml}
+                        <span class="read-more">阅读全文 <i class="fas fa-arrow-right"></i></span>
+                    </div>
+                `;
+            }).join('');
         }
 
         // ================================================================
@@ -3059,11 +3429,11 @@
                 await updateUIForUser();
                 await doSwitchPage('home', null);
             }, 1200);
-        }        // ================================================================
+        }
+
+        // ================================================================
         //  后台：站点切换
         // ================================================================
-        let currentAdminSite = 'main';
-
         async function switchAdminSite(site) {
             currentAdminSite = site;
             document.querySelectorAll('#adminSiteTabs button').forEach(btn => {
@@ -3152,9 +3522,7 @@
                 showToast('✅ 已通过');
                 await renderReviewList(site);
                 await renderAdminPostList(site);
-                if (site === currentSite) {
-                    await renderPostList(site, site + 'HomePostList');
-                }
+                if (site === currentSite) await renderPostList(site, site + 'HomePostList');
             } else showToast('操作失败');
         }
 
@@ -3204,9 +3572,7 @@
                 showToast('已删除');
                 await renderAdminPostList(site);
                 await renderReviewList(site);
-                if (site === currentSite) {
-                    await renderPostList(site, site + 'HomePostList');
-                }
+                if (site === currentSite) await renderPostList(site, site + 'HomePostList');
             } else showToast('删除失败');
         }
 
@@ -3667,7 +4033,7 @@
             container.innerHTML = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;">' +
                 members.map(m => `
                     <div class="leadership-member-card">
-                        ${m.photo ? `<img src="${m.photo}" alt="${escapeHtml(m.name)}" class="member-photo">` : ''}
+                        ${m.photo ? `<img src="${m.photo}" alt="${escapeHtml(m.name)}" class="member-photo" loading="lazy">` : ''}
                         <div class="member-name">${escapeHtml(m.name || '')}</div>
                         <div class="member-title">${escapeHtml(m.title || '')}</div>
                         ${m.joinDate ? `<div class="member-meta"><i class="fas fa-clock"></i> 加入：${escapeHtml(m.joinDate)}</div>` : ''}
@@ -3744,7 +4110,12 @@
             const members = await getLeadership(site);
             let photo = '';
             if (file) {
-                photo = await new Promise(res => { const r = new FileReader(); r.onload = ev => res(ev.target.result); r.readAsDataURL(file); });
+                // 领导照片也压缩
+                try {
+                    photo = await compressImage(file, 600, 0.8);
+                } catch (err) {
+                    photo = await new Promise(res => { const r = new FileReader(); r.onload = ev => res(ev.target.result); r.readAsDataURL(file); });
+                }
             } else if (index !== '' && members[parseInt(index)] && members[parseInt(index)].photo) {
                 photo = members[parseInt(index)].photo;
             }
@@ -3808,7 +4179,6 @@
             if (!container) return;
             detailC.style.display = 'none';
             container.style.display = 'block';
-            // 创建支部按钮
             const addBtn = $('addBranchBtn');
             if (addBtn) addBtn.style.display = (await isAdmin('zzb')) ? 'inline-block' : 'none';
 
@@ -4036,7 +4406,7 @@
                 });
             });
 
-            // 发布信息
+            // 发布信息（后台，带媒体压缩）
             document.querySelectorAll('.add-post-form').forEach(form => {
                 form.addEventListener('submit', async (e) => {
                     e.preventDefault();
@@ -4050,17 +4420,38 @@
                     const errEl = form.querySelector('.error-msg');
                     errEl.style.display = 'none';
                     if (!title || !date) { errEl.textContent = '请填写标题和日期'; errEl.style.display = 'block'; return; }
+
+                    // 压缩图片
+                    let images = [], imagesThumb = [];
+                    const imgInput = form.querySelector('.post-images');
+                    if (imgInput && imgInput.files.length > 0) {
+                        showToast('正在压缩图片...');
+                        try {
+                            const r = await processImages(imgInput.files);
+                            images = r.images;
+                            imagesThumb = r.thumbs;
+                        } catch (err) { console.error(err); }
+                    }
+                    // 压缩视频
+                    let videoData = '';
+                    const vidInput = form.querySelector('.post-video');
+                    if (vidInput && vidInput.files[0]) {
+                        showToast('正在压缩视频...');
+                        const r = await compressVideo(vidInput.files[0]);
+                        if (r.dataUrl) videoData = r.dataUrl;
+                    }
+
                     try {
-                        await addPost(site, title, date, content, getStoredUser(site), [], '', category, 'approved', '');
+                        await addPost(site, title, date, content, getStoredUser(site), images, videoData, category, 'approved', '', imagesThumb);
                         showToast('✅ 发布成功');
                         form.querySelector('.post-title').value = '';
                         form.querySelector('.post-date').value = '';
                         form.querySelector('.post-content').value = '';
+                        if (imgInput) imgInput.value = '';
+                        if (vidInput) vidInput.value = '';
                         await renderAdminPostList(site);
                         await renderReviewList(site);
-                        if (site === currentSite) {
-                            await renderPostList(site, site + 'HomePostList');
-                        }
+                        if (site === currentSite) await renderPostList(site, site + 'HomePostList');
                     } catch (err) {
                         errEl.textContent = '发布失败：' + err.message;
                         errEl.style.display = 'block';
@@ -4106,15 +4497,10 @@
                 });
             });
 
-            // 领导班子表单
             const lf = $('editLeadershipForm');
             if (lf) lf.addEventListener('submit', saveLeadershipMember);
-
-            // 支部表单
             const bf = $('branchEditForm');
             if (bf) bf.addEventListener('submit', saveBranch);
-
-            // 支部成员表单
             const bmf = $('branchMemberForm');
             if (bmf) bmf.addEventListener('submit', saveBranchMember);
         }
@@ -4163,6 +4549,11 @@
                 btn.addEventListener('click', () => setLoginWallSite(btn.dataset.site));
             });
             $('wallLoginForm').addEventListener('submit', handleWallLogin);
+            $('wallRegisterForm').addEventListener('submit', handleWallRegister);
+            $('wallSwitchToRegister').addEventListener('click', () => {
+                const mode = $('wallSwitchToRegister').dataset.mode === 'register' ? 'login' : 'register';
+                setWallMode(mode);
+            });
 
             // 顶部退出
             $('logoutBtn').addEventListener('click', handleLogout);
@@ -4192,24 +4583,26 @@
                 if (e.target === $('deleteRequestModal')) closeDeleteRequestModal();
             });
 
-            // 领导照片预览
+            // 领导照片预览（本地压缩后预览）
             const photoInput = $('editLeadershipPhoto');
             if (photoInput) {
-                photoInput.addEventListener('change', (e) => {
+                photoInput.addEventListener('change', async (e) => {
                     const f = e.target.files[0];
                     if (!f) return;
-                    const r = new FileReader();
-                    r.onload = ev => {
-                        $('editLeadershipPhotoPreview').innerHTML = `<img src="${ev.target.result}" style="max-width:150px;border-radius:8px;">`;
-                    };
-                    r.readAsDataURL(f);
+                    try {
+                        const small = await compressImage(f, 600, 0.8);
+                        $('editLeadershipPhotoPreview').innerHTML = `<img src="${small}" style="max-width:150px;border-radius:8px;">`;
+                    } catch (err) {
+                        const r = new FileReader();
+                        r.onload = ev => {
+                            $('editLeadershipPhotoPreview').innerHTML = `<img src="${ev.target.result}" style="max-width:150px;border-radius:8px;">`;
+                        };
+                        r.readAsDataURL(f);
+                    }
                 });
             }
 
-            // 后台事件绑定
             bindAdminEvents();
-
-            // 窗口尺寸变化
             window.addEventListener('resize', adjustNoticeBarPosition);
 
             // 开场动画结束后检查登录
@@ -4234,9 +4627,10 @@
                             wall.classList.add('hidden');
                             document.documentElement.style.overflow = '';
                             document.body.style.overflow = '';
-                            await updateUIForUser();
-                            await loadNotice(currentSite);
+                            // 先切页，再异步刷新
                             await doSwitchPage(siteConf(currentSite).defaultPage, null);
+                            refreshCurrentUser().then(updateUIForUser).catch(console.error);
+                            loadNotice(currentSite).catch(console.error);
                         }
                     }, 900);
                 }
@@ -4305,6 +4699,7 @@
         console.log('✅ 人民共产已启动');
         console.log('📌 三个模块的超级管理员：杨振浩 / Yzh061110');
         console.log('📌 请确保三套表都在 Supabase 中创建，并关闭 RLS');
+        console.log('📌 posts 表建议新增字段：images_thumb (jsonb) 用于列表缩略图加速');
     </script>
 </body>
 </html>
