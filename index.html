@@ -9,6 +9,12 @@
     <link rel="shortcut icon" href="./logo.png" type="image/png">
     <link rel="apple-touch-icon" href="./logo.png">
 
+    <!-- 首屏立即上色，避免白屏 -->
+    <style>
+        html { background: #b30000; }
+        body { background: #b30000; margin: 0; padding: 0; }
+    </style>
+
     <style>
         html, body { background: #b30000; margin: 0; padding: 0; }
         body {
@@ -21,7 +27,7 @@
             background: linear-gradient(135deg, #b30000 0%, #cc0000 50%, #990000 100%);
             z-index: 9999999;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            transition: opacity 0.9s ease;
+            transition: opacity 0.5s ease;
         }
         #introMask.fade-out { opacity: 0; pointer-events: none; }
         #introLogo {
@@ -37,14 +43,15 @@
         }
         #introTitle {
             margin-top: 28px; color: #fff; font-size: 36px;
-            font-family: 'Ma Shan Zheng', cursive; letter-spacing: 12px;
-            opacity: 0; animation: introTextIn 1s ease-out 0.4s forwards;
+            font-family: "STKaiti", "KaiTi", "楷体", "Microsoft YaHei", sans-serif;
+            letter-spacing: 12px;
+            opacity: 0; animation: introTextIn 1s ease-out 0.3s forwards;
             text-shadow: 2px 2px 12px rgba(0, 0, 0, 0.4);
         }
         #introSubtitle {
             margin-top: 12px; color: rgba(255, 215, 0, 0.9);
             font-size: 14px; letter-spacing: 4px;
-            opacity: 0; animation: introTextIn 1s ease-out 0.8s forwards;
+            opacity: 0; animation: introTextIn 1s ease-out 0.6s forwards;
         }
         @keyframes introZoom { 0% { transform: scale(0.3); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
         @keyframes introPulse { 0% { box-shadow: 0 0 0 0 rgba(255,215,0,0.8); } 70% { box-shadow: 0 0 0 30px rgba(255,215,0,0); } 100% { box-shadow: 0 0 0 0 rgba(255,215,0,0); } }
@@ -75,7 +82,9 @@
         }
         #loginWall h2 {
             color: #990000; font-size: 24px; text-align: center;
-            margin-bottom: 4px; font-family: 'Ma Shan Zheng', cursive; letter-spacing: 4px;
+            margin-bottom: 4px;
+            font-family: "STKaiti", "KaiTi", "楷体", "Microsoft YaHei", sans-serif;
+            letter-spacing: 4px;
         }
         #loginWall .wall-sub {
             text-align: center; color: #888; font-size: 14px; margin-bottom: 18px;
@@ -133,8 +142,9 @@
     </style>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- 已移除 Google Fonts，避免国内被墙阻塞 -->
+
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -150,7 +160,8 @@
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
         }
         .header h1 {
-            font-size: 64px; font-family: 'Ma Shan Zheng', cursive;
+            font-size: 64px;
+            font-family: "STKaiti", "KaiTi", "楷体", "Microsoft YaHei", sans-serif;
             letter-spacing: 12px; text-shadow: 2px 2px 12px rgba(0, 0, 0, 0.4);
             font-weight: 400;
         }
@@ -860,7 +871,6 @@
         .admin-site-panel { display: none; }
         .admin-site-panel.active { display: block; }
 
-        /* 压缩进度提示 */
         .compress-progress {
             display: none; font-size: 13px; color: #b30000;
             margin-top: 6px; font-weight: 600;
@@ -2205,16 +2215,16 @@
                     renderMainNav();
                     renderSubNav();
                 }
-                // 1. 立即关闭登录墙，让用户马上看到界面
+                // 1. 立即关闭登录墙
                 $('loginWall').classList.add('hidden');
                 document.documentElement.style.overflow = '';
                 document.body.style.overflow = '';
                 showToast('✅ 登录成功，欢迎回来！');
 
-                // 2. 立即切页（渲染任务在 doSwitchPage 内并行执行）
+                // 2. 立即切页
                 await doSwitchPage(siteConf(currentSite).defaultPage, null);
 
-                // 3. 用户信息、通知后台异步刷新，不阻塞界面
+                // 3. 后台异步刷新
                 refreshCurrentUser().then(updateUIForUser).catch(console.error);
                 loadNotice(currentSite).catch(console.error);
             } else {
@@ -2317,7 +2327,6 @@
                         adminEntryBtn.style.display =
                             (user.role === 'admin' || user.role === 'superadmin') ? 'inline-flex' : 'none';
                     }
-                    // 直接用 user.messages，避免再次请求
                     const msgs = Array.isArray(user.messages) ? user.messages : [];
                     const unread = msgs.filter(m => !m.read).length;
                     if (unread > 0) {
@@ -2373,7 +2382,7 @@
         }
 
         // ================================================================
-        //  页面切换（优化：渲染任务并行执行，不阻塞页面显示）
+        //  页面切换（优化：渲染任务并行，不阻塞页面显示）
         // ================================================================
         const ALL_PAGES = [
             'main-home', 'main-info', 'main-submit', 'main-my', 'main-detail',
@@ -2394,7 +2403,6 @@
         }
 
         async function doSwitchPage(page, extra) {
-            // 先让目标页面 active，UI 立即响应
             ALL_PAGES.forEach(p => {
                 const el = $('page-' + p);
                 if (el) el.classList.remove('active');
@@ -2411,7 +2419,6 @@
             currentPage = page;
             renderSubNav();
 
-            // 收集渲染任务，并行执行，不逐个 await
             const renderTasks = [];
             if (page === 'home') renderTasks.push(renderPostList(currentSite, currentSite + 'HomePostList'));
             if (page === 'info') renderTasks.push(renderPostList(currentSite, currentSite + 'InfoPostList'));
@@ -2428,7 +2435,10 @@
                 renderTasks.push(renderComments(currentSite, extra));
             }
 
-            await Promise.allSettled(renderTasks);
+            // 不 await，让页面框架立即显示，数据异步填充
+            renderTasks.forEach(p => {
+                if (p && typeof p.catch === 'function') p.catch(console.error);
+            });
 
             window.scrollTo({ top: 0, behavior: 'smooth' });
             setTimeout(adjustNoticeBarPosition, 100);
@@ -2543,7 +2553,6 @@
             if (await loginUser(currentSite, user, pass)) {
                 closeLoginModal();
                 showToast('✅ 登录成功！');
-                // 优化：先切页再异步刷新
                 await doSwitchPage(currentPage, currentPostId);
                 refreshCurrentUser().then(updateUIForUser).catch(console.error);
             } else {
@@ -2618,14 +2627,21 @@
                 showToast('删除失败');
             }
         }        // ================================================================
-        //  文章操作
+        //  文章操作（带 30 秒缓存）
         // ================================================================
-        async function getPosts(site) {
+        const _postsCache = {};
+
+        async function getPosts(site, force) {
+            const now = Date.now();
+            if (!force && _postsCache[site] && now - _postsCache[site].t < 30000) {
+                return _postsCache[site].data;
+            }
             const table = siteConf(site).postsTable;
             try {
                 const { data, error } = await supabaseClient
                     .from(table).select('*').order('created_at', { ascending: false });
                 if (error) { console.error('获取文章失败:', error); return []; }
+                _postsCache[site] = { data: data || [], t: now };
                 return data || [];
             } catch (e) { console.error(e); return []; }
         }
@@ -2672,6 +2688,7 @@
                             `新投稿《${title}》来自 ${author}，请审核。`, 'new_post');
                     }
                 }
+                _postsCache[site] = null;   // 清缓存
                 return data ? data[0] : newPost;
             } catch (e) { throw e; }
         }
@@ -2697,6 +2714,7 @@
             const { error } = await supabaseClient
                 .from(table).update(updates).eq('id', postId);
             if (error) { console.error('更新状态失败:', error); return false; }
+            _postsCache[site] = null;
             return true;
         }
 
@@ -2707,6 +2725,7 @@
                 await supabaseClient.from(commentsTable).delete().eq('post_id', postId);
                 const { error } = await supabaseClient.from(postsTable).delete().eq('id', postId);
                 if (error) { console.error('删除文章失败:', error); return false; }
+                _postsCache[site] = null;
                 return true;
             } catch (e) { console.error(e); return false; }
         }
@@ -2813,6 +2832,7 @@
                 if (cntEl) cntEl.textContent = likes;
                 if (likeBtn) likeBtn.classList.toggle('liked', !liked);
                 showToast(liked ? '已取消点赞' : '❤️ 点赞成功！');
+                _postsCache[site] = null;
                 await renderPostList(site, site + 'HomePostList');
             } finally {
                 if (likeBtn) likeBtn.disabled = false;
@@ -2825,6 +2845,7 @@
             if (!post) return;
             const views = Number(post.views || 0) + 1;
             await supabaseClient.from(table).update({ views }).eq('id', postId);
+            _postsCache[site] = null;
         }
 
         // ================================================================
@@ -2858,7 +2879,7 @@
                 if (Array.isArray(p.images_thumb) && p.images_thumb.length > 0) {
                     thumbSource = p.images_thumb;
                 } else if (Array.isArray(p.images) && p.images.length > 0) {
-                    thumbSource = p.images; // 兼容旧数据
+                    thumbSource = p.images;
                 }
                 let thumbHtml = '';
                 if (thumbSource) {
@@ -3429,9 +3450,7 @@
                 await updateUIForUser();
                 await doSwitchPage('home', null);
             }, 1200);
-        }
-
-        // ================================================================
+        }        // ================================================================
         //  后台：站点切换
         // ================================================================
         async function switchAdminSite(site) {
@@ -4110,7 +4129,6 @@
             const members = await getLeadership(site);
             let photo = '';
             if (file) {
-                // 领导照片也压缩
                 try {
                     photo = await compressImage(file, 600, 0.8);
                 } catch (err) {
@@ -4523,7 +4541,7 @@
         }
 
         // ================================================================
-        //  初始化
+        //  初始化（优化：非阻塞 + 快速首屏）
         // ================================================================
         document.addEventListener('DOMContentLoaded', async () => {
             const intro = $('introMask');
@@ -4532,19 +4550,62 @@
             document.body.style.overflow = 'hidden';
             if (wall) wall.classList.add('hidden');
 
-            // 初始化三个用户表
-            await initUsersTable('main');
-            await initUsersTable('xcb');
-            await initUsersTable('zzb');
+            // 1. 初始化用户表：非阻塞 + 缓存
+            if (!localStorage.getItem('pc_inited_v1')) {
+                Promise.allSettled([
+                    initUsersTable('main'),
+                    initUsersTable('xcb'),
+                    initUsersTable('zzb')
+                ]).then(() => {
+                    localStorage.setItem('pc_inited_v1', '1');
+                }).catch(() => {});
+            }
 
-            // 渲染导航
+            // 2. 立即渲染导航（不依赖网络）
             renderMainNav();
             renderSubNav();
-            await refreshCurrentUser();
-            await updateUIForUser();
 
-            // ---- 事件绑定 ----
-            // 登录墙模块选择
+            // 3. 开场动画 500ms 后立即淡出
+            const startApp = async () => {
+                if (intro) {
+                    intro.classList.add('fade-out');
+                    setTimeout(() => {
+                        if (intro.parentNode) intro.parentNode.removeChild(intro);
+                    }, 900);
+                }
+
+                const stored = getStoredUser(currentSite);
+                let valid = false;
+                if (stored) {
+                    const u = await findUser(currentSite, stored);
+                    if (u) {
+                        valid = true;
+                        currentUser = stored;
+                        currentUserSite = currentSite;
+                    } else {
+                        clearStoredUser(currentSite);
+                    }
+                }
+
+                if (!valid) {
+                    setLoginWallSite(currentSite);
+                    wall.classList.remove('hidden');
+                    document.documentElement.style.overflow = 'hidden';
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    wall.classList.add('hidden');
+                    document.documentElement.style.overflow = '';
+                    document.body.style.overflow = '';
+                    await doSwitchPage(siteConf(currentSite).defaultPage, null);
+                    refreshCurrentUser().then(updateUIForUser).catch(console.error);
+                    loadNotice(currentSite).catch(console.error);
+                }
+            };
+
+            // 立即执行
+            startApp();
+
+            // 4. 事件绑定
             document.querySelectorAll('#wallSiteSelector button').forEach(btn => {
                 btn.addEventListener('click', () => setLoginWallSite(btn.dataset.site));
             });
@@ -4555,15 +4616,12 @@
                 setWallMode(mode);
             });
 
-            // 顶部退出
             $('logoutBtn').addEventListener('click', handleLogout);
             $('adminLogoutBtn').addEventListener('click', handleLogout);
 
-            // 消息中心
             $('closeMsgModal').addEventListener('click', closeMsgModal);
             $('msgModal').addEventListener('click', (e) => { if (e.target === $('msgModal')) closeMsgModal(); });
 
-            // 模块内登录/注册
             $('closeLoginModal').addEventListener('click', closeLoginModal);
             $('loginModal').addEventListener('click', (e) => { if (e.target === $('loginModal')) closeLoginModal(); });
             $('tabLogin').addEventListener('click', () => switchAuthTab('login'));
@@ -4571,10 +4629,8 @@
             $('loginForm').addEventListener('submit', handleLoginForm);
             $('registerForm').addEventListener('submit', handleRegisterForm);
 
-            // 禁言
             $('muteForm').addEventListener('submit', handleMuteForm);
 
-            // 删除申请
             $('deleteRequestForm').addEventListener('submit', handleDeleteRequestForm);
             document.querySelectorAll('#deleteRequestModal .close-modal').forEach(el => {
                 el.addEventListener('click', closeDeleteRequestModal);
@@ -4583,7 +4639,6 @@
                 if (e.target === $('deleteRequestModal')) closeDeleteRequestModal();
             });
 
-            // 领导照片预览（本地压缩后预览）
             const photoInput = $('editLeadershipPhoto');
             if (photoInput) {
                 photoInput.addEventListener('change', async (e) => {
@@ -4604,37 +4659,6 @@
 
             bindAdminEvents();
             window.addEventListener('resize', adjustNoticeBarPosition);
-
-            // 开场动画结束后检查登录
-            setTimeout(() => {
-                if (intro) {
-                    intro.classList.add('fade-out');
-                    setTimeout(async () => {
-                        if (intro.parentNode) intro.parentNode.removeChild(intro);
-                        const stored = getStoredUser(currentSite);
-                        let valid = false;
-                        if (stored) {
-                            const u = await findUser(currentSite, stored);
-                            if (u) { valid = true; currentUser = stored; currentUserSite = currentSite; }
-                            else clearStoredUser(currentSite);
-                        }
-                        if (!valid) {
-                            setLoginWallSite(currentSite);
-                            wall.classList.remove('hidden');
-                            document.documentElement.style.overflow = 'hidden';
-                            document.body.style.overflow = 'hidden';
-                        } else {
-                            wall.classList.add('hidden');
-                            document.documentElement.style.overflow = '';
-                            document.body.style.overflow = '';
-                            // 先切页，再异步刷新
-                            await doSwitchPage(siteConf(currentSite).defaultPage, null);
-                            refreshCurrentUser().then(updateUIForUser).catch(console.error);
-                            loadNotice(currentSite).catch(console.error);
-                        }
-                    }, 900);
-                }
-            }, 2600);
         });
 
         // ================================================================
