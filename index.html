@@ -9,7 +9,6 @@
     <link rel="shortcut icon" href="./logo.png" type="image/png">
     <link rel="apple-touch-icon" href="./logo.png">
 
-    <!-- 首屏立即上色，避免白屏 -->
     <style>
         html { background: #b30000; }
         body { background: #b30000; margin: 0; padding: 0; }
@@ -57,7 +56,6 @@
         @keyframes introPulse { 0% { box-shadow: 0 0 0 0 rgba(255,215,0,0.8); } 70% { box-shadow: 0 0 0 30px rgba(255,215,0,0); } 100% { box-shadow: 0 0 0 0 rgba(255,215,0,0); } }
         @keyframes introTextIn { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
 
-        /* ===== 登录墙 ===== */
         #loginWall {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background: linear-gradient(135deg, #b30000 0%, #cc0000 50%, #990000 100%);
@@ -143,7 +141,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- 已移除 Google Fonts，避免国内被墙阻塞 -->
 
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -879,7 +876,6 @@
     </style>
 </head><body>
 
-    <!-- ================= 开场动画 ================= -->
     <div id="introMask">
         <div id="introLogo">
             <img src="./logo.png" alt="人民共产">
@@ -888,7 +884,6 @@
         <div id="introSubtitle">人民 进步 民主 共产</div>
     </div>
 
-    <!-- ================= 登录墙 ================= -->
     <div id="loginWall" class="hidden">
         <div class="wall-box">
             <img src="./logo.png" alt="人民共产" class="wall-logo">
@@ -902,7 +897,6 @@
             </div>
             <div class="site-hint" id="wallSiteHint">当前登录：人民共产网</div>
 
-            <!-- 登录表单 -->
             <form id="wallLoginForm">
                 <label for="wallUser">用户名</label>
                 <input type="text" id="wallUser" placeholder="请输入用户名" required autocomplete="username">
@@ -912,7 +906,6 @@
                 <div class="wall-error" id="wallError">用户名或密码错误！</div>
             </form>
 
-            <!-- 注册表单 -->
             <form id="wallRegisterForm" style="display:none;">
                 <label for="wallRegUser">用户名</label>
                 <input type="text" id="wallRegUser" placeholder="请设置用户名" required autocomplete="username">
@@ -930,10 +923,8 @@
         </div>
     </div>
 
-    <!-- Toast -->
     <div id="toast" class="toast"></div>
 
-    <!-- 消息中心 -->
     <div class="msg-modal" id="msgModal">
         <div class="msg-box">
             <button class="close-msg" id="closeMsgModal">&times;</button>
@@ -942,7 +933,6 @@
         </div>
     </div>
 
-    <!-- 登录/注册模态框（模块内使用） -->
     <div class="modal-overlay" id="loginModal">
         <div class="modal-box">
             <button class="close-modal" id="closeLoginModal">&times;</button>
@@ -977,7 +967,6 @@
         </div>
     </div>
 
-    <!-- 删除申请模态框 -->
     <div class="modal-overlay" id="deleteRequestModal">
         <div class="modal-box">
             <button class="close-modal" onclick="closeDeleteRequestModal()">&times;</button>
@@ -992,7 +981,6 @@
         </div>
     </div>
 
-    <!-- 禁言模态框 -->
     <div class="modal-overlay" id="muteModal">
         <div class="modal-box">
             <button class="close-modal" onclick="closeMuteModal()">&times;</button>
@@ -1010,7 +998,6 @@
         </div>
     </div>
 
-    <!-- 禁言审核模态框 -->
     <div class="modal-overlay" id="muteReviewModal">
         <div class="modal-box">
             <button class="close-modal" onclick="closeMuteReviewModal()">&times;</button>
@@ -1025,7 +1012,6 @@
         </div>
     </div>
 
-    <!-- 解除禁言审核模态框 -->
     <div class="modal-overlay" id="unmuteReviewModal">
         <div class="modal-box">
             <button class="close-modal" onclick="closeUnmuteReviewModal()">&times;</button>
@@ -1039,7 +1025,6 @@
         </div>
     </div>
 
-    <!-- 领导班子编辑模态框 -->
     <div class="modal-overlay" id="editLeadershipModal">
         <div class="modal-box" style="max-width:600px;">
             <button class="close-modal" onclick="closeEditLeadershipModal()">&times;</button>
@@ -1066,7 +1051,6 @@
         </div>
     </div>
 
-    <!-- 支部编辑模态框 -->
     <div class="modal-overlay" id="branchEditModal">
         <div class="modal-box" style="max-width:600px;">
             <button class="close-modal" onclick="closeBranchEditModal()">&times;</button>
@@ -1088,7 +1072,6 @@
         </div>
     </div>
 
-    <!-- 支部成员编辑模态框 -->
     <div class="modal-overlay" id="branchMemberModal">
         <div class="modal-box" style="max-width:500px;">
             <button class="close-modal" onclick="closeBranchMemberModal()">&times;</button>
@@ -1111,13 +1094,11 @@
         </div>
     </div>
 
-    <!-- 头部 -->
     <header class="header">
         <h1 id="headerTitle">人民共产</h1>
         <div class="header-sub" id="headerSub">人民 · 进步 · 民主 · 共产</div>
     </header>
 
-    <!-- 一级导航：模块切换 -->
     <nav class="nav-main" id="mainNav">
         <div class="nav-main-inner">
             <button class="site-btn active-site" data-site="main" onclick="switchSite('main')">
@@ -1147,20 +1128,18 @@
         </div>
     </nav>
 
-    <!-- 二级导航：模块内页面切换 -->
     <nav class="nav-sub" id="subNav">
         <div class="nav-sub-inner" id="subNavInner"></div>
     </nav>
 
-    <!-- 飘带通知 -->
     <div id="noticeBar">
         <div id="noticeContent">
             <span id="noticeText">欢迎来到人民共产</span>
         </div>
-    </div>    <!-- 主容器 -->
+    </div>
+
     <div class="main-wrapper">
 
-        <!-- ================= 人民共产网页面 ================= -->
         <div id="page-main-home" class="page active">
             <div id="mainHomePostList"></div>
         </div>
@@ -1173,7 +1152,7 @@
         </div>
         <div id="page-main-submit" class="page">
             <div class="submit-form">
-                <div class="sub">欢迎投稿，管理员审核通过后将自动发布在首页和信息公开栏目。支持图片和视频上传（自动压缩）。</div>
+                <div class="sub">欢迎投稿，管理员审核通过后将自动发布在首页和信息公开栏目。支持图片和视频上传。</div>
                 <div id="mainSubmitContent"></div>
             </div>
         </div>
@@ -1213,7 +1192,6 @@
             </div>
         </div>
 
-        <!-- ================= 中央宣传部页面 ================= -->
         <div id="page-xcb-home" class="page">
             <div id="xcbHomePostList"></div>
         </div>
@@ -1259,7 +1237,6 @@
             </div>
         </div>
 
-        <!-- ================= 中央组织部页面 ================= -->
         <div id="page-zzb-home" class="page">
             <div id="zzbHomePostList"></div>
         </div>
@@ -1316,7 +1293,6 @@
             </div>
         </div>
 
-        <!-- ================= 个人中心 ================= -->
         <div id="page-profile" class="page">
             <div class="profile-container">
                 <div class="sub">修改您的个人信息</div>
@@ -1324,7 +1300,6 @@
             </div>
         </div>
 
-        <!-- ================= 统一管理后台 ================= -->
         <div id="page-admin" class="page">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:10px;">
                 <div class="admin-site-tabs" id="adminSiteTabs" style="margin-bottom:0; flex:1;">
@@ -1335,7 +1310,6 @@
                 <button id="adminLogoutBtn" style="padding:8px 24px; background:#b30000; color:white; border:none; border-radius:30px; font-size:14px; cursor:pointer;">退出登录</button>
             </div>
 
-            <!-- 人民共产网后台 -->
             <div class="admin-site-panel active" id="adminPanel-main">
                 <div class="admin-panel">
                     <div class="admin-card">
@@ -1365,11 +1339,11 @@
                                 <textarea class="post-content" placeholder="正文"></textarea>
                             </div>
                             <div class="form-group">
-                                <label>上传图片（自动压缩，可多选）</label>
+                                <label>上传图片（可多选）</label>
                                 <input type="file" class="post-images" accept="image/*" multiple>
                             </div>
                             <div class="form-group">
-                                <label>上传视频（自动压缩）</label>
+                                <label>上传视频</label>
                                 <input type="file" class="post-video" accept="video/*">
                             </div>
                             <button type="submit" class="btn-admin"><i class="fas fa-paper-plane"></i> 发布</button>
@@ -1436,7 +1410,6 @@
                 </div>
             </div>
 
-            <!-- 宣传部后台 -->
             <div class="admin-site-panel" id="adminPanel-xcb">
                 <div class="admin-panel">
                     <div class="admin-card">
@@ -1473,11 +1446,11 @@
                                 <textarea class="post-content" placeholder="正文"></textarea>
                             </div>
                             <div class="form-group">
-                                <label>上传图片（自动压缩，可多选）</label>
+                                <label>上传图片（可多选）</label>
                                 <input type="file" class="post-images" accept="image/*" multiple>
                             </div>
                             <div class="form-group">
-                                <label>上传视频（自动压缩）</label>
+                                <label>上传视频</label>
                                 <input type="file" class="post-video" accept="video/*">
                             </div>
                             <button type="submit" class="btn-admin"><i class="fas fa-paper-plane"></i> 发布</button>
@@ -1550,7 +1523,6 @@
                 </div>
             </div>
 
-            <!-- 组织部后台 -->
             <div class="admin-site-panel" id="adminPanel-zzb">
                 <div class="admin-panel">
                     <div class="admin-card">
@@ -1580,11 +1552,11 @@
                                 <textarea class="post-content" placeholder="正文"></textarea>
                             </div>
                             <div class="form-group">
-                                <label>上传图片（自动压缩，可多选）</label>
+                                <label>上传图片（可多选）</label>
                                 <input type="file" class="post-images" accept="image/*" multiple>
                             </div>
                             <div class="form-group">
-                                <label>上传视频（自动压缩）</label>
+                                <label>上传视频</label>
                                 <input type="file" class="post-video" accept="video/*">
                             </div>
                             <button type="submit" class="btn-admin"><i class="fas fa-paper-plane"></i> 发布</button>
@@ -1666,19 +1638,22 @@
 
     </div>
 
-    <!-- 页脚 -->
     <footer class="footer">
         <div class="copyright">
             <p>人民共产网 · 人民共产中央宣传部 · 人民共产中央组织部</p>
             <p>© 2026 人民共产 版权所有</p>
         </div>
-    </footer>    <script>
+    </footer>
+
+    <script>
         // ================================================================
-        //  全局配置：三个模块的表映射
+        //  全局配置
         // ================================================================
         const SUPABASE_URL = 'https://fommjeqnlkhxyrzzhhlz.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_RschSsu3ctATjS7bD5AkSQ_qP-mZ7cE';
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        const STORAGE_BUCKET = 'media'; // ⚠️ 需要在 Supabase 中创建 public bucket
 
         const SITE_CONFIG = {
             main: {
@@ -1743,17 +1718,15 @@
         let currentAdminSite = 'main';
 
         // ================================================================
-        //  工具函数
+        //  工具
         // ================================================================
         function $(id) { return document.getElementById(id); }
-
         function escapeHtml(text) {
             if (text === null || text === undefined) return '';
             const div = document.createElement('div');
             div.textContent = String(text);
             return div.innerHTML;
         }
-
         function showToast(msg, duration = 2500) {
             const toast = $('toast');
             if (!toast) return;
@@ -1762,157 +1735,84 @@
             clearTimeout(toast._timer);
             toast._timer = setTimeout(() => toast.classList.remove('show'), duration);
         }
-
-        function siteConf(site) {
-            return SITE_CONFIG[site] || SITE_CONFIG.main;
-        }
+        function siteConf(site) { return SITE_CONFIG[site] || SITE_CONFIG.main; }
 
         // ================================================================
-        //  媒体压缩工具
+        //  媒体压缩与上传（Supabase Storage）
         // ================================================================
-
-        // 图片压缩：等比缩放到 maxWidth 内，输出 JPEG
-        function compressImage(file, maxWidth = 1280, quality = 0.75) {
+        function compressImageToBlob(file, maxWidth = 1280, quality = 0.75) {
             return new Promise((resolve, reject) => {
-                if (!file.type.startsWith('image/')) { reject(new Error('非图片文件')); return; }
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const img = new Image();
-                    img.onload = () => {
-                        let { width, height } = img;
-                        if (width > maxWidth) {
-                            height = Math.round(height * maxWidth / width);
-                            width = maxWidth;
-                        }
-                        const canvas = document.createElement('canvas');
-                        canvas.width = width;
-                        canvas.height = height;
-                        const ctx = canvas.getContext('2d');
-                        // 白色背景，防止透明 PNG 转 JPEG 变黑
-                        ctx.fillStyle = '#ffffff';
-                        ctx.fillRect(0, 0, width, height);
-                        ctx.drawImage(img, 0, 0, width, height);
-                        try {
-                            const dataUrl = canvas.toDataURL('image/jpeg', quality);
-                            resolve(dataUrl);
-                        } catch (err) { reject(err); }
-                    };
-                    img.onerror = reject;
-                    img.src = e.target.result;
-                };
-                reader.onerror = reject;
-                reader.readAsDataURL(file);
-            });
-        }
-
-        // 缩略图：小尺寸，用于列表页
-        function compressThumbnail(file, maxWidth = 320, quality = 0.7) {
-            return compressImage(file, maxWidth, quality);
-        }
-
-        // 视频压缩：canvas + MediaRecorder 重新编码
-        function compressVideo(file, maxWidth = 640, maxHeight = 360, bitrate = 800000) {
-            return new Promise((resolve) => {
-                if (!window.MediaRecorder || !HTMLCanvasElement.prototype.captureStream) {
-                    console.warn('浏览器不支持视频压缩，使用原视频');
-                    return resolve({ dataUrl: null, file, compressed: false });
-                }
-                const video = document.createElement('video');
-                video.muted = true;
-                video.playsInline = true;
-                video.crossOrigin = 'anonymous';
+                if (!file.type.startsWith('image/')) { reject(new Error('非图片')); return; }
+                const img = new Image();
                 const url = URL.createObjectURL(file);
-                video.src = url;
-
-                let finished = false;
-                const finish = (result) => {
-                    if (finished) return;
-                    finished = true;
-                    try { URL.revokeObjectURL(url); } catch (e) {}
-                    resolve(result);
-                };
-
-                video.onloadedmetadata = () => {
-                    let w = video.videoWidth, h = video.videoHeight;
-                    if (!w || !h) { finish({ dataUrl: null, file, compressed: false }); return; }
-                    if (w > maxWidth) { h = Math.round(h * maxWidth / w); w = maxWidth; }
-                    if (h > maxHeight) { w = Math.round(w * maxHeight / h); h = maxHeight; }
-
+                img.onload = () => {
+                    let { width, height } = img;
+                    if (width > maxWidth) { height = Math.round(height * maxWidth / width); width = maxWidth; }
                     const canvas = document.createElement('canvas');
-                    canvas.width = w;
-                    canvas.height = h;
+                    canvas.width = width; canvas.height = height;
                     const ctx = canvas.getContext('2d');
-                    const stream = canvas.captureStream(25);
-
-                    // 尝试录制音频（部分浏览器会失败，忽略即可）
-                    try {
-                        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                        const source = audioCtx.createMediaElementSource(video);
-                        const dest = audioCtx.createMediaStreamDestination();
-                        source.connect(dest);
-                        dest.stream.getAudioTracks().forEach(t => stream.addTrack(t));
-                    } catch (e) { /* 无音频轨道 */ }
-
-                    let mimeType = 'video/webm;codecs=vp8';
-                    if (!MediaRecorder.isTypeSupported(mimeType)) {
-                        mimeType = 'video/webm';
-                        if (!MediaRecorder.isTypeSupported(mimeType)) {
-                            finish({ dataUrl: null, file, compressed: false });
-                            return;
-                        }
-                    }
-
-                    const recorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: bitrate });
-                    const chunks = [];
-                    recorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
-                    recorder.onstop = () => {
-                        const blob = new Blob(chunks, { type: mimeType });
-                        if (blob.size === 0) { finish({ dataUrl: null, file, compressed: false }); return; }
-                        const reader = new FileReader();
-                        reader.onload = () => finish({ dataUrl: reader.result, file: blob, compressed: true });
-                        reader.onerror = () => finish({ dataUrl: null, file, compressed: false });
-                        reader.readAsDataURL(blob);
-                    };
-
-                    recorder.start(200);
-                    video.play().catch(() => {});
-
-                    function drawFrame() {
-                        if (video.paused || video.ended) return;
-                        try { ctx.drawImage(video, 0, 0, w, h); } catch (e) {}
-                        requestAnimationFrame(drawFrame);
-                    }
-                    drawFrame();
-
-                    video.onended = () => {
-                        if (recorder.state !== 'inactive') recorder.stop();
-                    };
-                    // 安全超时：最多录制 60 秒
-                    setTimeout(() => {
-                        if (recorder.state !== 'inactive') recorder.stop();
-                    }, 60000);
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(0, 0, width, height);
+                    ctx.drawImage(img, 0, 0, width, height);
+                    canvas.toBlob(blob => {
+                        URL.revokeObjectURL(url);
+                        blob ? resolve(blob) : reject(new Error('压缩失败'));
+                    }, 'image/jpeg', quality);
                 };
-                video.onerror = () => finish({ dataUrl: null, file, compressed: false });
+                img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('图片加载失败')); };
+                img.src = url;
             });
         }
 
-        // 批量处理图片：返回 { images, thumbs }
-        async function processImages(fileList, onProgress) {
-            const images = [];
+        async function uploadToStorage(file, folder = 'images') {
+            const ext = (file.name && file.name.split('.').pop()) || 'jpg';
+            const path = `${folder}/${Date.now()}_${Math.random().toString(36).slice(2, 8)}.${ext}`;
+            const { data, error } = await supabaseClient.storage
+                .from(STORAGE_BUCKET)
+                .upload(path, file, { cacheControl: '31536000', upsert: false, contentType: file.type });
+            if (error) throw error;
+            const { data: pub } = supabaseClient.storage.from(STORAGE_BUCKET).getPublicUrl(path);
+            return pub.publicUrl;
+        }
+
+        // 批量上传图片：返回 { urls, thumbs }
+        async function processAndUploadImages(fileList, onProgress) {
+            const urls = [];
             const thumbs = [];
             const files = Array.from(fileList);
             for (let i = 0; i < files.length; i++) {
                 try {
                     if (onProgress) onProgress(i + 1, files.length);
-                    const big = await compressImage(files[i], 1280, 0.75);
-                    const small = await compressThumbnail(files[i], 320, 0.7);
-                    images.push(big);
-                    thumbs.push(small);
+                    const bigBlob = await compressImageToBlob(files[i], 1280, 0.75);
+                    const smallBlob = await compressImageToBlob(files[i], 320, 0.7);
+                    const baseName = files[i].name.replace(/\.\w+$/, '');
+                    const bigFile = new File([bigBlob], baseName + '.jpg', { type: 'image/jpeg' });
+                    const smallFile = new File([smallBlob], 'thumb_' + baseName + '.jpg', { type: 'image/jpeg' });
+                    const [bigUrl, smallUrl] = await Promise.all([
+                        uploadToStorage(bigFile, 'images'),
+                        uploadToStorage(smallFile, 'thumbs')
+                    ]);
+                    urls.push(bigUrl);
+                    thumbs.push(smallUrl);
                 } catch (e) {
                     console.error('图片处理失败:', e);
+                    showToast('图片上传失败：' + (e.message || '未知错误'));
                 }
             }
-            return { images, thumbs };
+            return { urls, thumbs };
+        }
+
+        // 视频直接上传原文件（不做 canvas 重编码）
+        async function processAndUploadVideo(file, onProgress) {
+            if (!file) return '';
+            if (onProgress) onProgress('上传视频中...');
+            try {
+                return await uploadToStorage(file, 'videos');
+            } catch (e) {
+                console.error('视频上传失败:', e);
+                showToast('视频上传失败：' + (e.message || '未知错误'));
+                return '';
+            }
         }
 
         // ================================================================
@@ -1921,9 +1821,21 @@
         async function getUsers(site) {
             const table = siteConf(site).usersTable;
             try {
+                const { data, error } = await supabaseClient.from(table).select('*').order('username');
+                if (error) { console.error(error); return []; }
+                return data || [];
+            } catch (e) { console.error(e); return []; }
+        }
+
+        // 用户管理列表专用：只取必要字段
+        async function getUsersBrief(site) {
+            const table = siteConf(site).usersTable;
+            try {
                 const { data, error } = await supabaseClient
-                    .from(table).select('*').order('username');
-                if (error) { console.error('获取用户列表失败:', error); return []; }
+                    .from(table)
+                    .select('username,role,muted,muted_until,mute_reason,mute_by,mute_time')
+                    .order('username');
+                if (error) { console.error(error); return []; }
                 return data || [];
             } catch (e) { console.error(e); return []; }
         }
@@ -1945,12 +1857,11 @@
                 if (existing) {
                     const { error } = await supabaseClient
                         .from(table).update(userData).eq('username', userData.username);
-                    if (error) { console.error('更新用户失败:', error); return false; }
+                    if (error) { console.error(error); return false; }
                     return true;
                 } else {
-                    const { error } = await supabaseClient
-                        .from(table).insert([userData]);
-                    if (error) { console.error('新增用户失败:', error); return false; }
+                    const { error } = await supabaseClient.from(table).insert([userData]);
+                    if (error) { console.error(error); return false; }
                     return true;
                 }
             } catch (e) { console.error(e); return false; }
@@ -1959,9 +1870,8 @@
         async function deleteUser(site, username) {
             const table = siteConf(site).usersTable;
             try {
-                const { error } = await supabaseClient
-                    .from(table).delete().eq('username', username);
-                if (error) { console.error('删除用户失败:', error); return false; }
+                const { error } = await supabaseClient.from(table).delete().eq('username', username);
+                if (error) { console.error(error); return false; }
                 return true;
             } catch (e) { console.error(e); return false; }
         }
@@ -1971,10 +1881,7 @@
             try {
                 const { data: existing, error: checkError } = await supabaseClient
                     .from(table).select('*').eq('role', 'superadmin').limit(1);
-                if (checkError) {
-                    console.warn(`⚠️ 表 ${table} 访问失败：`, checkError.message);
-                    return;
-                }
+                if (checkError) { console.warn(`⚠️ ${table} 访问失败:`, checkError.message); return; }
                 if (!existing || existing.length === 0) {
                     const { error } = await supabaseClient.from(table).insert([{
                         username: '杨振浩',
@@ -1989,10 +1896,8 @@
                     }]);
                     if (error) console.error(`创建超管失败(${site}):`, error);
                     else console.log(`✅ ${siteConf(site).name} 超级管理员已创建`);
-                } else {
-                    console.log(`✅ ${siteConf(site).name} 超级管理员已存在`);
                 }
-            } catch (e) { console.error(`初始化用户表失败(${site}):`, e); }
+            } catch (e) { console.error(e); }
         }
 
         // ================================================================
@@ -2001,15 +1906,6 @@
         function getStoredUser(site) { return sessionStorage.getItem('currentUser_' + site); }
         function setStoredUser(site, username) { sessionStorage.setItem('currentUser_' + site, username); }
         function clearStoredUser(site) { sessionStorage.removeItem('currentUser_' + site); }
-
-        async function isLoggedIn(site) {
-            site = site || currentSite;
-            const stored = getStoredUser(site);
-            if (!stored) return false;
-            const user = await findUser(site, stored);
-            if (!user) { clearStoredUser(site); return false; }
-            return true;
-        }
 
         async function isAdmin(site) {
             site = site || currentSite;
@@ -2062,18 +1958,11 @@
             const existing = await findUser(site, username);
             if (existing) return false;
             const newUser = {
-                username: username,
-                password: password,
-                role: 'user',
-                messages: [],
-                muted: false,
-                muted_until: 0,
-                mute_reason: '',
-                mute_by: '',
-                mute_time: ''
+                username, password, role: 'user',
+                messages: [], muted: false, muted_until: 0,
+                mute_reason: '', mute_by: '', mute_time: ''
             };
-            const ok = await saveUser(site, newUser);
-            if (ok) {
+            if (await saveUser(site, newUser)) {
                 setStoredUser(site, username);
                 if (site === currentSite) {
                     currentUser = username;
@@ -2120,13 +2009,8 @@
             return await saveUser(site, user);
         }
 
-        async function getUnreadCount(site, username) {
-            const msgs = await getMessagesForUser(site, username);
-            return msgs.filter(m => !m.read).length;
-        }
-
         // ================================================================
-        //  禁言相关
+        //  禁言
         // ================================================================
         function isUserMuted(user) {
             if (!user || !user.muted) return false;
@@ -2150,12 +2034,12 @@
         }
 
         async function getSuperAdmins(site) {
-            const users = await getUsers(site);
+            const users = await getUsersBrief(site);
             return users.filter(u => u.role === 'superadmin');
         }
 
         // ================================================================
-        //  登录墙（含注册）
+        //  登录墙
         // ================================================================
         function setLoginWallSite(site) {
             currentLoginSite = site;
@@ -2164,7 +2048,6 @@
             });
             const hint = $('wallSiteHint');
             if (hint) hint.textContent = '当前登录：' + siteConf(site).name;
-            // 重置表单
             $('wallUser').value = '';
             $('wallPass').value = '';
             $('wallRegUser').value = '';
@@ -2175,7 +2058,6 @@
             setWallMode('login');
         }
 
-        // 切换登录墙的登录/注册表单
         function setWallMode(mode) {
             const loginForm = $('wallLoginForm');
             const regForm = $('wallRegisterForm');
@@ -2196,7 +2078,6 @@
             }
         }
 
-        // 登录墙：登录（优化：先关墙切页，再异步刷新）
         async function handleWallLogin(e) {
             e.preventDefault();
             const user = $('wallUser').value.trim();
@@ -2215,16 +2096,11 @@
                     renderMainNav();
                     renderSubNav();
                 }
-                // 1. 立即关闭登录墙
                 $('loginWall').classList.add('hidden');
                 document.documentElement.style.overflow = '';
                 document.body.style.overflow = '';
                 showToast('✅ 登录成功，欢迎回来！');
-
-                // 2. 立即切页
                 await doSwitchPage(siteConf(currentSite).defaultPage, null);
-
-                // 3. 后台异步刷新
                 refreshCurrentUser().then(updateUIForUser).catch(console.error);
                 loadNotice(currentSite).catch(console.error);
             } else {
@@ -2234,7 +2110,6 @@
             }
         }
 
-        // 登录墙：注册
         async function handleWallRegister(e) {
             e.preventDefault();
             const user = $('wallRegUser').value.trim();
@@ -2242,23 +2117,9 @@
             const confirm = $('wallRegPassConfirm').value.trim();
             const errEl = $('wallRegError');
             errEl.style.display = 'none';
-
-            if (!user || !pass) {
-                errEl.textContent = '请输入用户名和密码';
-                errEl.style.display = 'block';
-                return;
-            }
-            if (pass.length < 6) {
-                errEl.textContent = '密码至少6位';
-                errEl.style.display = 'block';
-                return;
-            }
-            if (pass !== confirm) {
-                errEl.textContent = '两次密码不一致';
-                errEl.style.display = 'block';
-                return;
-            }
-
+            if (!user || !pass) { errEl.textContent = '请输入用户名和密码'; errEl.style.display = 'block'; return; }
+            if (pass.length < 6) { errEl.textContent = '密码至少6位'; errEl.style.display = 'block'; return; }
+            if (pass !== confirm) { errEl.textContent = '两次密码不一致'; errEl.style.display = 'block'; return; }
             const ok = await registerUser(currentLoginSite, user, pass);
             if (ok) {
                 if (currentLoginSite !== currentSite) {
@@ -2270,7 +2131,6 @@
                 document.documentElement.style.overflow = '';
                 document.body.style.overflow = '';
                 showToast('✅ 注册成功，已自动登录！');
-
                 await doSwitchPage(siteConf(currentSite).defaultPage, null);
                 refreshCurrentUser().then(updateUIForUser).catch(console.error);
                 loadNotice(currentSite).catch(console.error);
@@ -2281,7 +2141,7 @@
         }
 
         // ================================================================
-        //  导航渲染
+        //  导航
         // ================================================================
         function renderMainNav() {
             document.querySelectorAll('.nav-main .site-btn').forEach(btn => {
@@ -2307,7 +2167,7 @@
         }
 
         // ================================================================
-        //  更新用户区 UI（优化：复用 user.messages，避免二次请求）
+        //  更新用户区 UI
         // ================================================================
         async function updateUIForUser() {
             const display = $('currentUserDisplay');
@@ -2350,7 +2210,7 @@
         }
 
         // ================================================================
-        //  模块切换
+        //  站点切换
         // ================================================================
         async function switchSite(site) {
             if (site === currentSite) return;
@@ -2382,7 +2242,7 @@
         }
 
         // ================================================================
-        //  页面切换（优化：渲染任务并行，不阻塞页面显示）
+        //  页面切换
         // ================================================================
         const ALL_PAGES = [
             'main-home', 'main-info', 'main-submit', 'main-my', 'main-detail',
@@ -2434,8 +2294,6 @@
                 renderTasks.push(renderDetail(currentSite, extra));
                 renderTasks.push(renderComments(currentSite, extra));
             }
-
-            // 不 await，让页面框架立即显示，数据异步填充
             renderTasks.forEach(p => {
                 if (p && typeof p.catch === 'function') p.catch(console.error);
             });
@@ -2504,7 +2362,7 @@
         }
 
         // ================================================================
-        //  登录/注册模态框（模块内使用）
+        //  登录/注册模态框
         // ================================================================
         function openLoginModal() {
             const modal = $('loginModal');
@@ -2626,12 +2484,15 @@
             } else {
                 showToast('删除失败');
             }
-        }        // ================================================================
-        //  文章操作（带 30 秒缓存）
+        }
+
+        // ================================================================
+        //  文章操作（带缓存）
         // ================================================================
         const _postsCache = {};
 
-        async function getPosts(site, force) {
+        // 列表用：只取必要字段
+        async function getPostsForList(site, force) {
             const now = Date.now();
             if (!force && _postsCache[site] && now - _postsCache[site].t < 30000) {
                 return _postsCache[site].data;
@@ -2639,8 +2500,10 @@
             const table = siteConf(site).postsTable;
             try {
                 const { data, error } = await supabaseClient
-                    .from(table).select('*').order('created_at', { ascending: false });
-                if (error) { console.error('获取文章失败:', error); return []; }
+                    .from(table)
+                    .select('id,title,date,author,authorTag,status,category,created_at,likes,views,images_thumb,reject_reason,content')
+                    .order('created_at', { ascending: false });
+                if (error) { console.error(error); return []; }
                 _postsCache[site] = { data: data || [], t: now };
                 return data || [];
             } catch (e) { console.error(e); return []; }
@@ -2651,18 +2514,16 @@
             try {
                 const { data, error } = await supabaseClient
                     .from(table).select('*').eq('id', id).maybeSingle();
-                if (error) { console.error('获取文章失败:', error); return null; }
+                if (error) { console.error(error); return null; }
                 return data;
             } catch (e) { console.error(e); return null; }
         }
 
-        // 新增文章（支持 images / images_thumb / video）
         async function addPost(site, title, date, content, author, images, video, category, status, authorTag, imagesThumb) {
             const table = siteConf(site).postsTable;
             const newPost = {
                 id: Date.now(),
-                title,
-                date,
+                title, date,
                 content: content || '',
                 author: author || '匿名',
                 authorTag: authorTag || '',
@@ -2677,20 +2538,18 @@
                 liked_users: [],
                 views: 0
             };
-            try {
-                const { data, error } = await supabaseClient
-                    .from(table).insert([newPost]).select();
-                if (error) { showToast('❌ 发布失败：' + error.message); throw error; }
-                if (status === 'pending') {
-                    const superAdmins = await getSuperAdmins(site);
-                    for (const admin of superAdmins) {
-                        await addMessageToUser(site, admin.username,
-                            `新投稿《${title}》来自 ${author}，请审核。`, 'new_post');
-                    }
+            const { data, error } = await supabaseClient
+                .from(table).insert([newPost]).select();
+            if (error) { showToast('❌ 发布失败：' + error.message); throw error; }
+            if (status === 'pending') {
+                const superAdmins = await getSuperAdmins(site);
+                for (const admin of superAdmins) {
+                    await addMessageToUser(site, admin.username,
+                        `新投稿《${title}》来自 ${author}，请审核。`, 'new_post');
                 }
-                _postsCache[site] = null;   // 清缓存
-                return data ? data[0] : newPost;
-            } catch (e) { throw e; }
+            }
+            _postsCache[site] = null;
+            return data ? data[0] : newPost;
         }
 
         async function updatePostStatus(site, postId, status, rejectReason = '') {
@@ -2711,9 +2570,8 @@
                         `您的投稿《${post.title}》已通过审核，现已发布。`, 'approve');
                 }
             }
-            const { error } = await supabaseClient
-                .from(table).update(updates).eq('id', postId);
-            if (error) { console.error('更新状态失败:', error); return false; }
+            const { error } = await supabaseClient.from(table).update(updates).eq('id', postId);
+            if (error) { console.error(error); return false; }
             _postsCache[site] = null;
             return true;
         }
@@ -2724,14 +2582,14 @@
             try {
                 await supabaseClient.from(commentsTable).delete().eq('post_id', postId);
                 const { error } = await supabaseClient.from(postsTable).delete().eq('id', postId);
-                if (error) { console.error('删除文章失败:', error); return false; }
+                if (error) { console.error(error); return false; }
                 _postsCache[site] = null;
                 return true;
             } catch (e) { console.error(e); return false; }
         }
 
         // ================================================================
-        //  评论操作
+        //  评论
         // ================================================================
         async function getComments(site, postId) {
             const table = siteConf(site).commentsTable;
@@ -2740,7 +2598,7 @@
                     .from(table).select('*').eq('post_id', postId)
                     .order('pinned', { ascending: false })
                     .order('id', { ascending: false });
-                if (error) { console.error('获取评论失败:', error); return []; }
+                if (error) { console.error(error); return []; }
                 return data || [];
             } catch (e) { console.error(e); return []; }
         }
@@ -2748,17 +2606,12 @@
         async function addComment(site, postId, author, content) {
             const table = siteConf(site).commentsTable;
             const newComment = {
-                id: Date.now(),
-                post_id: postId,
-                author: author || '匿名',
-                content,
+                id: Date.now(), post_id: postId,
+                author: author || '匿名', content,
                 time: new Date().toLocaleString('zh-CN'),
-                pinned: false,
-                likes: 0,
-                liked_users: []
+                pinned: false, likes: 0, liked_users: []
             };
-            const { data, error } = await supabaseClient
-                .from(table).insert([newComment]).select();
+            const { data, error } = await supabaseClient.from(table).insert([newComment]).select();
             if (error) { showToast('❌ 评论失败：' + error.message); throw error; }
             return data ? data[0] : newComment;
         }
@@ -2766,8 +2619,7 @@
         async function deleteCommentById(site, commentId) {
             const table = siteConf(site).commentsTable;
             const { error } = await supabaseClient.from(table).delete().eq('id', commentId);
-            if (error) return false;
-            return true;
+            return !error;
         }
 
         async function togglePinComment(site, commentId) {
@@ -2777,8 +2629,7 @@
             if (fetchErr || !data) return false;
             const { error } = await supabaseClient
                 .from(table).update({ pinned: !data.pinned }).eq('id', commentId);
-            if (error) return false;
-            return true;
+            return !error;
         }
 
         async function toggleCommentLike(site, commentId, username) {
@@ -2797,12 +2648,11 @@
             }
             const { error } = await supabaseClient
                 .from(table).update({ likes, liked_users: likedUsers }).eq('id', commentId);
-            if (error) return false;
-            return true;
+            return !error;
         }
 
         // ================================================================
-        //  点赞文章
+        //  点赞
         // ================================================================
         async function toggleLike(site) {
             const stored = getStoredUser(site);
@@ -2833,35 +2683,24 @@
                 if (likeBtn) likeBtn.classList.toggle('liked', !liked);
                 showToast(liked ? '已取消点赞' : '❤️ 点赞成功！');
                 _postsCache[site] = null;
-                await renderPostList(site, site + 'HomePostList');
             } finally {
                 if (likeBtn) likeBtn.disabled = false;
             }
         }
 
-        async function incrementView(site, postId) {
-            const table = siteConf(site).postsTable;
-            const post = await getPostById(site, postId);
-            if (!post) return;
-            const views = Number(post.views || 0) + 1;
-            await supabaseClient.from(table).update({ views }).eq('id', postId);
-            _postsCache[site] = null;
-        }
-
         // ================================================================
-        //  渲染文章列表（列表页优先使用缩略图 images_thumb）
+        //  列表渲染
         // ================================================================
         async function renderPostList(site, containerId, categoryFilter) {
             const container = $(containerId);
             if (!container) return;
-            // 先显示加载提示
             if (!container.dataset.loaded) {
                 container.innerHTML = `<div class="card" style="text-align:center;color:#999;padding:40px;">
                     <i class="fas fa-spinner fa-spin" style="font-size:28px;display:block;margin-bottom:12px;color:#dce3ed;"></i>
                     加载中...
                 </div>`;
             }
-            let posts = await getPosts(site);
+            let posts = await getPostsForList(site);
             posts = posts.filter(p => p.status !== 'rejected');
             if (categoryFilter) posts = posts.filter(p => p.category === categoryFilter);
 
@@ -2874,13 +2713,9 @@
                 return;
             }
             container.innerHTML = posts.map(p => {
-                // 列表页优先用缩略图
                 let thumbSource = null;
-                if (Array.isArray(p.images_thumb) && p.images_thumb.length > 0) {
-                    thumbSource = p.images_thumb;
-                } else if (Array.isArray(p.images) && p.images.length > 0) {
-                    thumbSource = p.images;
-                }
+                if (Array.isArray(p.images_thumb) && p.images_thumb.length > 0) thumbSource = p.images_thumb;
+                else if (Array.isArray(p.images) && p.images.length > 0) thumbSource = p.images;
                 let thumbHtml = '';
                 if (thumbSource) {
                     thumbHtml = `<div class="thumb-container">${
@@ -2910,7 +2745,7 @@
         }
 
         // ================================================================
-        //  打开详情
+        //  详情
         // ================================================================
         async function openDetail(site, postId) {
             const post = await getPostById(site, postId);
@@ -2919,12 +2754,16 @@
             currentSite = site;
             currentPostId = postId;
             await doSwitchPage('detail', postId);
-            await incrementView(site, postId);
-            const updated = await getPostById(site, postId);
-            if (updated) {
-                const vc = $(site + 'ViewCount');
-                if (vc) vc.textContent = updated.views || 0;
-            }
+
+            // 异步自增阅读数（不阻塞）
+            const views = Number(post.views || 0) + 1;
+            supabaseClient.from(siteConf(site).postsTable)
+                .update({ views }).eq('id', postId)
+                .then(() => {
+                    const vc = $(site + 'ViewCount');
+                    if (vc) vc.textContent = views;
+                }).catch(() => {});
+            _postsCache[site] = null;
         }
 
         async function renderDetail(site, postId) {
@@ -2981,7 +2820,6 @@
             const authorDisplay = $(site + 'CommentAuthorDisplay');
             const submitBtn = $(site + 'CommentSubmitBtn');
             const loginPrompt = (site === 'main') ? $('mainLoginPrompt') : null;
-
             if (authorDisplay) authorDisplay.textContent = stored || '游客';
             if (submitBtn) submitBtn.style.display = stored ? 'inline-block' : 'none';
             if (loginPrompt) loginPrompt.style.display = stored ? 'none' : 'inline';
@@ -3041,9 +2879,7 @@
                 input.value = '';
                 await renderComments(site, currentPostId);
                 showToast('✅ 评论发表成功');
-            } catch (e) {
-                showToast('评论失败，请重试');
-            }
+            } catch (e) { showToast('评论失败，请重试'); }
         }
 
         async function toggleCommentLikeAction(site, commentId) {
@@ -3051,9 +2887,7 @@
             if (!stored) { showToast('请先登录'); openLoginModal(); return; }
             if (await toggleCommentLike(site, commentId, stored)) {
                 await renderComments(site, currentPostId);
-            } else {
-                showToast('操作失败');
-            }
+            } else showToast('操作失败');
         }
 
         async function togglePin(site, commentId) {
@@ -3074,7 +2908,7 @@
         }
 
         // ================================================================
-        //  投稿表单（带图片/视频上传压缩）
+        //  投稿表单
         // ================================================================
         async function renderSubmitForm(site) {
             const container = $(site + 'SubmitContent');
@@ -3103,13 +2937,13 @@
                         <textarea id="${site}SubmitContentText" placeholder="详细内容（选填）"></textarea>
                     </div>
                     <div class="form-group">
-                        <label>上传图片（可多选，自动压缩）</label>
+                        <label>上传图片（可多选）</label>
                         <input type="file" id="${site}SubmitImages" accept="image/*" multiple>
                         <div class="compress-progress" id="${site}SubmitImagesProgress"></div>
                         <div class="file-preview" id="${site}SubmitImagesPreview"></div>
                     </div>
                     <div class="form-group">
-                        <label>上传视频（自动压缩，建议小于 50MB）</label>
+                        <label>上传视频（建议小于 50MB）</label>
                         <input type="file" id="${site}SubmitVideo" accept="video/*">
                         <div class="compress-progress" id="${site}SubmitVideoProgress"></div>
                     </div>
@@ -3122,7 +2956,6 @@
                 submitPostForm(site);
             });
 
-            // 图片选择后预览
             const imgInput = $(site + 'SubmitImages');
             imgInput.addEventListener('change', async (e) => {
                 const preview = $(site + 'SubmitImagesPreview');
@@ -3130,18 +2963,18 @@
                 const prog = $(site + 'SubmitImagesProgress');
                 const files = Array.from(e.target.files);
                 if (!files.length) { prog.classList.remove('show'); return; }
-                prog.textContent = `正在压缩 ${files.length} 张图片...`;
+                prog.textContent = `已选择 ${files.length} 张图片，提交时自动上传`;
                 prog.classList.add('show');
-                const { thumbs } = await processImages(files, (i, total) => {
-                    prog.textContent = `正在压缩图片 ${i}/${total}...`;
-                });
-                prog.classList.remove('show');
-                thumbs.forEach(t => {
-                    const d = document.createElement('div');
-                    d.className = 'preview-item';
-                    d.innerHTML = `<img src="${t}" alt="预览">`;
-                    preview.appendChild(d);
-                });
+                for (const f of files) {
+                    try {
+                        const blob = await compressImageToBlob(f, 320, 0.7);
+                        const url = URL.createObjectURL(blob);
+                        const d = document.createElement('div');
+                        d.className = 'preview-item';
+                        d.innerHTML = `<img src="${url}" alt="预览">`;
+                        preview.appendChild(d);
+                    } catch (err) {}
+                }
             });
         }
 
@@ -3156,32 +2989,32 @@
             const content = $(site + 'SubmitContentText').value.trim();
             if (!title || !date) { showToast('请完整填写标题和日期'); return; }
 
-            // 压缩图片
+            const submitBtn = document.querySelector(`#${site}SubmitPostForm button[type="submit"]`);
+            if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = '提交中...'; }
+
             let images = [], imagesThumb = [];
             const imageInput = $(site + 'SubmitImages');
             if (imageInput && imageInput.files.length > 0) {
                 const prog = $(site + 'SubmitImagesProgress');
-                prog.textContent = '正在压缩图片...';
+                prog.textContent = '正在压缩并上传图片...';
                 prog.classList.add('show');
                 try {
-                    const r = await processImages(imageInput.files, (i, total) => {
-                        prog.textContent = `正在压缩图片 ${i}/${total}...`;
+                    const r = await processAndUploadImages(imageInput.files, (i, total) => {
+                        prog.textContent = `正在上传图片 ${i}/${total}...`;
                     });
-                    images = r.images;
+                    images = r.urls;
                     imagesThumb = r.thumbs;
                 } catch (e) { console.error(e); }
                 prog.classList.remove('show');
             }
 
-            // 压缩视频
             let videoData = '';
             const videoInput = $(site + 'SubmitVideo');
             if (videoInput && videoInput.files[0]) {
                 const prog = $(site + 'SubmitVideoProgress');
-                prog.textContent = '正在压缩视频，请稍候...';
+                prog.textContent = '正在上传视频...';
                 prog.classList.add('show');
-                const r = await compressVideo(videoInput.files[0]);
-                if (r.dataUrl) videoData = r.dataUrl;
+                videoData = await processAndUploadVideo(videoInput.files[0]);
                 prog.classList.remove('show');
             }
 
@@ -3190,7 +3023,6 @@
                 const status = adm ? 'approved' : 'pending';
                 await addPost(site, title, date, content, stored, images, videoData, 'info', status, authorTag, imagesThumb);
                 showToast(adm ? '✅ 信息发布成功（管理员直接发布）！' : '✅ 投稿已提交，请等待管理员审核。');
-                // 清空
                 $(site + 'SubmitTitle').value = '';
                 $(site + 'SubmitAuthorTag').value = '';
                 $(site + 'SubmitDate').value = '';
@@ -3201,18 +3033,20 @@
                 if (currentPage === 'my') await renderMyPage(site);
             } catch (e) {
                 showToast('投稿失败，请重试');
+            } finally {
+                if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> 提交投稿'; }
             }
         }
 
         // ================================================================
-        //  我的页面
+        //  我的
         // ================================================================
         async function renderMyPage(site) {
             const container = $(site + 'MyContent');
             if (!container) return;
             const stored = getStoredUser(site);
             if (!stored) { container.innerHTML = '<p style="color:#666;">请先登录。</p>'; return; }
-            const all = await getPosts(site);
+            const all = await getPostsForList(site);
             const mine = all.filter(p => p.author === stored);
             if (mine.length === 0) { container.innerHTML = '<div class="my-empty">您还没有发布任何信息。</div>'; return; }
             container.innerHTML = mine.map(p => {
@@ -3250,7 +3084,6 @@
             if (await deletePost(site, postId)) {
                 showToast('已删除');
                 await renderMyPage(site);
-                await renderPostList(site, site + 'HomePostList');
             } else showToast('删除失败');
         }
 
@@ -3261,7 +3094,7 @@
             const kwInput = $(site + 'InfoSearch');
             const container = $(site + 'InfoPostList');
             const kw = (kwInput.value || '').trim().toLowerCase();
-            let posts = await getPosts(site);
+            let posts = await getPostsForList(site);
             posts = posts.filter(p => p.status !== 'rejected');
             if (!kw) {
                 await renderPostList(site, site + 'InfoPostList');
@@ -3450,8 +3283,10 @@
                 await updateUIForUser();
                 await doSwitchPage('home', null);
             }, 1200);
-        }        // ================================================================
-        //  后台：站点切换
+        }
+
+        // ================================================================
+        //  后台
         // ================================================================
         async function switchAdminSite(site) {
             currentAdminSite = site;
@@ -3472,7 +3307,6 @@
             const conf = siteConf(site);
             const isSuper = await isSuperAdmin(site);
 
-            // 通知
             try {
                 const { data } = await supabaseClient
                     .from(conf.configTable).select('value').eq('key', 'notice').maybeSingle();
@@ -3480,10 +3314,12 @@
                 if (inp) inp.value = data ? (data.value || '') : '';
             } catch (e) {}
 
-            await renderReviewList(site);
-            await renderAdminPostList(site);
-            await renderAdminUserList(site);
-            await updateUserCount(site);
+            await Promise.all([
+                renderReviewList(site),
+                renderAdminPostList(site),
+                renderAdminUserList(site)
+            ]);
+            updateUserCount(site);
 
             const delCard = $(site + 'DeleteReviewCard');
             if (delCard) delCard.style.display = isSuper ? 'block' : 'none';
@@ -3495,9 +3331,11 @@
             if (accCard) accCard.style.display = isSuper ? 'block' : 'none';
 
             if (isSuper) {
-                await renderDeleteRequests(site);
-                await renderMuteReviews(site);
-                await renderUnmuteReviews(site);
+                await Promise.all([
+                    renderDeleteRequests(site),
+                    renderMuteReviews(site),
+                    renderUnmuteReviews(site)
+                ]);
             }
             if (site === 'xcb' || site === 'zzb') {
                 await renderAdminLeadershipList(site);
@@ -3507,14 +3345,11 @@
             }
         }
 
-        // ================================================================
-        //  审核投稿
-        // ================================================================
         async function renderReviewList(site) {
             const container = $(site + 'ReviewList');
             if (!container) return;
             if (!await isAdmin(site)) { container.innerHTML = '<div class="admin-empty">权限不足</div>'; return; }
-            const all = await getPosts(site);
+            const all = await getPostsForList(site);
             const pending = all.filter(p => p.status === 'pending');
             if (pending.length === 0) {
                 container.innerHTML = '<div class="admin-empty">暂无待审核投稿</div>';
@@ -3541,7 +3376,6 @@
                 showToast('✅ 已通过');
                 await renderReviewList(site);
                 await renderAdminPostList(site);
-                if (site === currentSite) await renderPostList(site, site + 'HomePostList');
             } else showToast('操作失败');
         }
 
@@ -3556,14 +3390,11 @@
             } else showToast('操作失败');
         }
 
-        // ================================================================
-        //  所有信息
-        // ================================================================
         async function renderAdminPostList(site) {
             const container = $(site + 'PostList');
             if (!container) return;
             if (!await isAdmin(site)) { container.innerHTML = '<div class="admin-empty">权限不足</div>'; return; }
-            const posts = await getPosts(site);
+            const posts = await getPostsForList(site);
             if (posts.length === 0) { container.innerHTML = '<div class="admin-empty">暂无信息</div>'; return; }
             container.innerHTML = posts.map(p => {
                 let t = '待审核', c = 'pending';
@@ -3591,12 +3422,11 @@
                 showToast('已删除');
                 await renderAdminPostList(site);
                 await renderReviewList(site);
-                if (site === currentSite) await renderPostList(site, site + 'HomePostList');
             } else showToast('删除失败');
         }
 
         // ================================================================
-        //  用户管理
+        //  用户管理（无 N+1）
         // ================================================================
         const userSearchKws = { main: '', xcb: '', zzb: '' };
 
@@ -3616,7 +3446,7 @@
         }
 
         async function updateUserCount(site) {
-            const users = await getUsers(site);
+            const users = await getUsersBrief(site);
             const kw = userSearchKws[site];
             const filtered = kw ? users.filter(u => u.username.toLowerCase().includes(kw)) : users;
             const el = document.querySelector(`.total-user-count[data-site="${site}"]`);
@@ -3626,22 +3456,27 @@
         async function renderAdminUserList(site) {
             const container = $(site + 'UserList');
             if (!container) return;
-            if (!await isAdmin(site)) { container.innerHTML = '<div class="admin-empty">权限不足</div>'; return; }
-            let users = await getUsers(site);
+            // 一次性获取当前登录人信息
+            const stored = getStoredUser(site);
+            const me = stored ? await findUser(site, stored) : null;
+            const isAdm = !!(me && (me.role === 'admin' || me.role === 'superadmin'));
+            const isSuper = !!(me && me.role === 'superadmin');
+            if (!isAdm) { container.innerHTML = '<div class="admin-empty">权限不足</div>'; return; }
+
+            let users = await getUsersBrief(site);
             const kw = userSearchKws[site];
             if (kw) users = users.filter(u => u.username.toLowerCase().includes(kw));
             if (users.length === 0) { container.innerHTML = '<div class="admin-empty">没有匹配的用户</div>'; return; }
 
-            const stored = getStoredUser(site);
-            const isSuper = await isSuperAdmin(site);
-            const isAdm = await isAdmin(site);
-
+            const now = Date.now();
             container.innerHTML = users.map(u => {
                 const isSelf = u.username === stored;
                 const isSup = u.role === 'superadmin';
                 const isTargetAdm = u.role === 'admin';
-                const muted = isUserMuted(u);
-                const muteDays = getMuteRemainingDays(u);
+                const muted = u.muted && (u.muted_until === -1 || Number(u.muted_until) > now);
+                const muteDays = muted
+                    ? (u.muted_until === -1 ? -1 : Math.ceil((u.muted_until - now) / 86400000))
+                    : 0;
 
                 let roleLabel = '用户', roleClass = 'user';
                 if (isSup) { roleLabel = '超级管理员'; roleClass = 'superadmin'; }
@@ -3769,7 +3604,7 @@
         }
 
         // ================================================================
-        //  各类审核
+        //  审核申请
         // ================================================================
         async function getPendingRequests(site, type) {
             const supers = await getSuperAdmins(site);
@@ -4130,10 +3965,10 @@
             let photo = '';
             if (file) {
                 try {
-                    photo = await compressImage(file, 600, 0.8);
-                } catch (err) {
-                    photo = await new Promise(res => { const r = new FileReader(); r.onload = ev => res(ev.target.result); r.readAsDataURL(file); });
-                }
+                    const blob = await compressImageToBlob(file, 600, 0.8);
+                    const f = new File([blob], 'leader_' + Date.now() + '.jpg', { type: 'image/jpeg' });
+                    photo = await uploadToStorage(f, 'leaders');
+                } catch (err) { console.error(err); }
             } else if (index !== '' && members[parseInt(index)] && members[parseInt(index)].photo) {
                 photo = members[parseInt(index)].photo;
             }
@@ -4410,10 +4245,9 @@
         }
 
         // ================================================================
-        //  后台统一事件绑定
+        //  后台事件
         // ================================================================
         function bindAdminEvents() {
-            // 通知表单
             document.querySelectorAll('.notice-form').forEach(form => {
                 form.addEventListener('submit', async (e) => {
                     e.preventDefault();
@@ -4424,7 +4258,6 @@
                 });
             });
 
-            // 发布信息（后台，带媒体压缩）
             document.querySelectorAll('.add-post-form').forEach(form => {
                 form.addEventListener('submit', async (e) => {
                     e.preventDefault();
@@ -4439,24 +4272,21 @@
                     errEl.style.display = 'none';
                     if (!title || !date) { errEl.textContent = '请填写标题和日期'; errEl.style.display = 'block'; return; }
 
-                    // 压缩图片
                     let images = [], imagesThumb = [];
                     const imgInput = form.querySelector('.post-images');
                     if (imgInput && imgInput.files.length > 0) {
-                        showToast('正在压缩图片...');
+                        showToast('正在上传图片...');
                         try {
-                            const r = await processImages(imgInput.files);
-                            images = r.images;
+                            const r = await processAndUploadImages(imgInput.files);
+                            images = r.urls;
                             imagesThumb = r.thumbs;
                         } catch (err) { console.error(err); }
                     }
-                    // 压缩视频
                     let videoData = '';
                     const vidInput = form.querySelector('.post-video');
                     if (vidInput && vidInput.files[0]) {
-                        showToast('正在压缩视频...');
-                        const r = await compressVideo(vidInput.files[0]);
-                        if (r.dataUrl) videoData = r.dataUrl;
+                        showToast('正在上传视频...');
+                        videoData = await processAndUploadVideo(vidInput.files[0]);
                     }
 
                     try {
@@ -4469,7 +4299,6 @@
                         if (vidInput) vidInput.value = '';
                         await renderAdminPostList(site);
                         await renderReviewList(site);
-                        if (site === currentSite) await renderPostList(site, site + 'HomePostList');
                     } catch (err) {
                         errEl.textContent = '发布失败：' + err.message;
                         errEl.style.display = 'block';
@@ -4477,7 +4306,6 @@
                 });
             });
 
-            // 账号分发
             document.querySelectorAll('.add-account-form').forEach(form => {
                 form.addEventListener('submit', async (e) => {
                     e.preventDefault();
@@ -4541,7 +4369,7 @@
         }
 
         // ================================================================
-        //  初始化（优化：非阻塞 + 快速首屏）
+        //  初始化
         // ================================================================
         document.addEventListener('DOMContentLoaded', async () => {
             const intro = $('introMask');
@@ -4550,22 +4378,18 @@
             document.body.style.overflow = 'hidden';
             if (wall) wall.classList.add('hidden');
 
-            // 1. 初始化用户表：非阻塞 + 缓存
+            // 初始化用户表（非阻塞，缓存标记）
             if (!localStorage.getItem('pc_inited_v1')) {
                 Promise.allSettled([
                     initUsersTable('main'),
                     initUsersTable('xcb'),
                     initUsersTable('zzb')
-                ]).then(() => {
-                    localStorage.setItem('pc_inited_v1', '1');
-                }).catch(() => {});
+                ]).then(() => localStorage.setItem('pc_inited_v1', '1')).catch(() => {});
             }
 
-            // 2. 立即渲染导航（不依赖网络）
             renderMainNav();
             renderSubNav();
 
-            // 3. 开场动画 500ms 后立即淡出
             const startApp = async () => {
                 if (intro) {
                     intro.classList.add('fade-out');
@@ -4602,10 +4426,9 @@
                 }
             };
 
-            // 立即执行
             startApp();
 
-            // 4. 事件绑定
+            // 事件绑定
             document.querySelectorAll('#wallSiteSelector button').forEach(btn => {
                 btn.addEventListener('click', () => setLoginWallSite(btn.dataset.site));
             });
@@ -4645,15 +4468,10 @@
                     const f = e.target.files[0];
                     if (!f) return;
                     try {
-                        const small = await compressImage(f, 600, 0.8);
-                        $('editLeadershipPhotoPreview').innerHTML = `<img src="${small}" style="max-width:150px;border-radius:8px;">`;
-                    } catch (err) {
-                        const r = new FileReader();
-                        r.onload = ev => {
-                            $('editLeadershipPhotoPreview').innerHTML = `<img src="${ev.target.result}" style="max-width:150px;border-radius:8px;">`;
-                        };
-                        r.readAsDataURL(f);
-                    }
+                        const blob = await compressImageToBlob(f, 300, 0.8);
+                        const url = URL.createObjectURL(blob);
+                        $('editLeadershipPhotoPreview').innerHTML = `<img src="${url}" style="max-width:150px;border-radius:8px;">`;
+                    } catch (err) {}
                 });
             }
 
@@ -4719,11 +4537,12 @@
         window.closeBranchMemberModal = closeBranchMemberModal;
         window.saveBranchMember = saveBranchMember;
         window.deleteBranchMember = deleteBranchMember;
+        window.closeMuteReviewModal = function() {};
+        window.closeUnmuteReviewModal = function() {};
 
-        console.log('✅ 人民共产已启动');
-        console.log('📌 三个模块的超级管理员：杨振浩 / Yzh061110');
-        console.log('📌 请确保三套表都在 Supabase 中创建，并关闭 RLS');
-        console.log('📌 posts 表建议新增字段：images_thumb (jsonb) 用于列表缩略图加速');
+        console.log('✅ 人民共产已启动（优化版）');
+        console.log('📌 三个模块超管：杨振浩 / Yzh061110');
+        console.log('📌 需要在 Supabase 创建 public bucket：media');
     </script>
 </body>
 </html>
