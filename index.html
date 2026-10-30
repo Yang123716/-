@@ -124,6 +124,9 @@
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(179, 0, 0, 0.35);
         }
+        #loginWall .wall-btn:disabled {
+            opacity: 0.6; cursor: not-allowed; transform: none;
+        }
         #loginWall .wall-error {
             color: #cc0000; font-size: 14px; text-align: center;
             margin-top: 10px; display: none;
@@ -896,6 +899,7 @@
                 <button type="button" data-site="zzb">中央组织部</button>
             </div>
             <div class="site-hint" id="wallSiteHint">当前登录：人民共产网</div>
+            <div id="networkHint" style="text-align:center;font-size:12px;color:#ff9800;margin-bottom:8px;display:none;"></div>
 
             <form id="wallLoginForm">
                 <label for="wallUser">用户名</label>
@@ -903,7 +907,7 @@
                 <label for="wallPass">密码</label>
                 <input type="password" id="wallPass" placeholder="请输入密码" required autocomplete="current-password">
                 <button type="submit" class="wall-btn">登 录</button>
-                <div class="wall-error" id="wallError">用户名或密码错误！</div>
+                <div class="wall-error" id="wallError"></div>
             </form>
 
             <form id="wallRegisterForm" style="display:none;">
@@ -914,7 +918,7 @@
                 <label for="wallRegPassConfirm">确认密码</label>
                 <input type="password" id="wallRegPassConfirm" placeholder="再次输入密码" required autocomplete="new-password">
                 <button type="submit" class="wall-btn">注 册</button>
-                <div class="wall-error" id="wallRegError">注册失败，请检查信息</div>
+                <div class="wall-error" id="wallRegError"></div>
             </form>
 
             <div class="wall-switch">
@@ -1651,9 +1655,19 @@
         // ================================================================
         const SUPABASE_URL = 'https://fommjeqnlkhxyrzzhhlz.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_RschSsu3ctATjS7bD5AkSQ_qP-mZ7cE';
-        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        const STORAGE_BUCKET = 'media'; // ⚠️ 需要在 Supabase 中创建 public bucket
+        // 延迟初始化：等 SDK 加载完成
+        let supabaseClient = null;
+        function getSupabaseClient() {
+            if (supabaseClient) return supabaseClient;
+            if (window.supabase && window.supabase.createClient) {
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                return supabaseClient;
+            }
+            return null;
+        }
+
+        const STORAGE_BUCKET = 'media';
 
         const SITE_CONFIG = {
             main: {
@@ -1738,7 +1752,50 @@
         function siteConf(site) { return SITE_CONFIG[site] || SITE_CONFIG.main; }
 
         // ================================================================
-        //  媒体压缩与上传（Supabase Storage）
+        //  超时 + 重试的 Supabase 查询封装
+        // ================================================================
+        function withTimeout(promise, ms = 15000, label = '请求') {
+            return Promise.race([
+                promise,
+                new Promise((_, reject) =>
+                    setTimeout(() => reject(new Error(`${label}超时（${ms/1000}秒），请检查网络后重试`)), ms)
+                )
+            ]);
+        }
+
+        async function supabaseQuery(builderFn, { timeout = 15000, retries = 1, label = '请求' } = {}) {
+            let lastErr;
+            for (let i = 0; i <= retries; i++) {
+                try {
+                    const client = getSupabaseClient();
+                    if (!client) throw new Error('网络库未就绪，请刷新页面');
+                    const builder = builderFn(client);
+                    const result = await withTimeout(builder, timeout, label);
+                    if (result && result.error) {
+                        lastErr = new Error(result.error.message || '数据库请求失败');
+                        // 网络类错误才重试
+                        const isNetErr = /fetch|network|timeout|超时/i.test(lastErr.message);
+                        if (!isNetErr || i >= retries) throw lastErr;
+                        await new Promise(r => setTimeout(r, 800));
+                        continue;
+                    }
+                    return result;
+                } catch (e) {
+                    lastErr = e;
+                    const isNetErr = /超时|fetch|network|Failed|timeout/i.test(e.message || '');
+                    if (isNetErr && i < retries) {
+                        console.warn(`${label} 异常，重试中...`, e.message);
+                        await new Promise(r => setTimeout(r, 800));
+                        continue;
+                    }
+                    throw e;
+                }
+            }
+            throw lastErr;
+        }
+
+        // ================================================================
+        //  媒体压缩与上传
         // ================================================================
         function compressImageToBlob(file, maxWidth = 1280, quality = 0.75) {
             return new Promise((resolve, reject) => {
@@ -1765,17 +1822,20 @@
         }
 
         async function uploadToStorage(file, folder = 'images') {
+            const client = getSupabaseClient();
+            if (!client) throw new Error('网络库未就绪');
             const ext = (file.name && file.name.split('.').pop()) || 'jpg';
             const path = `${folder}/${Date.now()}_${Math.random().toString(36).slice(2, 8)}.${ext}`;
-            const { data, error } = await supabaseClient.storage
-                .from(STORAGE_BUCKET)
-                .upload(path, file, { cacheControl: '31536000', upsert: false, contentType: file.type });
+            const { data, error } = await withTimeout(
+                client.storage.from(STORAGE_BUCKET)
+                    .upload(path, file, { cacheControl: '31536000', upsert: false, contentType: file.type }),
+                30000, '上传文件'
+            );
             if (error) throw error;
-            const { data: pub } = supabaseClient.storage.from(STORAGE_BUCKET).getPublicUrl(path);
+            const { data: pub } = client.storage.from(STORAGE_BUCKET).getPublicUrl(path);
             return pub.publicUrl;
         }
 
-        // 批量上传图片：返回 { urls, thumbs }
         async function processAndUploadImages(fileList, onProgress) {
             const urls = [];
             const thumbs = [];
@@ -1802,7 +1862,6 @@
             return { urls, thumbs };
         }
 
-        // 视频直接上传原文件（不做 canvas 重编码）
         async function processAndUploadVideo(file, onProgress) {
             if (!file) return '';
             if (onProgress) onProgress('上传视频中...');
@@ -1816,25 +1875,29 @@
         }
 
         // ================================================================
-        //  用户管理
+        //  用户管理（所有请求走 supabaseQuery）
         // ================================================================
         async function getUsers(site) {
             const table = siteConf(site).usersTable;
             try {
-                const { data, error } = await supabaseClient.from(table).select('*').order('username');
+                const { data, error } = await supabaseQuery(
+                    client => client.from(table).select('*').order('username'),
+                    { timeout: 15000, retries: 1, label: '获取用户列表' }
+                );
                 if (error) { console.error(error); return []; }
                 return data || [];
             } catch (e) { console.error(e); return []; }
         }
 
-        // 用户管理列表专用：只取必要字段
         async function getUsersBrief(site) {
             const table = siteConf(site).usersTable;
             try {
-                const { data, error } = await supabaseClient
-                    .from(table)
-                    .select('username,role,muted,muted_until,mute_reason,mute_by,mute_time')
-                    .order('username');
+                const { data, error } = await supabaseQuery(
+                    client => client.from(table)
+                        .select('username,role,muted,muted_until,mute_reason,mute_by,mute_time')
+                        .order('username'),
+                    { timeout: 15000, retries: 1, label: '获取用户列表' }
+                );
                 if (error) { console.error(error); return []; }
                 return data || [];
             } catch (e) { console.error(e); return []; }
@@ -1843,11 +1906,19 @@
         async function findUser(site, username) {
             const table = siteConf(site).usersTable;
             try {
-                const { data, error } = await supabaseClient
-                    .from(table).select('*').eq('username', username).maybeSingle();
-                if (error) { console.error('查找用户失败:', error); return null; }
+                const { data, error } = await supabaseQuery(
+                    client => client.from(table).select('*').eq('username', username).maybeSingle(),
+                    { timeout: 15000, retries: 1, label: '查找用户' }
+                );
+                if (error) {
+                    console.error('查找用户失败:', error);
+                    throw new Error(error.message || '数据库请求失败');
+                }
                 return data;
-            } catch (e) { console.error(e); return null; }
+            } catch (e) {
+                console.error('findUser 异常:', e);
+                throw e;  // 抛给调用者显示
+            }
         }
 
         async function saveUser(site, userData) {
@@ -1855,12 +1926,17 @@
             try {
                 const existing = await findUser(site, userData.username);
                 if (existing) {
-                    const { error } = await supabaseClient
-                        .from(table).update(userData).eq('username', userData.username);
+                    const { error } = await supabaseQuery(
+                        client => client.from(table).update(userData).eq('username', userData.username),
+                        { timeout: 15000, retries: 1, label: '保存用户' }
+                    );
                     if (error) { console.error(error); return false; }
                     return true;
                 } else {
-                    const { error } = await supabaseClient.from(table).insert([userData]);
+                    const { error } = await supabaseQuery(
+                        client => client.from(table).insert([userData]),
+                        { timeout: 15000, retries: 0, label: '创建用户' }
+                    );
                     if (error) { console.error(error); return false; }
                     return true;
                 }
@@ -1870,7 +1946,10 @@
         async function deleteUser(site, username) {
             const table = siteConf(site).usersTable;
             try {
-                const { error } = await supabaseClient.from(table).delete().eq('username', username);
+                const { error } = await supabaseQuery(
+                    client => client.from(table).delete().eq('username', username),
+                    { timeout: 15000, retries: 1, label: '删除用户' }
+                );
                 if (error) { console.error(error); return false; }
                 return true;
             } catch (e) { console.error(e); return false; }
@@ -1879,11 +1958,15 @@
         async function initUsersTable(site) {
             const table = siteConf(site).usersTable;
             try {
-                const { data: existing, error: checkError } = await supabaseClient
-                    .from(table).select('*').eq('role', 'superadmin').limit(1);
+                const client = getSupabaseClient();
+                if (!client) return;
+                const { data: existing, error: checkError } = await withTimeout(
+                    client.from(table).select('*').eq('role', 'superadmin').limit(1),
+                    15000, '初始化用户表'
+                );
                 if (checkError) { console.warn(`⚠️ ${table} 访问失败:`, checkError.message); return; }
                 if (!existing || existing.length === 0) {
-                    const { error } = await supabaseClient.from(table).insert([{
+                    const { error } = await client.from(table).insert([{
                         username: '杨振浩',
                         password: 'Yzh061110',
                         role: 'superadmin',
@@ -1911,29 +1994,40 @@
             site = site || currentSite;
             const stored = getStoredUser(site);
             if (!stored) return false;
-            const user = await findUser(site, stored);
-            return !!(user && (user.role === 'admin' || user.role === 'superadmin'));
+            try {
+                const user = await findUser(site, stored);
+                return !!(user && (user.role === 'admin' || user.role === 'superadmin'));
+            } catch (e) { return false; }
         }
 
         async function isSuperAdmin(site) {
             site = site || currentSite;
             const stored = getStoredUser(site);
             if (!stored) return false;
-            const user = await findUser(site, stored);
-            return !!(user && user.role === 'superadmin');
+            try {
+                const user = await findUser(site, stored);
+                return !!(user && user.role === 'superadmin');
+            } catch (e) { return false; }
         }
 
         async function refreshCurrentUser() {
             const stored = getStoredUser(currentSite);
             if (stored) {
-                const user = await findUser(currentSite, stored);
-                if (user) {
-                    currentUser = user.username;
+                try {
+                    const user = await findUser(currentSite, stored);
+                    if (user) {
+                        currentUser = user.username;
+                        currentUserSite = currentSite;
+                    } else {
+                        clearStoredUser(currentSite);
+                        currentUser = null;
+                        currentUserSite = null;
+                    }
+                } catch (e) {
+                    // 网络错误时保留登录状态
+                    console.warn('刷新用户信息失败（保留登录状态）:', e.message);
+                    currentUser = stored;
                     currentUserSite = currentSite;
-                } else {
-                    clearStoredUser(currentSite);
-                    currentUser = null;
-                    currentUserSite = null;
                 }
             } else {
                 currentUser = null;
@@ -1977,36 +2071,44 @@
         //  消息系统
         // ================================================================
         async function addMessageToUser(site, username, content, type, extra = {}) {
-            const user = await findUser(site, username);
-            if (!user) return;
-            const messages = Array.isArray(user.messages) ? user.messages : [];
-            messages.push({
-                id: Date.now() + '_' + Math.random().toString(36).slice(2, 8),
-                content, time: new Date().toLocaleString('zh-CN'),
-                read: false, type, processed: false, ...extra
-            });
-            await saveUser(site, { ...user, messages });
+            try {
+                const user = await findUser(site, username);
+                if (!user) return;
+                const messages = Array.isArray(user.messages) ? user.messages : [];
+                messages.push({
+                    id: Date.now() + '_' + Math.random().toString(36).slice(2, 8),
+                    content, time: new Date().toLocaleString('zh-CN'),
+                    read: false, type, processed: false, ...extra
+                });
+                await saveUser(site, { ...user, messages });
+            } catch (e) { console.error('发送消息失败:', e); }
         }
 
         async function getMessagesForUser(site, username) {
-            const user = await findUser(site, username);
-            return user && Array.isArray(user.messages) ? user.messages : [];
+            try {
+                const user = await findUser(site, username);
+                return user && Array.isArray(user.messages) ? user.messages : [];
+            } catch (e) { return []; }
         }
 
         async function markMessagesAsRead(site, username) {
-            const user = await findUser(site, username);
-            if (!user || !Array.isArray(user.messages)) return;
-            user.messages.forEach(m => m.read = true);
-            await saveUser(site, user);
+            try {
+                const user = await findUser(site, username);
+                if (!user || !Array.isArray(user.messages)) return;
+                user.messages.forEach(m => m.read = true);
+                await saveUser(site, user);
+            } catch (e) { console.error(e); }
         }
 
         async function deleteMessageForUser(site, username, messageId) {
-            const user = await findUser(site, username);
-            if (!user || !Array.isArray(user.messages)) return false;
-            const before = user.messages.length;
-            user.messages = user.messages.filter(m => String(m.id) !== String(messageId));
-            if (user.messages.length === before) return false;
-            return await saveUser(site, user);
+            try {
+                const user = await findUser(site, username);
+                if (!user || !Array.isArray(user.messages)) return false;
+                const before = user.messages.length;
+                user.messages = user.messages.filter(m => String(m.id) !== String(messageId));
+                if (user.messages.length === before) return false;
+                return await saveUser(site, user);
+            } catch (e) { return false; }
         }
 
         // ================================================================
@@ -2029,8 +2131,10 @@
             site = site || currentSite;
             const stored = getStoredUser(site);
             if (!stored) return false;
-            const user = await findUser(site, stored);
-            return isUserMuted(user);
+            try {
+                const user = await findUser(site, stored);
+                return isUserMuted(user);
+            } catch (e) { return false; }
         }
 
         async function getSuperAdmins(site) {
@@ -2054,7 +2158,9 @@
             $('wallRegPass').value = '';
             $('wallRegPassConfirm').value = '';
             $('wallError').style.display = 'none';
+            $('wallError').innerHTML = '';
             $('wallRegError').style.display = 'none';
+            $('wallRegError').innerHTML = '';
             setWallMode('login');
         }
 
@@ -2078,65 +2184,118 @@
             }
         }
 
+        // 登录墙登录（带超时、错误区分、按钮禁用）
         async function handleWallLogin(e) {
             e.preventDefault();
             const user = $('wallUser').value.trim();
             const pass = $('wallPass').value.trim();
             const errEl = $('wallError');
+            const submitBtn = e.target.querySelector('button[type="submit"]');
             errEl.style.display = 'none';
+            errEl.innerHTML = '';
+
             if (!user || !pass) {
                 errEl.textContent = '请输入用户名和密码';
                 errEl.style.display = 'block';
                 return;
             }
-            const ok = await loginUser(currentLoginSite, user, pass);
-            if (ok) {
-                if (currentLoginSite !== currentSite) {
-                    currentSite = currentLoginSite;
-                    renderMainNav();
-                    renderSubNav();
+            if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = '登录中...'; }
+
+            try {
+                const ok = await withTimeout(
+                    loginUser(currentLoginSite, user, pass),
+                    18000, '登录'
+                );
+                if (ok) {
+                    if (currentLoginSite !== currentSite) {
+                        currentSite = currentLoginSite;
+                        renderMainNav();
+                        renderSubNav();
+                    }
+                    $('loginWall').classList.add('hidden');
+                    document.documentElement.style.overflow = '';
+                    document.body.style.overflow = '';
+                    showToast('✅ 登录成功，欢迎回来！');
+                    await doSwitchPage(siteConf(currentSite).defaultPage, null);
+                    refreshCurrentUser().then(updateUIForUser).catch(console.error);
+                    loadNotice(currentSite).catch(console.error);
+                } else {
+                    errEl.textContent = '用户名或密码错误，或该账号不属于此模块';
+                    errEl.style.display = 'block';
+                    showToast('❌ 登录失败');
                 }
-                $('loginWall').classList.add('hidden');
-                document.documentElement.style.overflow = '';
-                document.body.style.overflow = '';
-                showToast('✅ 登录成功，欢迎回来！');
-                await doSwitchPage(siteConf(currentSite).defaultPage, null);
-                refreshCurrentUser().then(updateUIForUser).catch(console.error);
-                loadNotice(currentSite).catch(console.error);
-            } else {
-                errEl.textContent = '用户名或密码错误，或该账号不属于此模块';
+            } catch (err) {
+                console.error('登录异常:', err);
+                const msg = err.message || '登录失败';
+                const isNetwork = /超时|网络|fetch|Failed|timeout/i.test(msg);
+                if (isNetwork) {
+                    errEl.innerHTML = `❌ 网络请求失败：${escapeHtml(msg)}<br>
+                        <span style="font-size:12px;color:#888;display:block;margin-top:6px;">
+                            移动数据下如持续失败，请切换 WiFi 重试，或点击下方刷新按钮。
+                        </span>
+                        <button type="button" onclick="location.reload()"
+                            style="margin-top:10px;padding:8px 20px;background:#b30000;color:#fff;border:none;border-radius:20px;font-size:14px;cursor:pointer;">
+                            刷新页面重试
+                        </button>`;
+                } else {
+                    errEl.textContent = '❌ ' + msg;
+                }
                 errEl.style.display = 'block';
-                showToast('❌ 登录失败');
+                showToast('登录失败：' + msg);
+            } finally {
+                if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = '登 录'; }
             }
         }
 
+        // 登录墙注册
         async function handleWallRegister(e) {
             e.preventDefault();
             const user = $('wallRegUser').value.trim();
             const pass = $('wallRegPass').value.trim();
             const confirm = $('wallRegPassConfirm').value.trim();
             const errEl = $('wallRegError');
+            const submitBtn = e.target.querySelector('button[type="submit"]');
             errEl.style.display = 'none';
+            errEl.innerHTML = '';
+
             if (!user || !pass) { errEl.textContent = '请输入用户名和密码'; errEl.style.display = 'block'; return; }
             if (pass.length < 6) { errEl.textContent = '密码至少6位'; errEl.style.display = 'block'; return; }
             if (pass !== confirm) { errEl.textContent = '两次密码不一致'; errEl.style.display = 'block'; return; }
-            const ok = await registerUser(currentLoginSite, user, pass);
-            if (ok) {
-                if (currentLoginSite !== currentSite) {
-                    currentSite = currentLoginSite;
-                    renderMainNav();
-                    renderSubNav();
+
+            if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = '注册中...'; }
+
+            try {
+                const ok = await withTimeout(
+                    registerUser(currentLoginSite, user, pass),
+                    18000, '注册'
+                );
+                if (ok) {
+                    if (currentLoginSite !== currentSite) {
+                        currentSite = currentLoginSite;
+                        renderMainNav();
+                        renderSubNav();
+                    }
+                    $('loginWall').classList.add('hidden');
+                    document.documentElement.style.overflow = '';
+                    document.body.style.overflow = '';
+                    showToast('✅ 注册成功，已自动登录！');
+                    await doSwitchPage(siteConf(currentSite).defaultPage, null);
+                    refreshCurrentUser().then(updateUIForUser).catch(console.error);
+                    loadNotice(currentSite).catch(console.error);
+                } else {
+                    errEl.textContent = '注册失败，用户名可能已被占用';
+                    errEl.style.display = 'block';
                 }
-                $('loginWall').classList.add('hidden');
-                document.documentElement.style.overflow = '';
-                document.body.style.overflow = '';
-                showToast('✅ 注册成功，已自动登录！');
-                await doSwitchPage(siteConf(currentSite).defaultPage, null);
-                refreshCurrentUser().then(updateUIForUser).catch(console.error);
-                loadNotice(currentSite).catch(console.error);
-            } else {
-                errEl.textContent = '注册失败，用户名可能已被占用';
+            } catch (err) {
+                console.error('注册异常:', err);
+                errEl.innerHTML = `❌ ${escapeHtml(err.message || '注册失败')}<br>
+                    <button type="button" onclick="location.reload()"
+                        style="margin-top:10px;padding:8px 20px;background:#b30000;color:#fff;border:none;border-radius:20px;font-size:14px;cursor:pointer;">
+                        刷新页面重试
+                    </button>`;
                 errEl.style.display = 'block';
+            } finally {
+                if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = '注 册'; }
             }
         }
 
@@ -2178,25 +2337,34 @@
 
             const stored = getStoredUser(currentSite);
             if (stored) {
-                const user = await findUser(currentSite, stored);
-                if (user) {
-                    display.textContent = `[${siteConf(currentSite).name}] ${user.username}`;
+                try {
+                    const user = await findUser(currentSite, stored);
+                    if (user) {
+                        display.textContent = `[${siteConf(currentSite).name}] ${user.username}`;
+                        logoutBtn.style.display = 'inline-block';
+                        profileLink.style.display = 'inline-block';
+                        if (adminEntryBtn) {
+                            adminEntryBtn.style.display =
+                                (user.role === 'admin' || user.role === 'superadmin') ? 'inline-flex' : 'none';
+                        }
+                        const msgs = Array.isArray(user.messages) ? user.messages : [];
+                        const unread = msgs.filter(m => !m.read).length;
+                        if (unread > 0) {
+                            msgBadge.textContent = unread;
+                            msgBadge.style.display = 'inline-block';
+                        } else {
+                            msgBadge.style.display = 'none';
+                        }
+                        currentUser = user.username;
+                        currentUserSite = currentSite;
+                        return;
+                    }
+                } catch (e) {
+                    console.warn('更新UI失败（保留显示）:', e.message);
+                    // 网络错误时保留登录显示
+                    display.textContent = `[${siteConf(currentSite).name}] ${stored}`;
                     logoutBtn.style.display = 'inline-block';
                     profileLink.style.display = 'inline-block';
-                    if (adminEntryBtn) {
-                        adminEntryBtn.style.display =
-                            (user.role === 'admin' || user.role === 'superadmin') ? 'inline-flex' : 'none';
-                    }
-                    const msgs = Array.isArray(user.messages) ? user.messages : [];
-                    const unread = msgs.filter(m => !m.read).length;
-                    if (unread > 0) {
-                        msgBadge.textContent = unread;
-                        msgBadge.style.display = 'inline-block';
-                    } else {
-                        msgBadge.style.display = 'none';
-                    }
-                    currentUser = user.username;
-                    currentUserSite = currentSite;
                     return;
                 }
             }
@@ -2216,19 +2384,24 @@
             if (site === currentSite) return;
             const stored = getStoredUser(site);
             if (stored) {
-                const user = await findUser(site, stored);
-                if (user) {
-                    currentSite = site;
-                    currentUser = stored;
-                    currentUserSite = site;
-                    currentPostId = null;
-                    renderMainNav();
-                    renderSubNav();
-                    await updateUIForUser();
-                    await loadNotice(site);
-                    await doSwitchPage(siteConf(site).defaultPage, null);
-                    return;
-                } else {
+                try {
+                    const user = await findUser(site, stored);
+                    if (user) {
+                        currentSite = site;
+                        currentUser = stored;
+                        currentUserSite = site;
+                        currentPostId = null;
+                        renderMainNav();
+                        renderSubNav();
+                        await updateUIForUser();
+                        await loadNotice(site);
+                        await doSwitchPage(siteConf(site).defaultPage, null);
+                        return;
+                    } else {
+                        clearStoredUser(site);
+                    }
+                } catch (e) {
+                    console.warn('切换站点验证失败:', e.message);
                     clearStoredUser(site);
                 }
             }
@@ -2309,8 +2482,10 @@
             site = site || currentSite;
             const table = siteConf(site).configTable;
             try {
-                const { data, error } = await supabaseClient
-                    .from(table).select('value').eq('key', 'notice').maybeSingle();
+                const { data, error } = await supabaseQuery(
+                    client => client.from(table).select('value').eq('key', 'notice').maybeSingle(),
+                    { timeout: 10000, retries: 0, label: '加载通知' }
+                );
                 if (error || !data) return;
                 updateNoticeBar(data.value);
             } catch (e) { console.error(e); }
@@ -2319,20 +2494,28 @@
         async function updateNotice(site, text) {
             const table = siteConf(site).configTable;
             try {
-                const { data: existing, error: checkErr } = await supabaseClient
-                    .from(table).select('*').eq('key', 'notice').maybeSingle();
+                const { data: existing, error: checkErr } = await supabaseQuery(
+                    client => client.from(table).select('*').eq('key', 'notice').maybeSingle(),
+                    { timeout: 15000, retries: 1, label: '检查通知' }
+                );
                 if (checkErr) { showToast('❌ 检查通知失败'); return false; }
                 let result;
                 if (existing) {
-                    result = await supabaseClient.from(table).update({ value: text }).eq('key', 'notice');
+                    result = await supabaseQuery(
+                        client => client.from(table).update({ value: text }).eq('key', 'notice'),
+                        { timeout: 15000, retries: 1, label: '更新通知' }
+                    );
                 } else {
-                    result = await supabaseClient.from(table).insert([{ key: 'notice', value: text }]);
+                    result = await supabaseQuery(
+                        client => client.from(table).insert([{ key: 'notice', value: text }]),
+                        { timeout: 15000, retries: 0, label: '更新通知' }
+                    );
                 }
                 if (result.error) { showToast('❌ 更新通知失败'); return false; }
                 if (site === currentSite) updateNoticeBar(text);
                 showToast('✅ 通知已更新');
                 return true;
-            } catch (e) { showToast('❌ 更新通知异常'); return false; }
+            } catch (e) { showToast('❌ 更新通知异常：' + (e.message || '网络错误')); return false; }
         }
 
         function updateNoticeBar(text) {
@@ -2408,14 +2591,21 @@
             e.preventDefault();
             const user = $('loginUser').value.trim();
             const pass = $('loginPass').value.trim();
-            if (await loginUser(currentSite, user, pass)) {
-                closeLoginModal();
-                showToast('✅ 登录成功！');
-                await doSwitchPage(currentPage, currentPostId);
-                refreshCurrentUser().then(updateUIForUser).catch(console.error);
-            } else {
+            try {
+                const ok = await withTimeout(loginUser(currentSite, user, pass), 18000, '登录');
+                if (ok) {
+                    closeLoginModal();
+                    showToast('✅ 登录成功！');
+                    await doSwitchPage(currentPage, currentPostId);
+                    refreshCurrentUser().then(updateUIForUser).catch(console.error);
+                } else {
+                    $('loginError').style.display = 'block';
+                    showToast('❌ 用户名或密码错误');
+                }
+            } catch (err) {
+                $('loginError').textContent = err.message || '登录失败';
                 $('loginError').style.display = 'block';
-                showToast('❌ 用户名或密码错误');
+                showToast('登录失败：' + (err.message || '网络错误'));
             }
         }
 
@@ -2428,14 +2618,19 @@
             errEl.style.display = 'none';
             if (pass !== confirm) { errEl.textContent = '两次密码不一致'; errEl.style.display = 'block'; return; }
             if (pass.length < 6) { errEl.textContent = '密码至少6位'; errEl.style.display = 'block'; return; }
-            const ok = await registerUser(currentSite, user, pass);
-            if (ok) {
-                closeLoginModal();
-                showToast('✅ 注册成功，已自动登录！');
-                await doSwitchPage(currentPage, currentPostId);
-                refreshCurrentUser().then(updateUIForUser).catch(console.error);
-            } else {
-                errEl.textContent = '注册失败，用户名可能已被占用';
+            try {
+                const ok = await withTimeout(registerUser(currentSite, user, pass), 18000, '注册');
+                if (ok) {
+                    closeLoginModal();
+                    showToast('✅ 注册成功，已自动登录！');
+                    await doSwitchPage(currentPage, currentPostId);
+                    refreshCurrentUser().then(updateUIForUser).catch(console.error);
+                } else {
+                    errEl.textContent = '注册失败，用户名可能已被占用';
+                    errEl.style.display = 'block';
+                }
+            } catch (err) {
+                errEl.textContent = err.message || '注册失败';
                 errEl.style.display = 'block';
             }
         }
@@ -2447,9 +2642,11 @@
             const stored = getStoredUser(currentSite);
             if (!stored) { showToast('请先登录'); return; }
             $('msgModal').classList.add('show');
-            await renderMessages();
-            await markMessagesAsRead(currentSite, stored);
-            await updateUIForUser();
+            try {
+                await renderMessages();
+                await markMessagesAsRead(currentSite, stored);
+                await updateUIForUser();
+            } catch (e) { console.error(e); }
         }
 
         function closeMsgModal() { $('msgModal').classList.remove('show'); }
@@ -2487,11 +2684,10 @@
         }
 
         // ================================================================
-        //  文章操作（带缓存）
+        //  文章操作
         // ================================================================
         const _postsCache = {};
 
-        // 列表用：只取必要字段
         async function getPostsForList(site, force) {
             const now = Date.now();
             if (!force && _postsCache[site] && now - _postsCache[site].t < 30000) {
@@ -2499,10 +2695,12 @@
             }
             const table = siteConf(site).postsTable;
             try {
-                const { data, error } = await supabaseClient
-                    .from(table)
-                    .select('id,title,date,author,authorTag,status,category,created_at,likes,views,images_thumb,reject_reason,content')
-                    .order('created_at', { ascending: false });
+                const { data, error } = await supabaseQuery(
+                    client => client.from(table)
+                        .select('id,title,date,author,authorTag,status,category,created_at,likes,views,images_thumb,reject_reason,content')
+                        .order('created_at', { ascending: false }),
+                    { timeout: 15000, retries: 1, label: '加载文章列表' }
+                );
                 if (error) { console.error(error); return []; }
                 _postsCache[site] = { data: data || [], t: now };
                 return data || [];
@@ -2512,8 +2710,10 @@
         async function getPostById(site, id) {
             const table = siteConf(site).postsTable;
             try {
-                const { data, error } = await supabaseClient
-                    .from(table).select('*').eq('id', id).maybeSingle();
+                const { data, error } = await supabaseQuery(
+                    client => client.from(table).select('*').eq('id', id).maybeSingle(),
+                    { timeout: 15000, retries: 1, label: '加载文章' }
+                );
                 if (error) { console.error(error); return null; }
                 return data;
             } catch (e) { console.error(e); return null; }
@@ -2538,50 +2738,67 @@
                 liked_users: [],
                 views: 0
             };
-            const { data, error } = await supabaseClient
-                .from(table).insert([newPost]).select();
-            if (error) { showToast('❌ 发布失败：' + error.message); throw error; }
-            if (status === 'pending') {
-                const superAdmins = await getSuperAdmins(site);
-                for (const admin of superAdmins) {
-                    await addMessageToUser(site, admin.username,
-                        `新投稿《${title}》来自 ${author}，请审核。`, 'new_post');
+            try {
+                const { data, error } = await supabaseQuery(
+                    client => client.from(table).insert([newPost]).select(),
+                    { timeout: 20000, retries: 0, label: '发布文章' }
+                );
+                if (error) { showToast('❌ 发布失败：' + error.message); throw new Error(error.message); }
+                if (status === 'pending') {
+                    const superAdmins = await getSuperAdmins(site);
+                    for (const admin of superAdmins) {
+                        await addMessageToUser(site, admin.username,
+                            `新投稿《${title}》来自 ${author}，请审核。`, 'new_post');
+                    }
                 }
+                _postsCache[site] = null;
+                return data ? data[0] : newPost;
+            } catch (e) {
+                throw e;
             }
-            _postsCache[site] = null;
-            return data ? data[0] : newPost;
         }
 
         async function updatePostStatus(site, postId, status, rejectReason = '') {
             const table = siteConf(site).postsTable;
             const updates = { status };
-            if (status === 'rejected') {
-                updates.reject_reason = rejectReason;
-                const post = await getPostById(site, postId);
-                if (post) {
-                    await addMessageToUser(site, post.author,
-                        `您的投稿《${post.title}》未通过审核，原因：${rejectReason || '未说明'}`, 'reject');
+            try {
+                if (status === 'rejected') {
+                    updates.reject_reason = rejectReason;
+                    const post = await getPostById(site, postId);
+                    if (post) {
+                        await addMessageToUser(site, post.author,
+                            `您的投稿《${post.title}》未通过审核，原因：${rejectReason || '未说明'}`, 'reject');
+                    }
+                } else if (status === 'approved') {
+                    updates.reject_reason = '';
+                    const post = await getPostById(site, postId);
+                    if (post) {
+                        await addMessageToUser(site, post.author,
+                            `您的投稿《${post.title}》已通过审核，现已发布。`, 'approve');
+                    }
                 }
-            } else if (status === 'approved') {
-                updates.reject_reason = '';
-                const post = await getPostById(site, postId);
-                if (post) {
-                    await addMessageToUser(site, post.author,
-                        `您的投稿《${post.title}》已通过审核，现已发布。`, 'approve');
-                }
-            }
-            const { error } = await supabaseClient.from(table).update(updates).eq('id', postId);
-            if (error) { console.error(error); return false; }
-            _postsCache[site] = null;
-            return true;
+                const { error } = await supabaseQuery(
+                    client => client.from(table).update(updates).eq('id', postId),
+                    { timeout: 15000, retries: 1, label: '更新状态' }
+                );
+                if (error) { console.error(error); return false; }
+                _postsCache[site] = null;
+                return true;
+            } catch (e) { console.error(e); return false; }
         }
 
         async function deletePost(site, postId) {
             const postsTable = siteConf(site).postsTable;
             const commentsTable = siteConf(site).commentsTable;
             try {
-                await supabaseClient.from(commentsTable).delete().eq('post_id', postId);
-                const { error } = await supabaseClient.from(postsTable).delete().eq('id', postId);
+                await supabaseQuery(
+                    client => client.from(commentsTable).delete().eq('post_id', postId),
+                    { timeout: 15000, retries: 1, label: '删除评论' }
+                );
+                const { error } = await supabaseQuery(
+                    client => client.from(postsTable).delete().eq('id', postId),
+                    { timeout: 15000, retries: 1, label: '删除文章' }
+                );
                 if (error) { console.error(error); return false; }
                 _postsCache[site] = null;
                 return true;
@@ -2594,10 +2811,12 @@
         async function getComments(site, postId) {
             const table = siteConf(site).commentsTable;
             try {
-                const { data, error } = await supabaseClient
-                    .from(table).select('*').eq('post_id', postId)
-                    .order('pinned', { ascending: false })
-                    .order('id', { ascending: false });
+                const { data, error } = await supabaseQuery(
+                    client => client.from(table).select('*').eq('post_id', postId)
+                        .order('pinned', { ascending: false })
+                        .order('id', { ascending: false }),
+                    { timeout: 15000, retries: 1, label: '加载评论' }
+                );
                 if (error) { console.error(error); return []; }
                 return data || [];
             } catch (e) { console.error(e); return []; }
@@ -2611,44 +2830,64 @@
                 time: new Date().toLocaleString('zh-CN'),
                 pinned: false, likes: 0, liked_users: []
             };
-            const { data, error } = await supabaseClient.from(table).insert([newComment]).select();
-            if (error) { showToast('❌ 评论失败：' + error.message); throw error; }
+            const { data, error } = await supabaseQuery(
+                client => client.from(table).insert([newComment]).select(),
+                { timeout: 15000, retries: 0, label: '发表评论' }
+            );
+            if (error) { showToast('❌ 评论失败：' + error.message); throw new Error(error.message); }
             return data ? data[0] : newComment;
         }
 
         async function deleteCommentById(site, commentId) {
             const table = siteConf(site).commentsTable;
-            const { error } = await supabaseClient.from(table).delete().eq('id', commentId);
-            return !error;
+            try {
+                const { error } = await supabaseQuery(
+                    client => client.from(table).delete().eq('id', commentId),
+                    { timeout: 15000, retries: 1, label: '删除评论' }
+                );
+                return !error;
+            } catch (e) { return false; }
         }
 
         async function togglePinComment(site, commentId) {
             const table = siteConf(site).commentsTable;
-            const { data, error: fetchErr } = await supabaseClient
-                .from(table).select('pinned').eq('id', commentId).maybeSingle();
-            if (fetchErr || !data) return false;
-            const { error } = await supabaseClient
-                .from(table).update({ pinned: !data.pinned }).eq('id', commentId);
-            return !error;
+            try {
+                const { data, error: fetchErr } = await supabaseQuery(
+                    client => client.from(table).select('pinned').eq('id', commentId).maybeSingle(),
+                    { timeout: 15000, retries: 1, label: '查询评论' }
+                );
+                if (fetchErr || !data) return false;
+                const { error } = await supabaseQuery(
+                    client => client.from(table).update({ pinned: !data.pinned }).eq('id', commentId),
+                    { timeout: 15000, retries: 1, label: '更新置顶' }
+                );
+                return !error;
+            } catch (e) { return false; }
         }
 
         async function toggleCommentLike(site, commentId, username) {
             const table = siteConf(site).commentsTable;
-            const { data, error: fetchErr } = await supabaseClient
-                .from(table).select('likes, liked_users').eq('id', commentId).maybeSingle();
-            if (fetchErr || !data) return false;
-            let likedUsers = Array.isArray(data.liked_users) ? data.liked_users : [];
-            let likes = Number(data.likes || 0);
-            if (likedUsers.includes(username)) {
-                likedUsers = likedUsers.filter(u => u !== username);
-                likes = Math.max(0, likes - 1);
-            } else {
-                likedUsers = [...likedUsers, username];
-                likes += 1;
-            }
-            const { error } = await supabaseClient
-                .from(table).update({ likes, liked_users: likedUsers }).eq('id', commentId);
-            return !error;
+            try {
+                const { data, error: fetchErr } = await supabaseQuery(
+                    client => client.from(table).select('likes, liked_users').eq('id', commentId).maybeSingle(),
+                    { timeout: 15000, retries: 1, label: '查询评论' }
+                );
+                if (fetchErr || !data) return false;
+                let likedUsers = Array.isArray(data.liked_users) ? data.liked_users : [];
+                let likes = Number(data.likes || 0);
+                if (likedUsers.includes(username)) {
+                    likedUsers = likedUsers.filter(u => u !== username);
+                    likes = Math.max(0, likes - 1);
+                } else {
+                    likedUsers = [...likedUsers, username];
+                    likes += 1;
+                }
+                const { error } = await supabaseQuery(
+                    client => client.from(table).update({ likes, liked_users: likedUsers }).eq('id', commentId),
+                    { timeout: 15000, retries: 1, label: '更新点赞' }
+                );
+                return !error;
+            } catch (e) { return false; }
         }
 
         // ================================================================
@@ -2675,14 +2914,18 @@
                     likedUsers = [...likedUsers, stored];
                     likes += 1;
                 }
-                const { error } = await supabaseClient
-                    .from(table).update({ likes, liked_users: likedUsers }).eq('id', currentPostId);
+                const { error } = await supabaseQuery(
+                    client => client.from(table).update({ likes, liked_users: likedUsers }).eq('id', currentPostId),
+                    { timeout: 15000, retries: 1, label: '点赞' }
+                );
                 if (error) { showToast('点赞失败'); return; }
                 const cntEl = $(site + 'LikeCount');
                 if (cntEl) cntEl.textContent = likes;
                 if (likeBtn) likeBtn.classList.toggle('liked', !liked);
                 showToast(liked ? '已取消点赞' : '❤️ 点赞成功！');
                 _postsCache[site] = null;
+            } catch (e) {
+                showToast('点赞失败：' + (e.message || '网络错误'));
             } finally {
                 if (likeBtn) likeBtn.disabled = false;
             }
@@ -2879,7 +3122,7 @@
                 input.value = '';
                 await renderComments(site, currentPostId);
                 showToast('✅ 评论发表成功');
-            } catch (e) { showToast('评论失败，请重试'); }
+            } catch (e) { showToast('评论失败：' + (e.message || '网络错误')); }
         }
 
         async function toggleCommentLikeAction(site, commentId) {
@@ -3032,7 +3275,7 @@
                 $(site + 'SubmitImagesPreview').innerHTML = '';
                 if (currentPage === 'my') await renderMyPage(site);
             } catch (e) {
-                showToast('投稿失败，请重试');
+                showToast('投稿失败：' + (e.message || '网络错误'));
             } finally {
                 if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> 提交投稿'; }
             }
@@ -3308,8 +3551,10 @@
             const isSuper = await isSuperAdmin(site);
 
             try {
-                const { data } = await supabaseClient
-                    .from(conf.configTable).select('value').eq('key', 'notice').maybeSingle();
+                const { data } = await supabaseQuery(
+                    client => client.from(conf.configTable).select('value').eq('key', 'notice').maybeSingle(),
+                    { timeout: 15000, retries: 1, label: '加载通知' }
+                );
                 const inp = document.querySelector(`.notice-input[data-site="${site}"]`);
                 if (inp) inp.value = data ? (data.value || '') : '';
             } catch (e) {}
@@ -3426,7 +3671,7 @@
         }
 
         // ================================================================
-        //  用户管理（无 N+1）
+        //  用户管理
         // ================================================================
         const userSearchKws = { main: '', xcb: '', zzb: '' };
 
@@ -3456,9 +3701,9 @@
         async function renderAdminUserList(site) {
             const container = $(site + 'UserList');
             if (!container) return;
-            // 一次性获取当前登录人信息
             const stored = getStoredUser(site);
-            const me = stored ? await findUser(site, stored) : null;
+            let me = null;
+            try { me = stored ? await findUser(site, stored) : null; } catch (e) {}
             const isAdm = !!(me && (me.role === 'admin' || me.role === 'superadmin'));
             const isSuper = !!(me && me.role === 'superadmin');
             if (!isAdm) { container.innerHTML = '<div class="admin-empty">权限不足</div>'; return; }
@@ -3610,13 +3855,15 @@
             const supers = await getSuperAdmins(site);
             const out = [];
             for (const admin of supers) {
-                const u = await findUser(site, admin.username);
-                if (!u || !Array.isArray(u.messages)) continue;
-                for (const m of u.messages) {
-                    if (m.type === type && m.processed === false) {
-                        out.push({ id: m.id, adminUsername: admin.username, data: m });
+                try {
+                    const u = await findUser(site, admin.username);
+                    if (!u || !Array.isArray(u.messages)) continue;
+                    for (const m of u.messages) {
+                        if (m.type === type && m.processed === false) {
+                            out.push({ id: m.id, adminUsername: admin.username, data: m });
+                        }
                     }
-                }
+                } catch (e) { console.error(e); }
             }
             return out;
         }
@@ -3857,8 +4104,10 @@
         async function getLeadership(site) {
             const table = siteConf(site).configTable;
             try {
-                const { data, error } = await supabaseClient
-                    .from(table).select('value').eq('key', 'leadership').maybeSingle();
+                const { data, error } = await supabaseQuery(
+                    client => client.from(table).select('value').eq('key', 'leadership').maybeSingle(),
+                    { timeout: 15000, retries: 1, label: '加载领导班子' }
+                );
                 if (error || !data) return [];
                 const v = data.value;
                 if (typeof v === 'string') { try { return JSON.parse(v); } catch (e) { return []; } }
@@ -3868,15 +4117,25 @@
 
         async function saveLeadership(site, members) {
             const table = siteConf(site).configTable;
-            const { data: existing } = await supabaseClient
-                .from(table).select('*').eq('key', 'leadership').maybeSingle();
-            let result;
-            if (existing) {
-                result = await supabaseClient.from(table).update({ value: JSON.stringify(members) }).eq('key', 'leadership');
-            } else {
-                result = await supabaseClient.from(table).insert([{ key: 'leadership', value: JSON.stringify(members) }]);
-            }
-            return !result.error;
+            try {
+                const { data: existing } = await supabaseQuery(
+                    client => client.from(table).select('*').eq('key', 'leadership').maybeSingle(),
+                    { timeout: 15000, retries: 1, label: '查询领导班子' }
+                );
+                let result;
+                if (existing) {
+                    result = await supabaseQuery(
+                        client => client.from(table).update({ value: JSON.stringify(members) }).eq('key', 'leadership'),
+                        { timeout: 15000, retries: 1, label: '保存领导班子' }
+                    );
+                } else {
+                    result = await supabaseQuery(
+                        client => client.from(table).insert([{ key: 'leadership', value: JSON.stringify(members) }]),
+                        { timeout: 15000, retries: 0, label: '保存领导班子' }
+                    );
+                }
+                return !result.error;
+            } catch (e) { return false; }
         }
 
         async function renderLeadership(site) {
@@ -4004,8 +4263,10 @@
         // ================================================================
         async function getBranches() {
             try {
-                const { data, error } = await supabaseClient
-                    .from(siteConf('zzb').configTable).select('value').eq('key', 'branches').maybeSingle();
+                const { data, error } = await supabaseQuery(
+                    client => client.from(siteConf('zzb').configTable).select('value').eq('key', 'branches').maybeSingle(),
+                    { timeout: 15000, retries: 1, label: '加载支部' }
+                );
                 if (error || !data) return [];
                 const v = data.value;
                 if (typeof v === 'string') { try { return JSON.parse(v); } catch (e) { return []; } }
@@ -4015,15 +4276,25 @@
 
         async function saveBranches(branches) {
             const table = siteConf('zzb').configTable;
-            const { data: existing } = await supabaseClient
-                .from(table).select('*').eq('key', 'branches').maybeSingle();
-            let result;
-            if (existing) {
-                result = await supabaseClient.from(table).update({ value: JSON.stringify(branches) }).eq('key', 'branches');
-            } else {
-                result = await supabaseClient.from(table).insert([{ key: 'branches', value: JSON.stringify(branches) }]);
-            }
-            return !result.error;
+            try {
+                const { data: existing } = await supabaseQuery(
+                    client => client.from(table).select('*').eq('key', 'branches').maybeSingle(),
+                    { timeout: 15000, retries: 1, label: '查询支部' }
+                );
+                let result;
+                if (existing) {
+                    result = await supabaseQuery(
+                        client => client.from(table).update({ value: JSON.stringify(branches) }).eq('key', 'branches'),
+                        { timeout: 15000, retries: 1, label: '保存支部' }
+                    );
+                } else {
+                    result = await supabaseQuery(
+                        client => client.from(table).insert([{ key: 'branches', value: JSON.stringify(branches) }]),
+                        { timeout: 15000, retries: 0, label: '保存支部' }
+                    );
+                }
+                return !result.error;
+            } catch (e) { return false; }
         }
 
         async function renderBranchList() {
@@ -4245,7 +4516,7 @@
         }
 
         // ================================================================
-        //  后台事件
+        //  后台事件绑定
         // ================================================================
         function bindAdminEvents() {
             document.querySelectorAll('.notice-form').forEach(form => {
@@ -4271,6 +4542,9 @@
                     const errEl = form.querySelector('.error-msg');
                     errEl.style.display = 'none';
                     if (!title || !date) { errEl.textContent = '请填写标题和日期'; errEl.style.display = 'block'; return; }
+
+                    const submitBtn = form.querySelector('button[type="submit"]');
+                    if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = '处理中...'; }
 
                     let images = [], imagesThumb = [];
                     const imgInput = form.querySelector('.post-images');
@@ -4302,6 +4576,8 @@
                     } catch (err) {
                         errEl.textContent = '发布失败：' + err.message;
                         errEl.style.display = 'block';
+                    } finally {
+                        if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> 发布'; }
                     }
                 });
             });
@@ -4378,7 +4654,53 @@
             document.body.style.overflow = 'hidden';
             if (wall) wall.classList.add('hidden');
 
-            // 初始化用户表（非阻塞，缓存标记）
+            // 网络状态监听
+            const netHint = $('networkHint');
+            function updateNetHint() {
+                if (!netHint) return;
+                if (!navigator.onLine) {
+                    netHint.style.display = 'block';
+                    netHint.innerHTML = '<i class="fas fa-wifi" style="color:#dc3545;"></i> 您已离线，请检查移动数据或 WiFi';
+                } else {
+                    netHint.style.display = 'none';
+                }
+            }
+            window.addEventListener('online', updateNetHint);
+            window.addEventListener('offline', updateNetHint);
+            updateNetHint();
+
+            // 等待 SDK 加载（最多 10 秒）
+            async function waitForSupabase(timeout = 10000) {
+                const start = Date.now();
+                while (Date.now() - start < timeout) {
+                    if (window.supabase && window.supabase.createClient) return true;
+                    await new Promise(r => setTimeout(r, 200));
+                }
+                return false;
+            }
+
+            const sdkOk = await waitForSupabase();
+            if (!sdkOk) {
+                document.body.innerHTML = `<div style="padding:40px;text-align:center;font-family:sans-serif;max-width:500px;margin:0 auto;">
+                    <h2 style="color:#b30000;">网络库加载失败</h2>
+                    <p style="color:#666;margin:16px 0;">可能是移动网络屏蔽了 CDN 服务。</p>
+                    <p style="color:#666;font-size:14px;">请尝试：</p>
+                    <ul style="text-align:left;color:#666;font-size:14px;display:inline-block;margin:8px 0;">
+                        <li>切换到 WiFi 网络</li>
+                        <li>更换浏览器重试</li>
+                        <li>检查手机网络是否正常</li>
+                    </ul>
+                    <div>
+                        <button onclick="location.reload()"
+                            style="margin-top:16px;padding:12px 40px;background:#b30000;color:#fff;border:none;border-radius:30px;font-size:16px;cursor:pointer;">
+                            重新加载
+                        </button>
+                    </div>
+                </div>`;
+                return;
+            }
+
+            // 初始化用户表（非阻塞）
             if (!localStorage.getItem('pc_inited_v1')) {
                 Promise.allSettled([
                     initUsersTable('main'),
@@ -4401,13 +4723,21 @@
                 const stored = getStoredUser(currentSite);
                 let valid = false;
                 if (stored) {
-                    const u = await findUser(currentSite, stored);
-                    if (u) {
+                    try {
+                        const u = await findUser(currentSite, stored);
+                        if (u) {
+                            valid = true;
+                            currentUser = stored;
+                            currentUserSite = currentSite;
+                        } else {
+                            clearStoredUser(currentSite);
+                        }
+                    } catch (e) {
+                        // 网络错误：保留登录状态，让用户自行决定
+                        console.warn('验证登录状态失败（网络）：', e.message);
                         valid = true;
                         currentUser = stored;
                         currentUserSite = currentSite;
-                    } else {
-                        clearStoredUser(currentSite);
                     }
                 }
 
@@ -4540,9 +4870,7 @@
         window.closeMuteReviewModal = function() {};
         window.closeUnmuteReviewModal = function() {};
 
-        console.log('✅ 人民共产已启动（优化版）');
-        console.log('📌 三个模块超管：杨振浩 / Yzh061110');
-        console.log('📌 需要在 Supabase 创建 public bucket：media');
+        console.log('✅ 人民共产已启动（网络修复版）');
     </script>
 </body>
 </html>
