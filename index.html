@@ -981,7 +981,7 @@
             <div class="sub" id="modalSub">登录您的账号以发表评论或投稿</div>
             <div class="tabs">
                 <button class="active-tab" id="tabLogin" onclick="switchAuthTab('login')">登录</button>
-                <button id="tabRegister" onclick="openApplyRegister(currentSite)">注册</button>
+                <button id="tabRegister" onclick="startRegisterFlow(currentSite)">注册</button>
             </div>
             <div id="loginFormContainer" class="form-container">
                 <form id="loginForm">
@@ -1171,7 +1171,7 @@
 
             <span class="user-info" id="userInfo">
                 <span id="currentUserDisplay">未登录</span>
-                <button class="logout-btn" id="navRegBtn" style="display:none;background:#ffb400;color:#7a0000;" onclick="openApplyRegister(currentSite)"><i class="fas fa-user-plus"></i> 注册 / 入会</button>
+                <button class="logout-btn" id="navRegBtn" style="display:none;background:#ffb400;color:#7a0000;" onclick="startRegisterFlow(currentSite)"><i class="fas fa-user-plus"></i> 注册 / 入会</button>
                 <button class="logout-btn" id="navLoginBtn" style="display:none;" onclick="openLoginModal()">登录</button>
                 <button class="admin-entry-btn" id="adminEntryBtn" style="display:none;" onclick="switchPage('admin')">
                     <i class="fas fa-user-shield"></i> 管理后台
@@ -4724,7 +4724,7 @@
             $('closeLoginModal').addEventListener('click', closeLoginModal);
             $('loginModal').addEventListener('click', (e) => { if (e.target === $('loginModal')) closeLoginModal(); });
             $('tabLogin').addEventListener('click', () => switchAuthTab('login'));
-            $('tabRegister').addEventListener('click', () => openApplyRegister(currentSite));
+            $('tabRegister').addEventListener('click', () => startRegisterFlow(currentSite));
             $('loginForm').addEventListener('submit', handleLoginForm);
             $('registerForm').addEventListener('submit', handleRegisterForm);
 
@@ -5115,7 +5115,25 @@
         let _applyAcctExists = false;
         let _applyAcctUser = '';
         function openApplyFormForExisting(site, username){ openApplyRegister(site, true, username); }
+        // 唯一注册入口：无论从哪里点“注册”，都先弹出登录墙并切到注册表单，
+        // 走两段式流程（先注册账号→自动弹出《入会申请表》→提交进入待审核）。
+        function startRegisterFlow(site){
+            safeRun(function(){
+                try { var lm=$('loginModal'); if(lm && lm.style.display==='flex') closeLoginModal(); } catch(e){}
+                var target = site || currentSite || currentLoginSite || 'main';
+                try { setLoginWallSite(target); } catch(e){ currentLoginSite=target; }
+                var wall=$('loginWall');
+                if(wall){ wall.classList.remove('hidden'); }
+                document.documentElement.style.overflow='hidden';
+                document.body.style.overflow='hidden';
+                try { setWallMode('register'); } catch(e){}
+                var u=$('wallRegUser'); if(u){ setTimeout(function(){ try{u.focus();}catch(e){} },60); }
+            },'打开注册表单');
+        }
+        window.startRegisterFlow = startRegisterFlow;
         function openApplyRegister(site, acctExists, acctUser){
+            // 兜底：任何未带已注册账号(即旧的一次性建号入口)的调用，统一改走两段式（先注册→自动弹申请表）
+            if (!acctExists) { return startRegisterFlow(site); }
             _applySite = site || currentLoginSite || 'main';
             _applyAcctExists = !!acctExists;
             _applyAcctUser = acctUser || '';
