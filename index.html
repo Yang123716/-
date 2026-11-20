@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="zh-CN" style="background:#b30000;">
 <head>
@@ -1785,6 +1786,7 @@
                     { page: 'info',       label: '信息公开',   icon: 'fa-folder-open' },
                     { page: 'leadership', label: '领导班子',   icon: 'fa-users' },
                     { page: 'branch',     label: '组织支部',   icon: 'fa-sitemap' },
+                    { page: 'archive',    label: '档案管理',   icon: 'fa-folder-open', adminOnly: true },
                     { page: 'my',         label: '我的',       icon: 'fa-user' }
                 ],
                 defaultPage: 'home'
@@ -2245,7 +2247,8 @@
         function renderSubNav() {
             const conf = siteConf(currentSite);
             const nav = $('subNavInner');
-            nav.innerHTML = conf.nav.map(item => `
+            const _canArchive = !!window.__canSeeArchive;
+            nav.innerHTML = conf.nav.filter(function(item){ return item.page !== 'archive' || _canArchive; }).map(item => `
                 <a href="#" data-page="${item.page}" onclick="switchPage('${item.page}'); return false;">
                     <i class="fas ${item.icon}"></i> ${item.label}
                 </a>
@@ -2278,7 +2281,10 @@
                         adminEntryBtn.style.display =
                             (user.role === 'admin' || user.role === 'superadmin') ? 'inline-flex' : 'none';
                     }
-                    const _abn = $('archiveNavBtn'); if (_abn) _abn.style.display = (await isAdmin('zzb')) ? 'inline-flex' : 'none';
+                    const _zzbAdm = await isAdmin('zzb');
+                    window.__canSeeArchive = _zzbAdm;
+                    const _abn = $('archiveNavBtn'); if (_abn) _abn.style.display = 'none';
+                    renderSubNav();
                     const msgs = Array.isArray(user.messages) ? user.messages : [];
                     const unread = msgs.filter(m => !m.read).length;
                     if (unread > 0) {
@@ -2300,6 +2306,8 @@
             msgBadge.style.display = 'none';
             if (adminEntryBtn) adminEntryBtn.style.display = 'none';
             const _abn2 = $('archiveNavBtn'); if (_abn2) _abn2.style.display = 'none';
+            window.__canSeeArchive = false;
+            renderSubNav();
             currentUser = null;
             currentUserSite = null;
         }
@@ -4648,7 +4656,7 @@
         const ARCHIVES_TABLE = 'archives'; // 需在 Supabase 创建该表
 
         function archiveStatusMeta(st){
-            if(st === 'approved') return { text: '已通过', cls: 'approved' };
+            if(st === 'approved') return { text: '已通过审核 · 已入会', cls: 'approved' };
             if(st === 'rejected') return { text: '未通过', cls: 'rejected' };
             return { text: '待审核', cls: 'pending' };
         }
@@ -5058,6 +5066,7 @@
             if (!container) return;
             if (!await isAdmin('zzb')) { container.innerHTML = '<div class="admin-empty">权限不足</div>'; return; }
             let list = await getAllArchives();
+            list = list.filter(a => (a.status || 'pending') === 'pending');
             const kwEl = $('archiveSearchInput');
             const kw = kwEl ? (kwEl.value || '').trim().toLowerCase() : '';
             if (kw) list = list.filter(a =>
@@ -5096,7 +5105,6 @@
             if (await updateArchive(id, { status: 'approved', reject_reason: '' })) {
                 await addMessageToUser(a.reg_site, a.username, '您的入会档案已通过中央组织部审核。', 'archive_approved');
                 showToast('已通过');
-                await deleteArchive(id);
                 await renderArchiveAdminList();
             } else showToast('操作失败');
         }
@@ -5108,7 +5116,6 @@
             if (await updateArchive(id, { status: 'rejected', reject_reason: reason || '未说明' })) {
                 await addMessageToUser(a.reg_site, a.username, '您的入会档案未通过审核，原因：' + (reason || '未说明'), 'archive_rejected');
                 showToast('已拒绝');
-                await deleteArchive(id);
                 await renderArchiveAdminList();
             } else showToast('操作失败');
         }
