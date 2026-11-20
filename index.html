@@ -5162,15 +5162,16 @@
             const arSubmitBtn = $('arSubmit');
             if (arBackBtn) arBackBtn.addEventListener('click', function (ev) { ev.preventDefault(); safeRun(closeApplyRegister, '返回登录'); });
             if (arSubmitBtn) arSubmitBtn.addEventListener('click', function (ev) { ev.preventDefault(); safeRun(submitApplyRegister, '提交入会申请'); });
+            var _lw = $('loginWall'); if (_lw) { _lw.classList.add('hidden'); }
             $('applyRegisterOverlay').style.display = 'flex';
             document.documentElement.style.overflow = 'hidden';
         }
 
         function closeApplyRegister(){
             $('applyRegisterOverlay').style.display = 'none';
-            const wall = $('loginWall');
-            if (wall && wall.classList.contains('hidden')) { document.documentElement.style.overflow = ''; document.body.style.overflow = ''; }
-            else { document.documentElement.style.overflow = 'hidden'; }
+            var wall = $('loginWall');
+            if (wall) wall.classList.remove('hidden');
+            document.documentElement.style.overflow = 'hidden'; document.body.style.overflow = 'hidden';
         }
 
         async function submitApplyRegister(){
