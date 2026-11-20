@@ -2248,6 +2248,12 @@
             }
         }
 
+        function withTimeout(promise, ms, msg) {
+            return Promise.race([promise, new Promise(function (_, rej) {
+                setTimeout(function () { rej(new Error(msg || '请求超时')); }, ms);
+            })]);
+        }
+
         async function handleWallRegister(e) {
             e.preventDefault();
             const user = $('wallRegUser').value.trim();
@@ -2258,17 +2264,26 @@
             if (!user || !pass) { errEl.textContent = '请输入用户名和密码'; errEl.style.display = 'block'; return; }
             if (pass.length < 6) { errEl.textContent = '密码至少6位'; errEl.style.display = 'block'; return; }
             if (pass !== confirm) { errEl.textContent = '两次密码不一致'; errEl.style.display = 'block'; return; }
-            const ok = await registerUser(currentLoginSite, user, pass);
-            if (ok) {
-                // 注册即进入"待审核"：不自动登录、不隐藏登录墙，先清空登录态
-                clearStoredUser(currentLoginSite);
-                if (currentUser === user) { currentUser = null; currentUserSite = null; }
-                renderMainNav();
-                showToast('✅ 账号注册成功，请继续填写《入会申请表》');
-                openApplyFormForExisting(currentLoginSite, user);
-            } else {
-                errEl.textContent = '注册失败，用户名可能已被占用';
+            const _rb = document.querySelector('#wallRegisterForm button[type=submit]');
+            if (_rb) { _rb.disabled = true; _rb.dataset._orig = _rb.textContent; _rb.textContent = '正在提交，请稍候…'; }
+            try {
+                const ok = await withTimeout(registerUser(currentLoginSite, user, pass), 25000, '连接服务器超时，请检查网络后重试');
+                if (_rb) { _rb.disabled = false; _rb.textContent = _rb.dataset._orig || '注 册'; }
+                if (ok) {
+                    clearStoredUser(currentLoginSite);
+                    if (currentUser === user) { currentUser = null; currentUserSite = null; }
+                    renderMainNav();
+                    showToast('✅ 账号注册成功，请继续填写《入会申请表》');
+                    openApplyFormForExisting(currentLoginSite, user);
+                } else {
+                    errEl.textContent = '注册失败，用户名可能已被占用';
+                    errEl.style.display = 'block';
+                }
+            } catch (ex) {
+                if (_rb) { _rb.disabled = false; _rb.textContent = _rb.dataset._orig || '注 册'; }
+                errEl.textContent = (ex && ex.message) ? ex.message : '注册失败，请稍后重试';
                 errEl.style.display = 'block';
+                showToast('❌ 操作未完成，请重试');
             }
         }
 
