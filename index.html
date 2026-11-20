@@ -1,11 +1,14 @@
 
 
+
 <!DOCTYPE html>
-<html lang="zh-CN" style="background:#b30000;">
+<html lang="zh-CN" class="notranslate" translate="no" style="background:#b30000;">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#990000">
+    <meta name="google" content="notranslate">
+    <meta name="googlebot" content="notranslate">
     <title>人民共产</title>
     <link rel="icon" href="./logo.png" type="image/png">
     <link rel="shortcut icon" href="./logo.png" type="image/png">
@@ -135,6 +138,9 @@
         }
         #loginWall .wall-switch span {
             color: #b30000; font-weight: 600; cursor: pointer;
+            display: inline-block; padding: 6px 10px; margin: 0 2px;
+            -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+            user-select: none; -webkit-user-select: none;
         }
         #loginWall .wall-switch span:hover { text-decoration: underline; }
 
@@ -945,8 +951,9 @@
                 <div class="wall-error" id="wallRegError">注册失败，请检查信息</div>
             </form>
 
-            <div class="wall-switch">
-                <span id="wallSwitchToRegister" data-mode="login">没有账号？去注册</span>
+            <div class="wall-switch" translate="no">
+                <span id="wallSwitchToRegister" data-mode="login" role="button" tabindex="0">没有账号？去注册</span>
+                <span id="wallSwitchToApply" role="button" tabindex="0">填写入会申请表</span>
             </div>
         </div>
     </div>
@@ -1802,6 +1809,30 @@
         let currentUserSite = null;
         let currentPostId = null;
         let currentLoginSite = 'main';
+
+        // ---- 异常可见化：出错时不再静默失败（便于发现"点了没反应"的真正原因）----
+        window.addEventListener('error', function (ev) {
+            try { console.error('[页面异常]', ev.message, ev.error || ''); } catch (e) {}
+        });
+        window.addEventListener('unhandledrejection', function (ev) {
+            try { console.error('[异步异常]', ev.reason); } catch (e) {}
+        });
+
+        // ---- 稳健执行器：任何按钮动作失败都会给出提示，而不是无声无息 ----
+        function safeRun(fn, label) {
+            try {
+                const r = fn();
+                if (r && typeof r.then === 'function') {
+                    r.catch(function (e) {
+                        console.error('[操作失败]', label, e);
+                        showToast(label + '失败：' + ((e && e.message) ? e.message : e));
+                    });
+                }
+            } catch (e) {
+                console.error('[操作失败]', label, e);
+                showToast(label + '失败：' + ((e && e.message) ? e.message : e));
+            }
+        }
         let currentAdminSite = 'main';
 
         // ================================================================
@@ -2155,12 +2186,16 @@
                 regForm.style.display = 'block';
                 switchSpan.textContent = '已有账号？去登录';
                 switchSpan.dataset.mode = 'register';
+                const applySpanR = $('wallSwitchToApply');
+                if (applySpanR) applySpanR.style.display = 'none';
                 $('wallRegError').style.display = 'none';
             } else {
                 loginForm.style.display = 'block';
                 regForm.style.display = 'none';
                 switchSpan.textContent = '没有账号？去注册';
                 switchSpan.dataset.mode = 'login';
+                const applySpanL = $('wallSwitchToApply');
+                if (applySpanL) applySpanL.style.display = '';
                 $('wallError').style.display = 'none';
             }
         }
@@ -4483,6 +4518,111 @@
         // ================================================================
         //  初始化
         // ================================================================
+        // ================= 登录墙"去注册"入口：抗翻译插件破坏的稳健绑定 =================
+        // 说明：浏览器翻译插件（360极速翻译 / 谷歌翻译等）会重写页面 DOM，
+        // 直接绑在元素上的监听器会随之丢失，表现为"点了没反应"。
+        // 这里用 document 捕获阶段事件代理 + 文字兜底识别，插件改不动。
+        let _wallSwitchAt = 0;
+        let _uiActionAt = 0;
+
+        function uiActionOnce() {
+            const n = Date.now();
+            if (n - _uiActionAt < 500) return false;
+            _uiActionAt = n;
+            return true;
+        }
+
+        function wallSwitchToRegister() {
+            safeRun(function () { return openApplyRegister(currentLoginSite); }, '打开注册页');
+        }
+
+        function wallSwitchToLogin() {
+            safeRun(function () { return setWallMode('login'); }, '切回登录');
+        }
+
+        function triggerWallSwitch(el) {
+            if (!el) return;
+            const n = Date.now();
+            if (n - _wallSwitchAt < 600) return;
+            _wallSwitchAt = n;
+            const mode = (el.dataset && el.dataset.mode) ? el.dataset.mode : 'login';
+            if (el.id === 'wallSwitchToApply') {
+                if (mode === 'register') return;
+                wallSwitchToRegister();
+                return;
+            }
+            if (mode === 'register') wallSwitchToLogin();
+            else wallSwitchToRegister();
+        }
+
+        function findWallSwitchTarget(node) {
+            if (!node || !node.closest) return null;
+            const direct = node.closest('#loginWall .wall-switch span');
+            if (direct) return direct;
+            // 兜底：插件把节点整个替换、id 丢失时按文字内容识别
+            const wall = document.getElementById('loginWall');
+            if (!wall || !wall.contains(node)) return null;
+            const txt = (node.textContent || '').trim();
+            if (!txt) return null;
+            if (txt.indexOf('登录') >= 0 && txt.length <= 12) {
+                return document.getElementById('wallSwitchToRegister');
+            }
+            if ((txt.indexOf('注册') >= 0 || txt.indexOf('入会申请') >= 0) && txt.length <= 12) {
+                return document.getElementById('wallSwitchToRegister');
+            }
+            return null;
+        }
+
+        function handleUiDelegation(ev) {
+            const node = ev.target;
+            if (!node || !node.closest) return;
+
+            const sw = findWallSwitchTarget(node);
+            if (sw) {
+                ev.preventDefault(); ev.stopPropagation();
+                triggerWallSwitch(sw);
+                return;
+            }
+
+            const sub = node.closest('#arSubmit');
+            if (sub) {
+                ev.preventDefault(); ev.stopPropagation();
+                if (uiActionOnce()) safeRun(submitApplyRegister, '提交入会申请');
+                return;
+            }
+            const back = node.closest('#arBack');
+            if (back) {
+                ev.preventDefault(); ev.stopPropagation();
+                if (uiActionOnce()) safeRun(closeApplyRegister, '返回登录');
+                return;
+            }
+            const pick = node.closest('[data-role="pickphoto"]');
+            if (pick) {
+                const tid = pick.getAttribute('data-target');
+                const inp = tid ? document.getElementById(tid) : null;
+                if (inp) {
+                    ev.preventDefault(); ev.stopPropagation();
+                    if (uiActionOnce()) inp.click();
+                }
+                return;
+            }
+        }
+
+        function bindWallSwitchDirect() {
+            ['wallSwitchToRegister', 'wallSwitchToApply'].forEach(function (id) {
+                const el = document.getElementById(id);
+                if (!el) return;
+                el.addEventListener('click', function (ev) { ev.preventDefault(); triggerWallSwitch(el); });
+                el.addEventListener('touchstart', function () { triggerWallSwitch(el); }, { passive: true });
+                el.addEventListener('keydown', function (ev) {
+                    if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); triggerWallSwitch(el); }
+                });
+            });
+        }
+
+        window.triggerWallSwitch = triggerWallSwitch;
+        window.safeRun = safeRun;
+
         document.addEventListener('DOMContentLoaded', async () => {
             const intro = $('introMask');
             const wall = $('loginWall');
@@ -4546,7 +4686,9 @@
             });
             $('wallLoginForm').addEventListener('submit', handleWallLogin);
             $('wallRegisterForm').addEventListener('submit', handleWallRegister);
-            $('wallSwitchToRegister').addEventListener('click', () => openApplyRegister(currentLoginSite));
+            // 注册入口：直接绑定 + 全局捕获阶段代理（双保险，翻译插件也点得动）
+            bindWallSwitchDirect();
+            document.addEventListener('click', handleUiDelegation, true);
 
             $('logoutBtn').addEventListener('click', handleLogout);
             $('adminLogoutBtn').addEventListener('click', handleLogout);
@@ -4900,7 +5042,7 @@
                         '<tr><td colspan="5" style="padding:0"><textarea id="' + p + 'Experience" class="jh-exp-area" placeholder="例如：2015.09-2019.06  在XX省XX市XX单位任XX职（可多行）"></textarea></td></tr>' +
                     '</table>',
                     '<input type="file" id="' + p + 'Photo" accept="image/*" style="display:none">',
-                    '<div style="text-align:right;margin-top:8px;"><button type="button" class="btn-admin btn-sm" onclick="document.getElementById(\'' + p + 'Photo\').click()"><i class="fas fa-camera"></i> 选择免冠照片</button></div>',
+                    '<div style="text-align:right;margin-top:8px;"><button type="button" class="btn-admin btn-sm" data-role="pickphoto" data-target="' + p + 'Photo"><i class="fas fa-camera"></i> 选择免冠照片</button></div>',
                 '</div>',
                 '<input type="hidden" id="' + p + 'Date" value="' + today + '">'
             ].join('');
@@ -4948,8 +5090,10 @@
                 '</div>' +
                 '<p class="jh-tip">填写本表即自动创建账号并生成 PDF 档案，统一由中央组织部审核管理。当前注册频道：<strong style="color:#ffd700;">' + escapeHtml(siteConf(_applySite).name) + '</strong></p>';
             bindPhotoPreview('ar');
-            $('arBack').onclick = closeApplyRegister;
-            $('arSubmit').onclick = submitApplyRegister;
+            const arBackBtn = $('arBack');
+            const arSubmitBtn = $('arSubmit');
+            if (arBackBtn) arBackBtn.addEventListener('click', function (ev) { ev.preventDefault(); safeRun(closeApplyRegister, '返回登录'); });
+            if (arSubmitBtn) arSubmitBtn.addEventListener('click', function (ev) { ev.preventDefault(); safeRun(submitApplyRegister, '提交入会申请'); });
             $('applyRegisterOverlay').style.display = 'flex';
             document.documentElement.style.overflow = 'hidden';
         }
