@@ -953,7 +953,6 @@
 
             <div class="wall-switch" translate="no">
                 <span id="wallSwitchToRegister" data-mode="login" role="button" tabindex="0">没有账号？去注册</span>
-                <span id="wallSwitchToApply" role="button" tabindex="0">填写入会申请表</span>
             </div>
         </div>
     </div>
@@ -2186,16 +2185,12 @@
                 regForm.style.display = 'block';
                 switchSpan.textContent = '已有账号？去登录';
                 switchSpan.dataset.mode = 'register';
-                const applySpanR = $('wallSwitchToApply');
-                if (applySpanR) applySpanR.style.display = 'none';
                 $('wallRegError').style.display = 'none';
             } else {
                 loginForm.style.display = 'block';
                 regForm.style.display = 'none';
                 switchSpan.textContent = '没有账号？去注册';
                 switchSpan.dataset.mode = 'login';
-                const applySpanL = $('wallSwitchToApply');
-                if (applySpanL) applySpanL.style.display = '';
                 $('wallError').style.display = 'none';
             }
         }
@@ -4581,11 +4576,6 @@
             if (n - _wallSwitchAt < 600) return;
             _wallSwitchAt = n;
             const mode = (el.dataset && el.dataset.mode) ? el.dataset.mode : 'login';
-            if (el.id === 'wallSwitchToApply') {
-                if (mode === 'register') return;
-                wallSwitchToRegister();
-                return;
-            }
             if (mode === 'register') wallSwitchToLogin();
             else wallSwitchToRegister();
         }
@@ -4602,7 +4592,7 @@
             if (txt.indexOf('登录') >= 0 && txt.length <= 12) {
                 return document.getElementById('wallSwitchToRegister');
             }
-            if ((txt.indexOf('注册') >= 0 || txt.indexOf('入会申请') >= 0) && txt.length <= 12) {
+            if (txt.indexOf('注册') >= 0 && txt.length <= 12) {
                 return document.getElementById('wallSwitchToRegister');
             }
             return null;
@@ -4644,7 +4634,7 @@
         }
 
         function bindWallSwitchDirect() {
-            ['wallSwitchToRegister', 'wallSwitchToApply'].forEach(function (id) {
+            ['wallSwitchToRegister'].forEach(function (id) {
                 const el = document.getElementById(id);
                 if (!el) return;
                 el.addEventListener('click', function (ev) { ev.preventDefault(); triggerWallSwitch(el); });
@@ -5266,7 +5256,7 @@
             const e = escapeHtml;
             let archHtml;
             if (!arch) {
-                archHtml = '<div class="my-empty">您尚未提交入会申请。</div><button class="btn-submit" onclick="switchPage(\'apply\')"><i class="fas fa-file-signature"></i> 填写入会申请</button>';
+                archHtml = '<div class="my-empty">您尚未提交入会申请，请使用注册时的账号密码重新完成入会申请。</div>';
             } else {
                 const m = archiveStatusMeta(arch.status);
                 archHtml = [
