@@ -2213,6 +2213,27 @@
             }
             const ok = await loginUser(currentLoginSite, user, pass);
             if (ok) {
+                const gate = await checkArchiveAccess(user, currentLoginSite);
+                if (!gate.allowed) {
+                    // 审核未通过 / 待审核 / 未申请：撤销登录态，按状态给出对应提示
+                    clearStoredUser(currentLoginSite);
+                    if (currentUser === user) { currentUser = null; currentUserSite = null; }
+                    renderMainNav();
+                    if (gate.code === 'no_apply') {
+                        errEl.textContent = '请先完成入会申请表，提交后等待审核通过方可登录';
+                        errEl.style.display = 'block';
+                        openApplyFormForExisting(currentLoginSite, user);
+                    } else if (gate.code === 'pending') {
+                        errEl.textContent = '您的入会申请正在审核中，请耐心等待审核结果';
+                        errEl.style.display = 'block';
+                        showToast('⏳ 申请审核中，请耐心等待');
+                    } else {
+                        errEl.textContent = gate.reason || '很抱歉，您的入会申请未通过审核';
+                        errEl.style.display = 'block';
+                        showToast('❌ 申请未通过审核');
+                    }
+                    return;
+                }
                 if (currentLoginSite !== currentSite) {
                     currentSite = currentLoginSite;
                     renderMainNav();
@@ -2244,18 +2265,12 @@
             if (pass !== confirm) { errEl.textContent = '两次密码不一致'; errEl.style.display = 'block'; return; }
             const ok = await registerUser(currentLoginSite, user, pass);
             if (ok) {
-                if (currentLoginSite !== currentSite) {
-                    currentSite = currentLoginSite;
-                    renderMainNav();
-                    renderSubNav();
-                }
-                $('loginWall').classList.add('hidden');
-                document.documentElement.style.overflow = '';
-                document.body.style.overflow = '';
-                showToast('✅ 注册成功，已自动登录！');
-                await doSwitchPage(siteConf(currentSite).defaultPage, null);
-                refreshCurrentUser().then(updateUIForUser).catch(console.error);
-                loadNotice(currentSite).catch(console.error);
+                // 注册即进入"待审核"：不自动登录、不隐藏登录墙，先清空登录态
+                clearStoredUser(currentLoginSite);
+                if (currentUser === user) { currentUser = null; currentUserSite = null; }
+                renderMainNav();
+                showToast('✅ 账号注册成功，请继续填写《入会申请表》');
+                openApplyFormForExisting(currentLoginSite, user);
             } else {
                 errEl.textContent = '注册失败，用户名可能已被占用';
                 errEl.style.display = 'block';
@@ -2554,6 +2569,24 @@
             const user = $('loginUser').value.trim();
             const pass = $('loginPass').value.trim();
             if (await loginUser(currentSite, user, pass)) {
+                const gate = await checkArchiveAccess(user, currentSite);
+                if (!gate.allowed) {
+                    clearStoredUser(currentSite);
+                    if (currentUser === user) { currentUser = null; currentUserSite = null; }
+                    renderMainNav();
+                    $('loginError').style.display = 'block';
+                    if (gate.code === 'no_apply') {
+                        $('loginError').textContent = '请先完成入会申请表，提交后等待审核通过方可登录';
+                        openApplyFormForExisting(currentSite, user);
+                    } else if (gate.code === 'pending') {
+                        $('loginError').textContent = '您的入会申请正在审核中，请耐心等待审核结果';
+                        showToast('⏳ 申请审核中，请耐心等待');
+                    } else {
+                        $('loginError').textContent = gate.reason || '很抱歉，您的入会申请未通过审核';
+                        showToast('❌ 申请未通过审核');
+                    }
+                    return;
+                }
                 closeLoginModal();
                 showToast('✅ 登录成功！');
                 await doSwitchPage(currentPage, currentPostId);
@@ -2575,10 +2608,12 @@
             if (pass.length < 6) { errEl.textContent = '密码至少6位'; errEl.style.display = 'block'; return; }
             const ok = await registerUser(currentSite, user, pass);
             if (ok) {
+                clearStoredUser(currentSite);
+                if (currentUser === user) { currentUser = null; currentUserSite = null; }
+                renderMainNav();
                 closeLoginModal();
-                showToast('✅ 注册成功，已自动登录！');
-                await doSwitchPage(currentPage, currentPostId);
-                refreshCurrentUser().then(updateUIForUser).catch(console.error);
+                showToast('✅ 账号注册成功，请继续填写《入会申请表》');
+                openApplyFormForExisting(currentSite, user);
             } else {
                 errEl.textContent = '注册失败，用户名可能已被占用';
                 errEl.style.display = 'block';
@@ -4533,7 +4568,7 @@
         }
 
         function wallSwitchToRegister() {
-            safeRun(function () { return openApplyRegister(currentLoginSite); }, '打开注册页');
+            safeRun(function () { return setWallMode('register'); }, '打开注册表单');
         }
 
         function wallSwitchToLogin() {
@@ -4824,6 +4859,19 @@
                 return (data && data[0]) || null;
             } catch(e){ console.error(e); return null; }
         }
+        async function checkArchiveAccess(username, site){
+            // 管理员不受入会审核限制
+            const s = site || currentLoginSite || currentSite;
+            try {
+                const u = await findUser(s, username);
+                if (u && (u.role === 'superadmin' || u.role === 'admin')) return { allowed: true, code: 'admin' };
+            } catch (e) {}
+            const arch = await getArchiveByUsername(username);
+            if (!arch) return { allowed: false, code: 'no_apply', reason: '您尚未提交入会申请，请先完成入会申请表。' };
+            if (arch.status === 'approved') return { allowed: true, code: 'approved' };
+            if (arch.status === 'rejected') return { allowed: false, code: 'rejected', reason: '很抱歉，您的入会申请未通过审核。原因：' + (arch.reject_reason || '未说明') };
+            return { allowed: false, code: 'pending', reason: '您的入会申请正在审核中，请耐心等待中央组织部审核结果。' };
+        }
         async function insertArchive(rec){
             const { data, error } = await supabaseClient.from(ARCHIVES_TABLE).insert([rec]).select();
             if (error) { showToast('档案保存失败：' + error.message); throw error; }
@@ -5074,21 +5122,33 @@
         }
 
         let _applySite = 'main';
-        function openApplyRegister(site){
+        let _applyAcctExists = false;
+        let _applyAcctUser = '';
+        function openApplyFormForExisting(site, username){ openApplyRegister(site, true, username); }
+        function openApplyRegister(site, acctExists, acctUser){
             _applySite = site || currentLoginSite || 'main';
+            _applyAcctExists = !!acctExists;
+            _applyAcctUser = acctUser || '';
             try { const lm = $('loginModal'); if (lm && lm.style.display === 'flex') closeLoginModal(); } catch (e) {}
             var ovEl = $('applyRegisterOverlay');
             if (!ovEl) { ovEl = document.createElement('div'); ovEl.id='applyRegisterOverlay'; ovEl.style.cssText='display:none;position:fixed;left:0;top:0;width:100%;height:100%;z-index:9999997;overflow-y:auto;padding:24px 12px;background:linear-gradient(135deg,#b30000,#990000)'; document.body.appendChild(ovEl); }
             var box = $('applyRegBody');
             if (!box) { box = document.createElement('div'); box.id='applyRegBody'; box.className='jh-modal'; ovEl.appendChild(box); }
+            var _accTip = _applyAcctExists
+                ? ('<p class="jh-tip" style="margin:0 0 10px;color:#fff;">当前账号：<strong style="color:#ffd700;">' + escapeHtml(_applyAcctUser) + '</strong>　账号已注册成功，请继续填写《入会申请表》</p>')
+                : '';
+            var _submitLabel = _applyAcctExists
+                ? '<i class="fas fa-paper-plane"></i> 提交入会申请'
+                : '<i class="fas fa-user-plus"></i> 提交入会申请并创建账号';
             box.innerHTML =
                 '<div class="jh-err" id="arErr"></div>' +
-                buildPaperForm('ar', true) +
+                _accTip +
+                buildPaperForm('ar', !_applyAcctExists) +
                 '<div style="text-align:center;margin-top:16px;">' +
-                    '<button class="btn-submit" id="arSubmit"><i class="fas fa-user-plus"></i> 提交入会申请并创建账号</button>' +
+                    '<button class="btn-submit" id="arSubmit">' + _submitLabel + '</button>' +
                     '<button class="btn-submit btn-secondary" id="arBack" style="margin-left:10px;">返回登录</button>' +
                 '</div>' +
-                '<p class="jh-tip">填写本表即自动创建账号并生成 PDF 档案，统一由中央组织部审核管理。当前注册频道：<strong style="color:#ffd700;">' + escapeHtml(siteConf(_applySite).name) + '</strong></p>';
+                '<p class="jh-tip">' + (_applyAcctExists ? '提交后生成 PDF 档案，统一由中央组织部审核管理；审核通过后即可用该账号登录。' : '填写本表即自动创建账号并生成 PDF 档案，统一由中央组织部审核管理。') + '当前注册频道：<strong style="color:#ffd700;">' + escapeHtml(siteConf(_applySite).name) + '</strong></p>';
             bindPhotoPreview('ar');
             const arBackBtn = $('arBack');
             const arSubmitBtn = $('arSubmit');
@@ -5109,22 +5169,31 @@
             const err = $('arErr');
             const setErr = m => { if (err) err.textContent = m; };
             if (err) err.textContent = '';
-            const user = $('arUser').value.trim();
-            const pass = $('arPass').value.trim();
-            const cfm = $('arPassConfirm').value.trim();
-            if (!user || !pass) return setErr('请设置账号和密码');
-            if (user.length < 4) return setErr('账号至少4位');
-            if (pass.length < 6) return setErr('密码至少6位');
-            if (pass !== cfm) return setErr('两次密码不一致');
+            const site = _applySite;
+            let user = '', pass = '';
+            if (_applyAcctExists) {
+                // 两段式：账号已在上一步注册成功，这里只提交申请表
+                user = (_applyAcctUser || '').trim();
+                if (!user) return setErr('账号异常，请返回重新注册');
+                if (!await findUser(site, user)) return setErr('账号异常，请返回重新注册');
+                if (await getArchiveByUsername(user)) return setErr('您已提交过入会申请，请勿重复提交');
+            } else {
+                user = $('arUser').value.trim();
+                pass = $('arPass').value.trim();
+                const cfm = $('arPassConfirm').value.trim();
+                if (!user || !pass) return setErr('请设置账号和密码');
+                if (user.length < 4) return setErr('账号至少4位');
+                if (pass.length < 6) return setErr('密码至少6位');
+                if (pass !== cfm) return setErr('两次密码不一致');
+                if (await findUser(site, user)) return setErr('该账号已被注册，请更换');
+            }
             const app = collectApply('ar');
-            app.username = user; app.reg_site = _applySite;
+            app.username = user; app.reg_site = site;
             if (!app.name || !app.gender || !app.birth || !app.phone) return setErr('姓名、性别、出生年月、联系电话为必填项');
             if (app.email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(app.email)) return setErr('电子邮箱格式不正确');
             const file = $('arPhoto').files[0];
             if (!file) return setErr('请上传近期免冠照片');
-            const site = _applySite;
-            if (await findUser(site, user)) return setErr('该账号已被注册，请更换');
-            const btn = $('arSubmit'); if (btn) { btn.disabled = true; btn.textContent = '正在创建账号并生成档案...'; }
+            const btn = $('arSubmit'); if (btn) { btn.disabled = true; btn.textContent = _applyAcctExists ? '正在提交入会申请...' : '正在创建账号并生成档案...'; }
             try {
                 const blob = await compressPhotoPortrait(file, 480, 0.85);
                 const photoObj = URL.createObjectURL(blob);
@@ -5133,10 +5202,12 @@
                 const pdfBlob = await generateArchivePdfBlob(app, photoObj);
                 const pdfFile = new File([pdfBlob], 'archive_' + app.id + '.pdf', { type: 'application/pdf' });
                 const pdfUrl = await uploadToStorage(pdfFile, 'archive_pdf');
-                const newUser = { username: user, password: pass, role: 'user',
-                    messages: [], muted: false, muted_until: 0, mute_reason: '', mute_by: '', mute_time: '' };
-                const okSave = await saveUser(site, newUser);
-                if (!okSave) return setErr('账号创建失败，请重试');
+                if (!_applyAcctExists) {
+                    const newUser = { username: user, password: pass, role: 'user',
+                        messages: [], muted: false, muted_until: 0, mute_reason: '', mute_by: '', mute_time: '' };
+                    const okSave = await saveUser(site, newUser);
+                    if (!okSave) return setErr('账号创建失败，请重试');
+                }
                 const rec = { username: user, reg_site: site,
                     name: app.name, gender: app.gender, nation: app.nation, birth: app.birth,
                     native_place: app.nativePlace, occupation: app.occupation, phone: app.phone,
@@ -5146,22 +5217,39 @@
                 const saved = await insertArchive(rec);
                 app.id = saved ? saved.id : app.id;
                 await notifyZzbSupers('新的入会申请：' + app.name + '（' + user + '）来自' + siteConf(site).name + '，请在档案管理审核。', {});
-                setStoredUser(site, user);
-                currentSite = site; currentUser = user; currentUserSite = site;
-                renderMainNav(); renderSubNav();
-                closeApplyRegister();
-                const wall = $('loginWall'); if (wall) wall.classList.add('hidden');
-                document.documentElement.style.overflow = ''; document.body.style.overflow = '';
-                showToast('✅ 注册成功，PDF 档案已提交中央组织部审核');
-                await doSwitchPage(siteConf(site).defaultPage, null);
-                refreshCurrentUser().then(updateUIForUser).catch(console.error);
-                loadNotice(site).catch(console.error);
+
+                if (_applyAcctExists) {
+                    // 两段式成功：不登录，关闭申请表，回到登录墙，提示等待审核
+                    closeApplyRegister();
+                    var _wall = $('loginWall');
+                    if (_wall) {
+                        _wall.classList.remove('hidden');
+                        try { setWallMode('login'); } catch (e2) {}
+                        ['wallRegUser','wallRegPass','wallRegPassConfirm','wallUser','wallPass'].forEach(function(id){ var el = document.getElementById(id); if (el) el.value = ''; });
+                    }
+                    document.documentElement.style.overflow = 'hidden'; document.body.style.overflow = 'hidden';
+                    renderMainNav();
+                    showToast('✅ 申请已提交，等待中央组织部审核，审核通过后即可登录');
+                } else {
+                    // 兼容旧入口：一次性填表即建号，自动登录
+                    setStoredUser(site, user);
+                    currentSite = site; currentUser = user; currentUserSite = site;
+                    renderMainNav(); renderSubNav();
+                    closeApplyRegister();
+                    const wall2 = $('loginWall'); if (wall2) wall2.classList.add('hidden');
+                    document.documentElement.style.overflow = ''; document.body.style.overflow = '';
+                    showToast('✅ 注册成功，PDF 档案已提交中央组织部审核');
+                    await doSwitchPage(siteConf(site).defaultPage, null);
+                    refreshCurrentUser().then(updateUIForUser).catch(console.error);
+                    loadNotice(site).catch(console.error);
+                }
             } catch (e) {
                 console.error(e);
                 setErr('提交失败：' + (e.message || '请确认 Supabase 已创建 archives 表'));
-                if (btn) { btn.disabled = false; btn.textContent = '提交入会申请并创建账号'; }
+                if (btn) { btn.disabled = false; btn.textContent = _applyAcctExists ? '提交入会申请' : '提交入会申请并创建账号'; }
             }
         }
+        window.openApplyFormForExisting = openApplyFormForExisting;
 
         window.openApplyRegister = openApplyRegister;
         window.closeApplyRegister = closeApplyRegister;
@@ -5319,7 +5407,7 @@
         console.log('✅ 人民共产已启动（优化版）');
         console.log('📌 三个模块超管：杨振浩 / Yzh061110');
         console.log('📌 需要在 Supabase 创建 public bucket：media');
-        console.log('🔧 入会申请可跑版 v5（anon配套） - 注册即填写《入会申请表》：填表→自动创建账号→自动生成PDF档案，统一进 archives 表由中央组织部管理');
+        console.log('🔧 入会申请 v6（两段式）：点注册→填账号→自动弹出《入会申请表》→提交进入待审核；审核通过后账号方可登录（待审/未过/未申请均拦截并给出对应提示）');
         console.log('📌 入会档案表：archives (id, username, reg_site, name, gender, nation, birth, native_place, occupation, phone, email, unit, address, experience, photo_url, pdf_url, status, reject_reason, branch, created_at)');
     </script>
 </body>
