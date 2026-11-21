@@ -1950,7 +1950,7 @@
             try {
                 const { data, error } = await supabaseClient
                     .from(table)
-                    .select('username,role,muted,muted_until,mute_reason,mute_by,mute_time')
+                    .select('username,role,status,muted,muted_until,mute_reason,mute_by,mute_time')
                     .order('username');
                 if (error) { console.error(error); return []; }
                 return data || [];
@@ -2004,6 +2004,7 @@
                         username: '杨振浩',
                         password: 'Yzh061110',
                         role: 'superadmin',
+                        status: 'approved',
                         messages: [],
                         muted: false,
                         muted_until: 0,
@@ -2076,6 +2077,7 @@
             if (existing) return false;
             const newUser = {
                 username, password, role: 'user',
+                status: 'pending',
                 messages: [], muted: false, muted_until: 0,
                 mute_reason: '', mute_by: '', mute_time: ''
             };
@@ -2152,7 +2154,7 @@
 
         async function getSuperAdmins(site) {
             const users = await getUsersBrief(site);
-            return users.filter(u => u.role === 'superadmin');
+            return users.filter(u => u.role === 'superadmin' && (u.status || 'approved') === 'approved');
         }
 
         // ================================================================
@@ -2273,7 +2275,7 @@
                     clearStoredUser(currentLoginSite);
                     if (currentUser === user) { currentUser = null; currentUserSite = null; }
                     renderMainNav();
-                    showToast('✅ 账号注册成功，请继续填写《入会申请表》');
+                    showToast('✅ 注册成功，账号已提交，待管理员审核通过后即可在用户列表显示');
                     openApplyFormForExisting(currentLoginSite, user);
                 } else {
                     errEl.textContent = '注册失败，用户名可能已被占用';
@@ -2622,7 +2624,7 @@
                 if (currentUser === user) { currentUser = null; currentUserSite = null; }
                 renderMainNav();
                 closeLoginModal();
-                showToast('✅ 账号注册成功，请继续填写《入会申请表》');
+                showToast('✅ 注册成功，账号已提交，待管理员审核通过后即可在用户列表显示');
                 openApplyFormForExisting(currentSite, user);
             } else {
                 errEl.textContent = '注册失败，用户名可能已被占用';
@@ -3665,6 +3667,7 @@
                 const isSelf = u.username === stored;
                 const isSup = u.role === 'superadmin';
                 const isTargetAdm = u.role === 'admin';
+                const uStatus = (u.status || 'approved');
                 const muted = u.muted && (u.muted_until === -1 || Number(u.muted_until) > now);
                 const muteDays = muted
                     ? (u.muted_until === -1 ? -1 : Math.ceil((u.muted_until - now) / 86400000))
@@ -3673,6 +3676,10 @@
                 let roleLabel = '用户', roleClass = 'user';
                 if (isSup) { roleLabel = '超级管理员'; roleClass = 'superadmin'; }
                 else if (isTargetAdm) { roleLabel = '管理员'; roleClass = 'admin'; }
+                let auditLabel = '', auditClass = '';
+                if (uStatus === 'pending') { auditLabel = '待审核'; auditClass = 'pending'; }
+                else if (uStatus === 'rejected') { auditLabel = '已拒绝'; auditClass = 'rejected'; }
+                else if (uStatus === 'approved') { auditLabel = '已通过'; auditClass = 'approved'; }
 
                 const muteLabel = muted ? (muteDays === -1 ? '🔇 永久' : `🔇 ${muteDays}天`) : '';
                 let acts = '';
@@ -3697,11 +3704,16 @@
                 } else if (isAdm && !isSelf && !isSup && !isTargetAdm) {
                     acts += `<button class="del-btn" onclick="openDeleteRequestModal('${site}','${u.username}')" title="申请删除" style="color:#b8860b;"><i class="fas fa-clock"></i></button>`;
                 }
+                if (isAdm && !isSelf && uStatus !== 'approved') {
+                    acts += `<button class="approve-btn" onclick="auditUser('${site}','${u.username}','approved')" title="通过审核"><i class="fas fa-user-check"></i></button>`;
+                    acts += `<button class="reject-btn" onclick="auditUser('${site}','${u.username}','rejected')" title="拒绝"><i class="fas fa-user-times"></i></button>`;
+                }
                 return `
                     <div class="admin-list-item">
                         <span class="item-info">
                             <strong>${escapeHtml(u.username)}</strong>
                             <span class="role-tag ${roleClass}">${roleLabel}</span>
+                            ${auditLabel ? `<span class="status-tag ${auditClass}">${auditLabel}</span>` : ''}
                             ${isSelf ? ' <span style="color:#888;font-size:12px;">(当前)</span>' : ''}
                             ${muteLabel ? `<span class="muted-tag">${muteLabel}</span>` : ''}
                         </span>
@@ -3709,6 +3721,24 @@
                     </div>
                 `;
             }).join('');
+        }
+
+        async function auditUser(site, username, status) {
+            if (!await isAdmin(site)) { showToast('权限不足'); return; }
+            const user = await findUser(site, username);
+            if (!user) { showToast('用户不存在'); return; }
+            if (user.role === 'superadmin') { showToast('不能审核超级管理员'); return; }
+            user.status = status;
+            if (await saveUser(site, user)) {
+                showToast(status === 'approved' ? '✅ 已通过审核' : '已拒绝');
+                await addMessageToUser(site, username,
+                    status === 'approved'
+                        ? '恭喜，您的账号已通过管理员审核，现在可以正常使用了。'
+                        : '很抱歉，您的账号审核未通过，如有疑问请腔系管理员。',
+                    status === 'approved' ? 'approve' : 'reject');
+                await renderAdminUserList(site);
+                await updateUserCount(site);
+            } else showToast('操作失败');
         }
 
         async function changeUserRole(site, username, newRole) {
