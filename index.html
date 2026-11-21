@@ -1433,7 +1433,8 @@
         </div>
 
         <div id="page-archive" class="page">
-            <div class="admin-card full-width" style="max-width:900px;margin:0 auto;">
+            <div style="display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;justify-content:center;">
+            <div class="admin-card" style="flex:1;min-width:420px;max-width:720px;">
                 <h3><i class="fas fa-folder-open"></i> 档案管理（入会申请档案）</h3>
                 <div class="user-search-bar">
                     <input type="text" id="archiveSearchInput" placeholder="搜索姓名 / 账号..." oninput="renderArchiveAdminList()">
@@ -1442,6 +1443,16 @@
                 </div>
                 <div class="user-search-info">共 <span id="archiveTotalCount">0</span> 份档案</div>
                 <div class="admin-list" id="zzbArchiveAdminList" style="max-height:520px;"></div>
+            </div>
+            <div class="admin-card" style="flex:0 0 360px;min-width:320px;">
+                <h3><i class="fas fa-user-tag"></i> 成员任命</h3>
+                <div class="user-search-bar">
+                    <input type="text" id="memberAppointSearch" placeholder="搜索成员账号..." oninput="renderMemberAppointList()">
+                    <button onclick="renderMemberAppointList()"><i class="fas fa-search"></i> 搜索</button>
+                </div>
+                <div class="user-search-info">共 <span id="memberAppointCount">0</span> 名成员 · 填写会内职务后点保存即同步至「我的-我的组织」</div>
+                <div class="admin-list" id="memberAppointList" style="max-height:520px;"></div>
+            </div>
             </div>
         </div>
 
@@ -2516,7 +2527,7 @@
             if (page === 'branch') renderTasks.push(renderBranchList());
             if (page === 'profile') renderTasks.push(renderProfile());
             if (page === 'admin') renderTasks.push(renderAdmin());
-            if (page === 'archive') renderTasks.push(renderArchiveAdminList());
+            if (page === 'archive') { renderTasks.push(renderArchiveAdminList()); renderTasks.push(renderMemberAppointList()); }
             if (page === 'detail' && extra) {
                 currentPostId = extra;
                 renderTasks.push(renderDetail(currentSite, extra));
@@ -5500,24 +5511,50 @@ async function getReviewersByRank(rank){
 function openArchiveEditRequest(){
     var d = _myHub.data; if(!d || !d.arch){ showToast('暂无可修改的档案'); return; }
     if(d.myEditPending){ showToast('您已有一条修改申请正在审核中，请等待审核结果'); return; }
-    var a = d.arch;
+    var a = d.arch; var esc = escapeHtml;
+    function at(v){ return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+    function inp(id, val, ph){ return '<input id="ae'+id+'" value="'+at(val)+'"'+(ph?(' placeholder="'+ph+'"'):'')+'>'; }
     var ov = $('aeOverlay');
-    if(!ov){ ov = document.createElement('div'); ov.id='aeOverlay'; ov.style.cssText='display:none;position:fixed;left:0;top:0;width:100%;height:100%;z-index:9999998;overflow-y:auto;padding:24px 12px;background:rgba(0,0,0,.55)'; document.body.appendChild(ov); }
-    var box = document.createElement('div'); box.style.cssText='max-width:560px;margin:0 auto;background:#fff;border-radius:12px;padding:20px 22px;box-sizing:border-box;font-family:"Microsoft YaHei",sans-serif;';
-    function f(id, lbl, val){ return '<label style="display:block;margin-bottom:10px;font-size:14px;color:#444;">' + lbl + '<input id="ae' + id + '" style="width:100%;margin-top:4px;padding:8px 10px;border:1px solid #ddd;border-radius:6px;box-sizing:border-box;" value="' + escapeHtml(val || '') + '"></label>'; }
-    box.innerHTML =
-        '<h3 style="color:#b30000;margin:0 0 6px;font-size:18px;">申请修改档案</h3>' +
-        '<p style="color:#888;font-size:13px;margin:0 0 14px;">带 <span style="color:#d00;">*</span> 为必填。修改提交后须经上一级职级审核通过才会生效。</p>' +
-        '<div id="aeErr" style="display:none;color:#c00;background:#fff0f0;border:1px solid #d00;border-radius:6px;padding:8px 10px;margin-bottom:10px;font-size:13px;"></div>' +
-        f('Name','姓名*', a.name) + f('Gender','性别*', a.gender) + f('Nation','民族*', a.nation) + f('Birth','出生年月*', a.birth) +
-        f('Native','籍贯', a.native_place) + f('Job','职业', a.occupation) + f('Phone','联系电话*', a.phone) + f('Email','电子邮箱', a.email) +
-        f('Unit','单位', a.unit) + f('Address','现居住地', a.address) +
-        '<label style="display:block;margin-bottom:10px;font-size:14px;color:#444;">本人经历<textarea id="aeExperience" style="width:100%;margin-top:4px;padding:8px 10px;border:1px solid #ddd;border-radius:6px;box-sizing:border-box;min-height:70px;">' + escapeHtml(a.experience || '') + '</textarea></label>' +
-        '<div style="text-align:right;margin-top:6px;"><label style="font-size:13px;color:#444;">更新免冠照片（可选）<input type="file" id="aePhoto" accept="image/*" style="margin-left:8px;"></label></div>' +
-        '<div style="text-align:center;margin-top:16px;"><button class="btn-submit" id="aeSubmitBtn">提交修改申请</button> <button class="btn-submit btn-secondary" id="aeCancelBtn" style="background:#888;margin-left:10px;">取消</button></div>';
-    ov.innerHTML=''; ov.appendChild(box); ov.style.display='flex';
-    var cancel=function(){ ov.style.display='none'; };
-    $('aeCancelBtn').onclick=cancel;
+    if(!ov){ ov = document.createElement('div'); ov.id='aeOverlay'; ov.style.cssText='display:none;position:fixed;left:0;top:0;width:100%;height:100%;z-index:9999998;overflow-y:auto;padding:24px 12px;background:linear-gradient(135deg,#b30000,#990000)'; document.body.appendChild(ov); }
+    var box = document.createElement('div'); box.className='jh-modal'; box.style.cssText='max-width:640px;margin:0 auto;';
+    var photoHas = !!a.photo_url;
+    var html =
+      '<div class="jh-err" id="aeErr" style="display:none;"></div>' +
+      '<div class="jh-paper">' +
+        '<div class="jh-title">中国共进会入会申请表（档案修改）</div>' +
+        '<div class="jh-note">带 <span class="jh-req">*</span> 的为必填项，其余可不填。修改须经上一级职级审核通过后才会生效。</div>' +
+        '<table class="jh-table">' +
+          '<tr>' +
+            '<td class="jh-lbl">姓 名<span class="jh-req">*</span></td><td>'+inp('Name',a.name,'真实姓名')+'</td>' +
+            '<td class="jh-lbl">性 别<span class="jh-req">*</span></td><td>'+inp('Gender',a.gender,'男/女')+'</td>' +
+            '<td class="jh-photo" rowspan="4" id="aePhotoCell">' +
+              '<span class="jh-photo-tip" id="aePhotoTip" style="'+(photoHas?'display:none':'')+'">近期<br>免冠照片</span>' +
+              '<img class="jh-photo-img" id="aePhotoImg" style="'+(photoHas?'display:block':'display:none')+'"'+(photoHas?(' src="'+at(a.photo_url)+'"'):'')+'>' +
+            '</td>' +
+          '</tr>' +
+          '<tr><td class="jh-lbl">民 族<span class="jh-req">*</span></td><td>'+inp('Nation',a.nation,'如：汉族')+'</td><td class="jh-lbl">出生年月<span class="jh-req">*</span></td><td>'+inp('Birth',a.birth,'1990年1月')+'</td></tr>' +
+          '<tr><td class="jh-lbl">籍 贯</td><td>'+inp('Native',a.native_place,'省/市')+'</td><td class="jh-lbl">职 业</td><td>'+inp('Job',a.occupation)+'</td></tr>' +
+          '<tr><td class="jh-lbl">联系电话<span class="jh-req">*</span></td><td>'+inp('Phone',a.phone,'手机号码')+'</td><td class="jh-lbl">电子邮箱</td><td>'+inp('Email',a.email)+'</td></tr>' +
+          '<tr><td class="jh-lbl">单 位</td><td colspan="4"><input id="aeUnit" value="'+at(a.unit)+'" style="text-align:left"></td></tr>' +
+          '<tr><td class="jh-lbl">现居住地</td><td colspan="4"><input id="aeAddress" value="'+at(a.address)+'" style="text-align:left"></td></tr>' +
+          '<tr><td class="jh-exp-head" colspan="5">本人经历</td></tr>' +
+          '<tr><td class="jh-exp-sub-lbl">何年何月至何年何月</td><td class="jh-exp-sub" colspan="4">在何地、何单位、任何职</td></tr>' +
+          '<tr><td colspan="5" style="padding:0"><textarea id="aeExperience" class="jh-exp-area" placeholder="例如：2015.09-2019.06  在XX省XX市XX单位任XX职（可多行）">'+esc(a.experience||'')+'</textarea></td></tr>' +
+        '</table>' +
+        '<input type="file" id="aePhoto" accept="image/*" style="display:none">' +
+        '<div style="text-align:right;margin-top:8px;"><button type="button" class="btn-admin btn-sm" id="aePickPhoto"><i class="fas fa-camera"></i> 更换免冠照片</button></div>' +
+      '</div>' +
+      '<div style="text-align:center;margin-top:16px;">' +
+        '<button class="btn-submit" id="aeSubmitBtn">提交修改申请</button>' +
+        '<button class="btn-submit btn-secondary" id="aeCancelBtn" style="background:#888;margin-left:10px;">取消</button>' +
+      '</div>';
+    ov.innerHTML=''; box.innerHTML=html; ov.appendChild(box); ov.style.display='flex';
+    try{ document.documentElement.style.overflow='hidden'; document.body.style.overflow='hidden'; }catch(e){}
+    var pickBtn=$('aePickPhoto'), pf=$('aePhoto');
+    if(pickBtn && pf){ pickBtn.onclick=function(){ pf.click(); }; }
+    if(pf){ pf.addEventListener('change', function(ev){ var f=ev.target.files[0]; if(!f) return; try{ compressPhotoPortrait(f,480,0.85).then(function(blob){ var u=URL.createObjectURL(blob); var img=$('aePhotoImg'); if(img){ img.src=u; img.style.display='block'; } var tip=$('aePhotoTip'); if(tip) tip.style.display='none'; }).catch(function(){}); }catch(e){} }); }
+    var closeOv=function(){ ov.style.display='none'; try{ document.documentElement.style.overflow=''; document.body.style.overflow=''; }catch(e){} };
+    $('aeCancelBtn').onclick=closeOv;
     $('aeSubmitBtn').onclick=function(){ safeRun(submitArchiveEditRequest,'提交修改申请'); };
 }
 window.openArchiveEditRequest = openArchiveEditRequest;
@@ -5715,7 +5752,7 @@ function _mhHomeHtml(){
         _mhCrumb('我的首页'),
         '<div class="mh-grid">',
             '<div class="mh-card" style="flex:1;min-width:280px;">',
-                '<div class="mh-card-head"><span><i class="fas fa-id-badge"></i> 会员基本资料</span><span class="mh-card-act">查看</span></div>',
+                '<div class="mh-card-head"><span><i class="fas fa-id-badge"></i> 团员基本资料</span><span class="mh-card-act">查看</span></div>',
                 '<div class="mh-card-body"><div class="mh-profile">',
                     _mhPfRow('姓名', e(name)),
                     _mhPfRow('性别', e(gender)),
@@ -5723,6 +5760,9 @@ function _mhHomeHtml(){
                     _mhPfRow('年龄', age),
                     _mhPfRow('会龄', tao),
                     _mhPfRow('所在组织', e(org)),
+                    _mhPfRow('联系电话', e((arch && arch.phone) ? arch.phone : '—')),
+                    _mhPfRow('所在单位', e((arch && arch.unit) ? arch.unit : '—')),
+                    _mhPfRow('电子邮箱', e((arch && arch.email) ? arch.email : '—')),
                 '</div></div>',
             '</div>',
             '<div class="mh-card" style="flex:0 0 280px;min-width:260px;">',
@@ -5776,7 +5816,7 @@ function _mhOrgHtml(){
         var a = archMap[u.username] || {};
         var nm = a.name ? a.name : u.username;
         var ph = a.phone ? a.phone : '—';
-        return '<tr><td>' + (i+1) + '</td><td>' + e(nm) + '</td><td>' + e(ph) + '</td><td>' + _mhRoleLabel(u.role) + '</td>' +
+        return '<tr><td>' + (i+1) + '</td><td>' + e(nm) + '</td><td>' + e(ph) + '</td><td>' + e(u.position || _mhRoleLabel(u.role)) + '</td>' +
                '<td><button class="mh-view-btn" onclick="myHubViewMember(' + i + ')"><i class="fas fa-eye"></i> 查看</button></td></tr>';
     }).join('');
     if(!rows) rows = '<tr><td colspan="5" style="color:#999;">暂无审核通过的成员</td></tr>';
@@ -5823,7 +5863,7 @@ function myHubViewMember(idx){
     var html = '<div style="background:#fffbe6;border:1px solid #f0d9a8;border-radius:8px;padding:12px 14px;margin-bottom:10px;font-size:14px;color:#5a4a1a;line-height:2;">' +
         '<strong style="color:#c00;">成员详情</strong>　姓名：' + e(a.name || u.username) +
         '　性别：' + e(a.gender || '—') + '　民族：' + e(a.nation || '—') + '　联系电话：' + e(a.phone || '—') +
-        '<br>所在单位：' + e(a.unit || '—') + '　职务：' + _mhRoleLabel(u.role) + '</div>';
+        '<br>所在单位：' + e(a.unit || '—') + '　职务：' + e(u.position || _mhRoleLabel(u.role)) + '</div>';
     var box = $('mhMemberDetail'); if(box) box.innerHTML = html;
 }
 window.myHubViewMember = myHubViewMember;
@@ -5991,7 +6031,47 @@ function _mhMsgHtml(){
         window.renderApplyForm = renderApplyForm;
         window.submitApplyForm = submitApplyForm;
         window.renderZzbMy = renderZzbMy;
-        window.renderArchiveAdminList = renderArchiveAdminList;
+        var _memberAppointList = [];
+async function renderMemberAppointList(){
+    var box = $('memberAppointList'); if(!box) return;
+    if(!await isAdmin('zzb')){ box.innerHTML = '<div class="admin-empty">权限不足</div>'; return; }
+    var e = escapeHtml;
+    function at(v){ return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+    var siteName = { main:'人民共产网', xcb:'中央宣传部', zzb:'中央组织部' };
+    var sites = ['main','xcb','zzb'];
+    var all = [];
+    for(var sIdx=0; sIdx<sites.length; sIdx++){
+        var us = await getUsers(sites[sIdx]);
+        us.forEach(function(u){ if(!u.status || u.status==='approved'){ all.push({ site:sites[sIdx], username:u.username, role:u.role, position:u.position||'' }); } });
+    }
+    var kwEl = $('memberAppointSearch'); var kw = kwEl ? (kwEl.value||'').trim().toLowerCase() : '';
+    if(kw) all = all.filter(function(u){ return String(u.username||'').toLowerCase().indexOf(kw)>=0 || String(u.position||'').toLowerCase().indexOf(kw)>=0; });
+    _memberAppointList = all;
+    var cnt = $('memberAppointCount'); if(cnt) cnt.textContent = all.length;
+    if(!all.length){ box.innerHTML = '<div class="admin-empty">暂无成员</div>'; return; }
+    box.innerHTML = all.map(function(u,i){
+        return '<div class="admin-list-item" style="align-items:center;">' +
+          '<span class="item-info" style="flex:0 0 auto;min-width:110px;">' +
+            '<strong>'+e(u.username)+'</strong>' +
+            '<span style="color:#888;font-size:12px;"> · '+e(siteName[u.site]||u.site)+'</span>' +
+          '</span>' +
+          '<input id="map_'+i+'" value="'+at(u.position)+'" placeholder="会内职务（如：支部书记）" style="flex:1;min-width:110px;padding:6px 8px;border:1px solid #ddd;border-radius:6px;box-sizing:border-box;">' +
+          '<button class="approve-btn" onclick="saveMemberPosition('+i+')" title="保存任命"><i class="fas fa-save"></i></button>' +
+        '</div>';
+    }).join('');
+}
+async function saveMemberPosition(i){
+    var u = _memberAppointList[i]; if(!u){ showToast('未找到该成员'); return; }
+    if(!await isAdmin('zzb')){ showToast('权限不足'); return; }
+    var el = $('map_'+i); var position = el ? (el.value||'').trim() : '';
+    var ok = await saveUser(u.site, { username:u.username, position:position });
+    if(ok){ u.position = position; showToast('已任命：'+u.username+' → '+(position||'（已清除职务）')); }
+    else showToast('保存失败，请确认用户表已新增 position 字段');
+}
+window.renderMemberAppointList = renderMemberAppointList;
+window.saveMemberPosition = saveMemberPosition;
+
+window.renderArchiveAdminList = renderArchiveAdminList;
         window.approveArchive = approveArchive;
         window.rejectArchive = rejectArchive;
         window.openTransferArchiveModal = openTransferArchiveModal;
