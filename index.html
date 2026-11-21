@@ -914,7 +914,7 @@
         @media (max-width:640px){ .jh-table td.jh-lbl{width:66px;font-size:12px;} .jh-photo{width:96px;} .jh-title{font-size:17px;letter-spacing:2px;} .jh-exp-sub-lbl{width:90px;} }
     </style>
 <style>
-/* ===== 我的（智慧团建风格）专用样式 ===== */
+/* ===== 我的（中国共进会风格）专用样式 ===== */
 .mh-wrap{display:flex;gap:0;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.08);min-height:520px;border:1px solid #f0d9d9;}
 .mh-side{width:172px;flex:0 0 172px;background:#c00;color:#fff;}
 .mh-side-head{padding:22px 16px;background:#990000;font-size:16px;font-weight:700;display:flex;align-items:center;gap:8px;}
@@ -3289,7 +3289,7 @@
         //  我的
         // ================================================================
         async function renderMyPage(site) {
-            await renderMyHub(site); return; // 智慧团建风格个人空间
+            await renderMyHub(site); return; // 中国共进会风格个人空间
             if (site === 'zzb') { await renderZzbMy(); return; }
             const container = $(site + 'MyContent');
             if (!container) return;
@@ -5436,7 +5436,7 @@
 
         
 // ================================================================
-//  我的（智慧团建风格）个人空间
+//  我的（中国共进会风格）个人空间
 // ================================================================
 var _myHub = { site: 'main', data: null, tab: 'home' };
 
@@ -5463,7 +5463,7 @@ function _mhJoinAge(createdAt){
 function _mhRoleLabel(role){
     if(role === 'superadmin') return '超级管理员';
     if(role === 'admin') return '管理员';
-    return '团员';
+    return '会员';
 }
 function _mhMenuItem(key, label, icon){
     var act = (_myHub.tab === key) ? ' active' : '';
@@ -5550,7 +5550,7 @@ function _mhHomeHtml(){
                     _mhPfRow('性别', e(gender)),
                     _mhPfRow('民族', e(nation)),
                     _mhPfRow('年龄', age),
-                    _mhPfRow('团龄', tao),
+                    _mhPfRow('会龄', tao),
                     _mhPfRow('所在组织', e(org)),
                 '</div></div>',
             '</div>',
@@ -5564,8 +5564,8 @@ function _mhHomeHtml(){
         '</div>',
         '<div class="mh-grid" style="margin-top:14px;">',
             _mhPlaceCard('fa-users','我的三会'),
-            _mhPlaceCard('fa-book-open','我的团课'),
-            _mhPlaceCard('fa-calendar-check','我的团日活动'),
+            _mhPlaceCard('fa-book-open','我的会课'),
+            _mhPlaceCard('fa-calendar-check','我的会日活动'),
         '</div>',
         '<div class="mh-card" style="margin-top:14px;">',
             '<div class="mh-card-head"><span><i class="fas fa-bullhorn"></i> 组织会议活动</span></div>',
@@ -5613,18 +5613,18 @@ function _mhOrgHtml(){
         _mhCrumb('我的组织'),
         '<div class="mh-grid">',
             '<div class="mh-card" style="flex:1;min-width:280px;">',
-                '<div class="mh-card-head"><span><i class="fas fa-building"></i> 团组织信息</span><span class="mh-card-act">查看</span></div>',
+                '<div class="mh-card-head"><span><i class="fas fa-building"></i> 会组织信息</span><span class="mh-card-act">查看</span></div>',
                 '<div class="mh-card-body"><div class="mh-info-grid">',
-                    _mhPfRow('组织简称', e(conf.name)),
-                    _mhPfRow('上级组织', '中共中央委员会'),
-                    _mhPfRow('组织全称', e(conf.headerTitle)),
-                    _mhPfRow('组织类别', '部门'),
-                    _mhPfRow('所属行业', '党政机关'),
-                    _mhPfRow('团员人数', members.length + '位'),
+                    _mhPfRow('组织简称:', e(conf.name)),
+                    _mhPfRow('上级组织:', '中共中央委员会'),
+                    _mhPfRow('组织全称:', e(conf.headerTitle)),
+                    _mhPfRow('组织类别:', '部门'),
+                    _mhPfRow('所属行业:', '党政机关'),
+                    _mhPfRow('会员人数:', members.length + '位'),
                 '</div></div>',
             '</div>',
             '<div class="mh-card" style="flex:0 0 300px;min-width:260px;">',
-                '<div class="mh-card-head"><span><i class="fas fa-chart-pie"></i> 团支部成员统计</span></div>',
+                '<div class="mh-card-head"><span><i class="fas fa-chart-pie"></i> 会支部成员统计</span></div>',
                 '<div class="mh-card-body"><div class="mh-pie-wrap">',
                     '<div class="mh-pie" style="' + pieStyle + '"><div class="mh-pie-hole"></div></div>',
                     '<div class="mh-legend">',
@@ -5635,10 +5635,10 @@ function _mhOrgHtml(){
             '</div>',
         '</div>',
         '<div class="mh-card" style="margin-top:14px;">',
-            '<div class="mh-card-head"><span><i class="fas fa-users"></i> 组织成员—团员</span></div>',
+            '<div class="mh-card-head"><span><i class="fas fa-users"></i> 组织成员—会员</span></div>',
             '<div class="mh-card-body" style="padding-top:8px;">',
                 '<div id="mhMemberDetail"></div>',
-                '<table class="mh-table"><thead><tr><th>序号</th><th>姓名</th><th>手机号码</th><th>团内职务</th><th>查看</th></tr></thead><tbody>' + rows + '</tbody></table>',
+                '<table class="mh-table"><thead><tr><th>序号</th><th>姓名</th><th>手机号码</th><th>会内职务</th><th>查看</th></tr></thead><tbody>' + rows + '</tbody></table>',
             '</div>',
         '</div>',
         '<button class="mh-back-btn" onclick="myHubSwitch(\'home\')"><i class="fas fa-arrow-left"></i> 返回首页</button>'
