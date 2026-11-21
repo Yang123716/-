@@ -1,6 +1,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html lang="zh-CN" class="notranslate" translate="no" style="background:#b30000;">
 <head>
@@ -912,6 +913,55 @@
         .jh-modal-head{color:#fff;font-size:20px;font-weight:bold;text-align:center;letter-spacing:2px;margin-bottom:14px;}
         @media (max-width:640px){ .jh-table td.jh-lbl{width:66px;font-size:12px;} .jh-photo{width:96px;} .jh-title{font-size:17px;letter-spacing:2px;} .jh-exp-sub-lbl{width:90px;} }
     </style>
+<style>
+/* ===== 我的（智慧团建风格）专用样式 ===== */
+.mh-wrap{display:flex;gap:0;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.08);min-height:520px;border:1px solid #f0d9d9;}
+.mh-side{width:172px;flex:0 0 172px;background:#c00;color:#fff;}
+.mh-side-head{padding:22px 16px;background:#990000;font-size:16px;font-weight:700;display:flex;align-items:center;gap:8px;}
+.mh-menu{padding:8px 0;}
+.mh-item{display:flex;align-items:center;gap:10px;padding:13px 18px;font-size:15px;color:#fff;cursor:pointer;border-left:4px solid transparent;transition:.15s;}
+.mh-item:hover{background:#a30000;}
+.mh-item.active{background:#fff;color:#c00;border-left-color:#ffd700;font-weight:700;}
+.mh-main{flex:1;background:#f5f6f7;padding:16px;min-width:0;}
+.mh-crumb{font-size:14px;color:#666;margin-bottom:14px;}
+.mh-crumb i{color:#c00;margin-right:4px;}
+.mh-grid{display:flex;gap:14px;flex-wrap:wrap;}
+.mh-card{background:#fff;border-radius:8px;border:1px solid #eee;overflow:hidden;}
+.mh-card-head{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid #f0f0f0;font-weight:700;color:#c00;font-size:15px;}
+.mh-card-head .mh-card-act{color:#999;font-weight:400;font-size:13px;}
+.mh-card-body{padding:16px;}
+.mh-profile{display:grid;grid-template-columns:1fr 1fr;gap:14px 24px;}
+.mh-profile .mh-pf-row{display:flex;font-size:15px;}
+.mh-profile .mh-pf-lbl{flex:0 0 84px;background:#f3f4f5;color:#444;border-radius:6px;padding:8px 10px;text-align:center;margin-right:12px;}
+.mh-profile .mh-pf-val{color:#222;padding:8px 0;}
+.mh-op{display:flex;gap:40px;align-items:flex-start;}
+.mh-ring-wrap{text-align:center;}
+.mh-ring{width:96px;height:96px;border-radius:50%;border:9px solid #c00;display:flex;align-items:center;justify-content:center;margin:0 auto;}
+.mh-ring.green{border-color:#1ab394;}
+.mh-ring-num{font-size:34px;font-weight:700;color:#c00;}
+.mh-ring.green .mh-ring-num{color:#1ab394;}
+.mh-ring-label{margin-top:10px;font-size:14px;color:#555;}
+.mh-info-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px 26px;}
+.mh-info-grid .mh-pf-row{display:flex;font-size:15px;}
+.mh-pie-wrap{display:flex;align-items:center;gap:30px;flex-wrap:wrap;}
+.mh-pie{width:130px;height:130px;border-radius:50%;position:relative;flex:0 0 130px;}
+.mh-pie-hole{position:absolute;left:50%;top:50%;width:54px;height:54px;background:#fff;border-radius:50%;transform:translate(-50%,-50%);}
+.mh-legend{font-size:15px;color:#444;}
+.mh-legend .mh-sw{display:inline-block;width:14px;height:14px;border-radius:2px;margin-right:8px;vertical-align:middle;}
+.mh-table{width:100%;border-collapse:collapse;font-size:14px;margin-top:4px;}
+.mh-table th{background:#c00;color:#fff;padding:10px 8px;font-weight:600;text-align:center;}
+.mh-table td{padding:10px 8px;text-align:center;border-bottom:1px solid #f0f0f0;color:#333;}
+.mh-table tr:nth-child(even) td{background:#fafafa;}
+.mh-view-btn{background:#fff;border:1px solid #c00;color:#c00;border-radius:4px;padding:4px 10px;font-size:13px;cursor:pointer;}
+.mh-view-btn:hover{background:#c00;color:#fff;}
+.mh-empty{color:#999;font-size:14px;padding:8px 2px;}
+.mh-tag{display:inline-block;padding:1px 8px;border-radius:10px;font-size:12px;}
+.mh-tag.approved{background:#e6f7ee;color:#1a9a55;}
+.mh-tag.pending{background:#fff4e0;color:#d98b00;}
+.mh-tag.rejected{background:#fdeaea;color:#d33;}
+.mh-back-btn{margin-top:10px;background:#666;color:#fff;border:none;border-radius:6px;padding:8px 16px;font-size:14px;cursor:pointer;}
+@media (max-width:680px){.mh-wrap{flex-direction:column;}.mh-side{width:100%;flex:none;}.mh-menu{display:flex;flex-wrap:wrap;}.mh-item{flex:1;min-width:120px;border-left:none;border-bottom:3px solid transparent;}.mh-item.active{border-left:none;border-bottom-color:#ffd700;}.mh-profile,.mh-info-grid{grid-template-columns:1fr;}}
+</style>
 </head><body>
 
     <div id="introMask">
@@ -1779,7 +1829,8 @@
                     { page: 'home',       label: '宣传部首页', icon: 'fa-home' },
                     { page: 'info',       label: '信息公开',   icon: 'fa-folder-open' },
                     { page: 'policy',     label: '政策解读',   icon: 'fa-book-open' },
-                    { page: 'leadership', label: '领导班子',   icon: 'fa-users' }
+                    { page: 'leadership', label: '领导班子',   icon: 'fa-users' },
+                    { page: 'my',         label: '我的',       icon: 'fa-user' }
                 ],
                 defaultPage: 'home'
             },
@@ -3238,6 +3289,7 @@
         //  我的
         // ================================================================
         async function renderMyPage(site) {
+            await renderMyHub(site); return; // 智慧团建风格个人空间
             if (site === 'zzb') { await renderZzbMy(); return; }
             const container = $(site + 'MyContent');
             if (!container) return;
@@ -5381,6 +5433,284 @@
                 archHtml
             ].join('');
         }
+
+        
+// ================================================================
+//  我的（智慧团建风格）个人空间
+// ================================================================
+var _myHub = { site: 'main', data: null, tab: 'home' };
+
+function _mhAge(birth){
+    if(!birth) return '';
+    var m = String(birth).match(/(\d{4})\D{0,3}(\d{1,2})?/);
+    if(!m) return '';
+    var y = parseInt(m[1],10);
+    var mo = m[2] ? parseInt(m[2],10) : 1;
+    var now = new Date();
+    var age = now.getFullYear() - y;
+    if((now.getMonth()+1) < mo) age--;
+    if(age < 0 || age > 120) return '';
+    return age;
+}
+function _mhJoinAge(createdAt){
+    if(!createdAt) return '';
+    var d = new Date(createdAt);
+    if(isNaN(d.getTime())) return '';
+    var t = Math.floor((new Date() - d)/(365.25*24*3600*1000));
+    if(t < 0) return '';
+    return t;
+}
+function _mhRoleLabel(role){
+    if(role === 'superadmin') return '超级管理员';
+    if(role === 'admin') return '管理员';
+    return '团员';
+}
+function _mhMenuItem(key, label, icon){
+    var act = (_myHub.tab === key) ? ' active' : '';
+    return '<a class="mh-item' + act + '" onclick="myHubSwitch(\'' + key + '\')"><i class="fas ' + icon + '"></i> ' + label + '</a>';
+}
+function _mhCrumb(label){
+    return '<div class="mh-crumb"><i class="fas fa-map-marker-alt"></i> 当前位置:' + label + '</div>';
+}
+function _mhPfRow(l, v){
+    return '<div class="mh-pf-row"><span class="mh-pf-lbl">' + l + '</span><span class="mh-pf-val">' + (v || '—') + '</span></div>';
+}
+
+async function renderMyHub(site){
+    site = site || currentSite;
+    var container = $(site + 'MyContent');
+    if(!container) return;
+    var stored = getStoredUser(site);
+    if(!stored){ container.innerHTML = '<p style="color:#666;">请先登录。</p>'; return; }
+    _myHub.site = site;
+    _myHub.tab = 'home';
+    var user = await findUser(site, stored);
+    var arch = await getArchiveByUsername(stored);
+    var usersAll = await getUsers(site);
+    var members = usersAll.filter(function(u){ return !u.status || u.status === 'approved'; });
+    var archsAll = await getAllArchives();
+    var archMap = {};
+    archsAll.forEach(function(a){ if(a.username && !archMap[a.username]) archMap[a.username] = a; });
+    _myHub.data = { stored: stored, user: user, arch: arch, members: members, archMap: archMap };
+    container.innerHTML = [
+        '<div class="mh-wrap">',
+            '<div class="mh-side">',
+                '<div class="mh-side-head"><i class="fas fa-user-circle"></i> ' + escapeHtml(stored) + '</div>',
+                '<div class="mh-menu" id="mhMenu"></div>',
+            '</div>',
+            '<div class="mh-main" id="mhBody"></div>',
+        '</div>'
+    ].join('');
+    _mhRenderMenu();
+    _mhRenderBody();
+}
+function _mhRenderMenu(){
+    var el = $('mhMenu'); if(!el) return;
+    el.innerHTML = [
+        _mhMenuItem('home','我的首页','fa-home'),
+        _mhMenuItem('org','我的组织','fa-sitemap'),
+        _mhMenuItem('archive','我的档案','fa-id-card'),
+        _mhMenuItem('msg','我的消息','fa-bell')
+    ].join('');
+}
+function myHubSwitch(tab){
+    _myHub.tab = tab;
+    _mhRenderMenu();
+    _mhRenderBody();
+}
+window.myHubSwitch = myHubSwitch;
+function _mhRenderBody(){
+    var body = $('mhBody'); if(!body) return;
+    if(!_myHub.data){ body.innerHTML = '<p style="color:#666;">数据加载中…</p>'; return; }
+    if(_myHub.tab === 'org'){ body.innerHTML = _mhOrgHtml(); }
+    else if(_myHub.tab === 'archive'){ body.innerHTML = _mhArchiveHtml(); }
+    else if(_myHub.tab === 'msg'){ body.innerHTML = _mhMsgHtml(); }
+    else { body.innerHTML = _mhHomeHtml(); }
+}
+
+function _mhHomeHtml(){
+    var d = _myHub.data, e = escapeHtml;
+    var arch = d.arch, user = d.user, conf = siteConf(_myHub.site);
+    var name = (arch && arch.name) ? arch.name : d.stored;
+    var gender = (arch && arch.gender) ? arch.gender : '—';
+    var nation = (arch && arch.nation) ? arch.nation : '—';
+    var age = (arch && arch.birth) ? (_mhAge(arch.birth) + '岁') : '—';
+    var tao = (arch && arch.created_at) ? (_mhJoinAge(arch.created_at) + '年') : '—';
+    var org = (arch && arch.branch) ? arch.branch : conf.name;
+    var msgs = (user && Array.isArray(user.messages)) ? user.messages : [];
+    var unread = msgs.filter(function(m){ return !m.read; }).length;
+    var todo = (arch && arch.status === 'pending') ? 1 : 0;
+    return [
+        _mhCrumb('我的首页'),
+        '<div class="mh-grid">',
+            '<div class="mh-card" style="flex:1;min-width:280px;">',
+                '<div class="mh-card-head"><span><i class="fas fa-id-badge"></i> 团员基本资料</span><span class="mh-card-act">查看</span></div>',
+                '<div class="mh-card-body"><div class="mh-profile">',
+                    _mhPfRow('姓名', e(name)),
+                    _mhPfRow('性别', e(gender)),
+                    _mhPfRow('民族', e(nation)),
+                    _mhPfRow('年龄', age),
+                    _mhPfRow('团龄', tao),
+                    _mhPfRow('所在组织', e(org)),
+                '</div></div>',
+            '</div>',
+            '<div class="mh-card" style="flex:0 0 280px;min-width:260px;">',
+                '<div class="mh-card-head"><span><i class="fas fa-cog"></i> 操作中心</span><span class="mh-card-act">查看</span></div>',
+                '<div class="mh-card-body"><div class="mh-op">',
+                    '<div class="mh-ring-wrap"><div class="mh-ring"><span class="mh-ring-num">' + unread + '</span></div><div class="mh-ring-label">未读消息数</div></div>',
+                    '<div class="mh-ring-wrap"><div class="mh-ring green"><span class="mh-ring-num">' + todo + '</span></div><div class="mh-ring-label">待办事项</div></div>',
+                '</div></div>',
+            '</div>',
+        '</div>',
+        '<div class="mh-grid" style="margin-top:14px;">',
+            _mhPlaceCard('fa-users','我的三会'),
+            _mhPlaceCard('fa-book-open','我的团课'),
+            _mhPlaceCard('fa-calendar-check','我的团日活动'),
+        '</div>',
+        '<div class="mh-card" style="margin-top:14px;">',
+            '<div class="mh-card-head"><span><i class="fas fa-bullhorn"></i> 组织会议活动</span></div>',
+            '<div class="mh-card-body"><div class="mh-empty">暂无近期组织会议活动。</div></div>',
+        '</div>',
+        '<button class="mh-back-btn" onclick="myHubBackHome()"><i class="fas fa-home"></i> 返回主页</button>'
+    ].join('');
+}
+function _mhPlaceCard(icon, title){
+    return '<div class="mh-card" style="flex:1;min-width:200px;">' +
+        '<div class="mh-card-head"><span><i class="fas ' + icon + '"></i> ' + title + '</span><span class="mh-card-act">查看</span></div>' +
+        '<div class="mh-card-body"><div class="mh-empty">暂无内容。</div></div></div>';
+}
+function myHubBackHome(){
+    var s = _myHub.site || currentSite;
+    try { doSwitchPage('home', null); } catch(e){}
+}
+window.myHubBackHome = myHubBackHome;
+
+function _mhOrgHtml(){
+    var d = _myHub.data, e = escapeHtml, conf = siteConf(_myHub.site);
+    var members = d.members, archMap = d.archMap;
+    var male = 0, female = 0;
+    members.forEach(function(u){
+        var a = archMap[u.username];
+        var g = a && a.gender ? String(a.gender).trim() : '';
+        if(g.indexOf('男') >= 0) male++;
+        else if(g.indexOf('女') >= 0) female++;
+    });
+    var total = male + female;
+    var pieStyle = 'background:#ddd;';
+    if(total > 0){
+        var mp = Math.round(male/total*100);
+        pieStyle = 'background:conic-gradient(#1e88e5 0 ' + mp + '%, #c00 ' + mp + '% 100%);';
+    }
+    var rows = members.map(function(u, i){
+        var a = archMap[u.username] || {};
+        var nm = a.name ? a.name : u.username;
+        var ph = a.phone ? a.phone : '—';
+        return '<tr><td>' + (i+1) + '</td><td>' + e(nm) + '</td><td>' + e(ph) + '</td><td>' + _mhRoleLabel(u.role) + '</td>' +
+               '<td><button class="mh-view-btn" onclick="myHubViewMember(' + i + ')"><i class="fas fa-eye"></i> 查看</button></td></tr>';
+    }).join('');
+    if(!rows) rows = '<tr><td colspan="5" style="color:#999;">暂无审核通过的成员</td></tr>';
+    return [
+        _mhCrumb('我的组织'),
+        '<div class="mh-grid">',
+            '<div class="mh-card" style="flex:1;min-width:280px;">',
+                '<div class="mh-card-head"><span><i class="fas fa-building"></i> 团组织信息</span><span class="mh-card-act">查看</span></div>',
+                '<div class="mh-card-body"><div class="mh-info-grid">',
+                    _mhPfRow('组织简称', e(conf.name)),
+                    _mhPfRow('上级组织', '中共中央委员会'),
+                    _mhPfRow('组织全称', e(conf.headerTitle)),
+                    _mhPfRow('组织类别', '部门'),
+                    _mhPfRow('所属行业', '党政机关'),
+                    _mhPfRow('团员人数', members.length + '位'),
+                '</div></div>',
+            '</div>',
+            '<div class="mh-card" style="flex:0 0 300px;min-width:260px;">',
+                '<div class="mh-card-head"><span><i class="fas fa-chart-pie"></i> 团支部成员统计</span></div>',
+                '<div class="mh-card-body"><div class="mh-pie-wrap">',
+                    '<div class="mh-pie" style="' + pieStyle + '"><div class="mh-pie-hole"></div></div>',
+                    '<div class="mh-legend">',
+                        '<div style="margin-bottom:10px;"><span class="mh-sw" style="background:#1e88e5;"></span>男性: ' + male + ' 个</div>',
+                        '<div><span class="mh-sw" style="background:#c00;"></span>女性: ' + female + ' 个</div>',
+                    '</div>',
+                '</div></div>',
+            '</div>',
+        '</div>',
+        '<div class="mh-card" style="margin-top:14px;">',
+            '<div class="mh-card-head"><span><i class="fas fa-users"></i> 组织成员—团员</span></div>',
+            '<div class="mh-card-body" style="padding-top:8px;">',
+                '<div id="mhMemberDetail"></div>',
+                '<table class="mh-table"><thead><tr><th>序号</th><th>姓名</th><th>手机号码</th><th>团内职务</th><th>查看</th></tr></thead><tbody>' + rows + '</tbody></table>',
+            '</div>',
+        '</div>',
+        '<button class="mh-back-btn" onclick="myHubSwitch(\'home\')"><i class="fas fa-arrow-left"></i> 返回首页</button>'
+    ].join('');
+}
+function myHubViewMember(idx){
+    var d = _myHub.data; if(!d || !d.members) return;
+    var u = d.members[idx]; if(!u) return;
+    var e = escapeHtml;
+    var a = d.archMap[u.username] || {};
+    var html = '<div style="background:#fffbe6;border:1px solid #f0d9a8;border-radius:8px;padding:12px 14px;margin-bottom:10px;font-size:14px;color:#5a4a1a;line-height:2;">' +
+        '<strong style="color:#c00;">成员详情</strong>　姓名：' + e(a.name || u.username) +
+        '　性别：' + e(a.gender || '—') + '　民族：' + e(a.nation || '—') + '　联系电话：' + e(a.phone || '—') +
+        '<br>所在单位：' + e(a.unit || '—') + '　职务：' + _mhRoleLabel(u.role) + '</div>';
+    var box = $('mhMemberDetail'); if(box) box.innerHTML = html;
+}
+window.myHubViewMember = myHubViewMember;
+
+function _mhArchiveHtml(){
+    var d = _myHub.data, e = escapeHtml, arch = d.arch;
+    if(!arch){
+        return _mhCrumb('我的档案') + '<div class="mh-card"><div class="mh-card-body">' +
+            '<div class="mh-empty">您尚未提交入会申请，暂无个人档案。请通过注册流程完成入会申请。</div>' +
+            '<button class="mh-back-btn" onclick="myHubSwitch(\'home\')">返回</button></div></div>';
+    }
+    var m = archiveStatusMeta(arch.status);
+    return [
+        _mhCrumb('我的档案'),
+        '<div class="mh-card"><div class="mh-card-head"><span><i class="fas fa-id-card"></i> 我的入会档案</span></div>',
+        '<div class="mh-card-body">',
+        '<div style="margin-bottom:12px;">档案状态：<span class="mh-tag ' + m.cls + '">' + m.text + '</span>' +
+            (arch.branch ? '　|　编入支部：<strong style="color:#990000;">' + e(arch.branch) + '</strong>' : '') + '</div>',
+        arch.status === 'rejected' && arch.reject_reason ? '<div style="color:#c60a0a;margin-bottom:12px;font-size:14px;">未通过原因：' + e(arch.reject_reason) + '</div>' : '',
+        '<div class="mh-profile">',
+            _mhPfRow('姓名', e(arch.name)),
+            _mhPfRow('性别', e(arch.gender)),
+            _mhPfRow('民族', e(arch.nation)),
+            _mhPfRow('出生年月', e(arch.birth)),
+            _mhPfRow('籍贯', e(arch.native_place)),
+            _mhPfRow('职业', e(arch.occupation)),
+            _mhPfRow('联系电话', e(arch.phone)),
+            _mhPfRow('电子邮箱', e(arch.email)),
+            _mhPfRow('单位', e(arch.unit)),
+            _mhPfRow('现居住地', e(arch.address)),
+        '</div>',
+        arch.experience ? '<div style="margin-top:14px;"><span class="mh-pf-lbl">本人经历</span><div style="white-space:pre-wrap;margin-top:6px;color:#333;font-size:14px;">' + e(arch.experience) + '</div></div>' : '',
+        '<div style="margin-top:16px;">' + (arch.pdf_url ? '<a href="' + arch.pdf_url + '" target="_blank" style="color:#b30000;font-weight:600;"><i class="fas fa-file-pdf"></i> 查看档案PDF</a>' : '（无PDF）') + '</div>',
+        '<button class="mh-back-btn" onclick="myHubSwitch(\'home\')">返回首页</button>',
+        '</div></div>'
+    ].join('');
+}
+
+function _mhMsgHtml(){
+    var d = _myHub.data, e = escapeHtml;
+    var msgs = (d.user && Array.isArray(d.user.messages)) ? d.user.messages : [];
+    var crumb = _mhCrumb('我的消息');
+    if(!msgs.length){
+        return crumb + '<div class="mh-card"><div class="mh-card-body"><div class="mh-empty">您还没有收到任何消息。</div>' +
+            '<button class="mh-back-btn" onclick="myHubSwitch(\'home\')">返回</button></div></div>';
+    }
+    var items = msgs.slice().reverse().map(function(m){
+        var isRead = !!m.read;
+        var t = m.time ? (typeof m.time === 'number' ? new Date(m.time).toLocaleString() : String(m.time)) : '';
+        return '<div style="border-bottom:1px solid #f0f0f0;padding:12px 4px;">' +
+            '<div style="font-size:15px;color:' + (isRead ? '#888' : '#c00') + ';font-weight:' + (isRead ? '400' : '600') + ';">' + (isRead ? '' : '<span class="mh-tag rejected">未读</span> ') + e(m.text || m.title || m.content || '') + '</div>' +
+            (t ? '<div style="font-size:12px;color:#aaa;margin-top:4px;"><i class="far fa-clock"></i> ' + e(t) + '</div>' : '') +
+            '</div>';
+    }).join('');
+    return crumb + '<div class="mh-card"><div class="mh-card-head"><span><i class="fas fa-bell"></i> 我的消息</span></div>' +
+        '<div class="mh-card-body" style="padding-top:4px;">' + items +
+        '<button class="mh-back-btn" onclick="myHubSwitch(\'home\')">返回首页</button></div></div>';
+}
 
         // ---- 档案管理（管理员可见） ----
         async function renderArchiveAdminList(){
