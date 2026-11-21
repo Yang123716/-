@@ -903,6 +903,10 @@
         .jh-exp-sub{font-size:13px;background:#fafafa;}
         .jh-exp-area{width:100%;min-height:150px;border:none;outline:none;padding:10px;font-size:14px;font-family:inherit;resize:vertical;box-sizing:border-box;}
         .jh-err{color:#c00;font-size:14px;min-height:20px;margin-bottom:6px;text-align:center;font-weight:600;}
+        .jh-req{color:#e00;font-weight:bold;margin-left:2px;font-family:Arial,sans-serif;}
+        .jh-note{text-align:center;font-size:13px;color:#888;margin:0 0 12px;}
+        .jh-table td.jh-miss{background:#fff0f0 !important;border-color:#e00 !important;}
+        .jh-table td input.jh-miss{outline:2px solid #e00;background:#fff0f0;box-shadow:0 0 0 2px rgba(224,0,0,.18);border-radius:3px;}
         .jh-tip{color:#ffe;font-size:13px;margin-top:12px;text-align:center;}
         .jh-modal{background:transparent;max-width:840px;margin:0 auto;}
         .jh-modal-head{color:#fff;font-size:20px;font-weight:bold;text-align:center;letter-spacing:2px;margin-bottom:14px;}
@@ -5054,13 +5058,13 @@
         async function submitApplyForm(){
             const stored = getStoredUser(currentSite);
             if (!stored) { openLoginModal(); return; }
-            const err = $('appErr'); if (err) err.textContent = '';
+            const err = $('appErr'); clearApplyErr(err); const setErr = m => flashApplyErr(err, m);
             const app = collectApply('app');
             app.username = stored; app.reg_site = currentSite;
-            if (!app.name || !app.gender || !app.birth || !app.phone) { if (err) err.textContent = '姓名、性别、出生年月、联系电话为必填项'; return; }
-            if (app.email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(app.email)) { if (err) err.textContent = '电子邮箱格式不正确'; return; }
+            const chk = checkRequiredApply('app'); if (!chk.ok) { setErr('以下必填项（带 * 号）未填写：' + chk.missing.join('、')); var _fe = $(chk.firstId); if (_fe) { try { _fe.focus(); } catch(e){} try { _fe.scrollIntoView({behavior:'smooth',block:'center'}); } catch(e){} } return; }
+            if (app.email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(app.email)) { setErr('电子邮箱格式不正确'); return; }
             const file = $('appPhoto').files[0];
-            if (!file) { if (err) err.textContent = '请上传近期免冠照片'; return; }
+            if (!file) { setErr('请上传近期免冠照片'); return; }
             const btn = $('applySubmitBtn'); if (btn) { btn.disabled = true; btn.textContent = '正在生成档案...'; }
             try {
                 const blob = await compressPhotoPortrait(file, 480, 0.85);
@@ -5087,7 +5091,7 @@
                 const tp = $('appPhotoTip'); if (tp) tp.style.display = '';
             } catch (e) {
                 console.error(e);
-                if (err) err.textContent = '提交失败：' + (e.message || '请检查 Supabase 是否已创建 archives 表');
+                setErr('提交失败：' + (e.message || '请检查 Supabase 是否已创建 archives 表'));
             } finally {
                 if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-paper-plane"></i> 提交入会申请并生成档案'; }
             }
@@ -5106,18 +5110,19 @@
                 acc,
                 '<div class="jh-paper">',
                     '<div class="jh-title">中国共进会入会申请表</div>',
+                '<div class="jh-note">带 <span class="jh-req">*</span> 的为必填项，其余可不填</div>',
                     '<table class="jh-table">',
                         '<tr>' +
-                            '<td class="jh-lbl">姓 名</td><td><input id="' + p + 'Name" placeholder="真实姓名"></td>' +
-                            '<td class="jh-lbl">性 别</td><td><input id="' + p + 'Gender" placeholder="男/女"></td>' +
+                            '<td class="jh-lbl">姓 名<span class="jh-req">*</span></td><td><input id="' + p + 'Name" placeholder="真实姓名"></td>' +
+                            '<td class="jh-lbl">性 别<span class="jh-req">*</span></td><td><input id="' + p + 'Gender" placeholder="男/女"></td>' +
                             '<td class="jh-photo" rowspan="4" id="' + p + 'PhotoCell">' +
                                 '<span class="jh-photo-tip" id="' + p + 'PhotoTip">近期<br>免冠照片</span>' +
                                 '<img class="jh-photo-img" id="' + p + 'PhotoImg" style="display:none">' +
                             '</td>' +
                         '</tr>' +
-                        '<tr><td class="jh-lbl">民 族</td><td><input id="' + p + 'Nation" placeholder="如：汉族"></td><td class="jh-lbl">出生年月</td><td><input id="' + p + 'Birth" placeholder="1990年1月"></td></tr>' +
+                        '<tr><td class="jh-lbl">民 族<span class="jh-req">*</span></td><td><input id="' + p + 'Nation" placeholder="如：汉族"></td><td class="jh-lbl">出生年月<span class="jh-req">*</span></td><td><input id="' + p + 'Birth" placeholder="1990年1月"></td></tr>' +
                         '<tr><td class="jh-lbl">籍 贯</td><td><input id="' + p + 'Native" placeholder="省/市"></td><td class="jh-lbl">职 业</td><td><input id="' + p + 'Job"></td></tr>' +
-                        '<tr><td class="jh-lbl">联系电话</td><td><input id="' + p + 'Phone" placeholder="手机号码"></td><td class="jh-lbl">电子邮箱</td><td><input id="' + p + 'Email"></td></tr>' +
+                        '<tr><td class="jh-lbl">联系电话<span class="jh-req">*</span></td><td><input id="' + p + 'Phone" placeholder="手机号码"></td><td class="jh-lbl">电子邮箱</td><td><input id="' + p + 'Email"></td></tr>' +
                         '<tr><td class="jh-lbl">单 位</td><td colspan="4"><input id="' + p + 'Unit" style="text-align:left"></td></tr>' +
                         '<tr><td class="jh-lbl">现居住地</td><td colspan="4"><input id="' + p + 'Address" style="text-align:left"></td></tr>' +
                         '<tr><td class="jh-exp-head" colspan="5">本人经历</td></tr>' +
@@ -5129,6 +5134,37 @@
                 '</div>',
                 '<input type="hidden" id="' + p + 'Date" value="' + today + '">'
             ].join('');
+        }
+
+        function checkRequiredApply(p){
+            var REQ = [['Name','姓名'],['Gender','性别'],['Nation','民族'],['Birth','出生年月'],['Phone','联系电话']];
+            var missing = [], firstId = '';
+            REQ.forEach(function(f){
+                var el = $(p + f[0]); if (!el) return;
+                var v = (el.value || '').trim();
+                var cell = el.parentElement;
+                if (!v){
+                    el.classList.add('jh-miss'); if (cell) cell.classList.add('jh-miss');
+                    if (!firstId) firstId = el.id;
+                    missing.push(f[1]);
+                } else {
+                    el.classList.remove('jh-miss'); if (cell) cell.classList.remove('jh-miss');
+                }
+            });
+            return { ok: missing.length === 0, missing: missing, firstId: firstId };
+        }
+        function flashApplyErr(errEl, msg){
+            if (!errEl) return;
+            errEl.textContent = msg;
+            errEl.style.background = '#fff0f0'; errEl.style.border = '1px solid #d00';
+            errEl.style.padding = '10px 12px'; errEl.style.borderRadius = '8px';
+            errEl.style.color = '#c00'; errEl.style.fontWeight = '700'; errEl.style.display = 'block';
+        }
+        function clearApplyErr(errEl){
+            if (!errEl) return;
+            errEl.textContent = '';
+            errEl.style.background = ''; errEl.style.border = ''; errEl.style.padding = '';
+            errEl.style.borderRadius = ''; errEl.style.color = ''; errEl.style.fontWeight = ''; errEl.style.display = '';
         }
 
         function collectApply(p){
@@ -5221,8 +5257,8 @@
 
         async function submitApplyRegister(){
             const err = $('arErr');
-            const setErr = m => { if (err) err.textContent = m; };
-            if (err) err.textContent = '';
+            const setErr = m => flashApplyErr(err, m);
+            clearApplyErr(err);
             const site = _applySite;
             let user = '', pass = '';
             if (_applyAcctExists) {
@@ -5243,7 +5279,7 @@
             }
             const app = collectApply('ar');
             app.username = user; app.reg_site = site;
-            if (!app.name || !app.gender || !app.birth || !app.phone) return setErr('姓名、性别、出生年月、联系电话为必填项');
+            const chk = checkRequiredApply('ar'); if (!chk.ok) { setErr('以下必填项（带 * 号）未填写：' + chk.missing.join('、')); var _fe = $(chk.firstId); if (_fe) { try { _fe.focus(); } catch(e){} try { _fe.scrollIntoView({behavior:'smooth',block:'center'}); } catch(e){} } return; }
             if (app.email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(app.email)) return setErr('电子邮箱格式不正确');
             const file = $('arPhoto').files[0];
             if (!file) return setErr('请上传近期免冠照片');
