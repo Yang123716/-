@@ -4924,7 +4924,7 @@
         const ARCHIVES_TABLE = 'archives'; // 需在 Supabase 创建该表
 
         function archiveStatusMeta(st){
-            if(st === 'approved') return { text: '已通过审核 · 已入会', cls: 'approved' };
+            if(st === 'approved') return { text: '已通过审核', cls: 'approved' };
             if(st === 'rejected') return { text: '未通过', cls: 'rejected' };
             return { text: '待审核', cls: 'pending' };
         }
